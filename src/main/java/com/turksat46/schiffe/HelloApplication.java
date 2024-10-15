@@ -28,7 +28,9 @@ public class HelloApplication extends Application {
         stage.show();               // Scene zeigen
     }
 
-
+    public void showSettings() throws IOException {
+        setScene("settings.fxml");
+    }
 
     public static void main(String[] args) {
         launch();

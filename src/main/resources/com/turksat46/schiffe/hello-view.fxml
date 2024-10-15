@@ -5,12 +5,13 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<VBox alignment="CENTER" spacing="20.0" style="-fx-background-image: image/gedreht.jpeg;"
+<VBox alignment="CENTER" spacing="20.0" style="-fx-background-image: url(&quot;file:images/gedreht.jpeg&quot;);"
       xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.turksat46.schiffe.HelloController">
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
     </padding>
+
     <Label text="Schiffe versenken">
         <font>
             <Font name="Roboto Light" size="26.0"/>
@@ -21,5 +22,5 @@
     <Button onAction="#onHelloButtonClick" text="Einzelspieler"/>
     <Button mnemonicParsing="false" text="Mehrspieler"/>
     <Button mnemonicParsing="false" text="Einstellungen"/>
-    <Button mnemonicParsing="false" text="Spiel beenden"/>
+    <Button mnemonicParsing="false" onAction="#onExitButtonClick" text="Spiel beenden"/>
 </VBox>
