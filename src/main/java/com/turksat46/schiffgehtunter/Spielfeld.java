@@ -11,6 +11,7 @@ import javafx.stage.Stage;
 
 public class Spielfeld {
 
+    int belowoffset = 150;
     int spielfeldgroesse;
     int squaresize = 50;
     int canvasgroesse;
@@ -19,8 +20,9 @@ public class Spielfeld {
 
     public Spielfeld (int groesse){
         this.spielfeldgroesse = groesse;
+        squaresize = getQuadratGroesse();
         canvasgroesse = spielfeldgroesse*squaresize;
-        canvas = new Canvas(canvasgroesse, canvasgroesse);
+        canvas = new Canvas(canvasgroesse, canvasgroesse+belowoffset);
         gc = canvas.getGraphicsContext2D();
         System.out.println ("Spielfeld groesse: " + canvasgroesse + " und groesse: "+groesse);
         for (int i = 0; i < groesse; i++){
@@ -37,9 +39,23 @@ public class Spielfeld {
         });
 
         StackPane root = new StackPane(canvas);
-        Scene scene = new Scene(root, canvasgroesse, canvasgroesse);
+        Scene scene = new Scene(root, canvasgroesse, canvasgroesse+belowoffset);
         Stage stage = new Stage();
         stage.setScene(scene);
         stage.show();
+    }
+
+    private int getQuadratGroesse() {
+        int groesse = 0;
+        if(spielfeldgroesse <= 5){
+            return 75;
+        }
+        else if (spielfeldgroesse > 5 && spielfeldgroesse <= 10) {
+            return 50;
+        } else if (spielfeldgroesse > 10 && spielfeldgroesse <= 20) {
+            return 30;
+        }else{
+            return 20;
+        }
     }
 }

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.*?>
+<?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
@@ -47,12 +48,15 @@
                 </Label>
                 <HBox prefHeight="41.0" prefWidth="592.0">
                     <children>
-                        <Slider blockIncrement="1.0" max="30.0" min="5.0" minorTickCount="25" prefHeight="65.0" prefWidth="514.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="5.0">
+                        <Slider fx:id="groesseslider" blockIncrement="1.0" majorTickUnit="5.0" max="30.0" min="5.0" minorTickCount="4" onDragDone="#updateTextField" onDragDropped="#updateTextField" onDragExited="#updateTextField" prefHeight="65.0" prefWidth="514.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="5.0">
                             <HBox.margin>
                                 <Insets bottom="10.0" left="10.0" top="10.0" />
                             </HBox.margin>
+                     <cursor>
+                        <Cursor fx:constant="CLOSED_HAND" />
+                     </cursor>
                         </Slider>
-                        <TextField>
+                        <TextField fx:id="groessetextfield">
                             <HBox.margin>
                                 <Insets left="10.0" right="10.0" top="10.0" />
                             </HBox.margin>
