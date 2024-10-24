@@ -34,14 +34,8 @@ public class CreateGameController {
     ObservableList<Difficulty> difficulties = FXCollections.observableArrayList();
 
     public void initialize() {
-        Difficulty leicht = new Difficulty(0, "Noob");
-        difficulties.add(leicht);
-        Difficulty mittel = new Difficulty(1, "Average");
-        difficulties.add(mittel);
-        Difficulty schwer = new Difficulty(2, "Hardcore");
-        difficulties.add(schwer);
-        //cb.setItems(FXCollections.observableArrayList("Noob", "Average", "Hardcore"));
-        cb.setItems();
+
+        cb.setItems(FXCollections.observableArrayList("Noob", "Average", "Hardcore"));
         cb2.setItems(FXCollections.observableArrayList("Spieler vs. Computer", "Spieler vs. Spieler", "Computer vs. Computer"));
         mainGameController = new MainGameController();
         groessetextfield.setText(String.valueOf(groesseslider.getValue()));
