@@ -10,6 +10,7 @@ module com.turksat46.schiffgehtunter {
     requires org.kordamp.bootstrapfx.core;
     requires eu.hansolo.tilesfx;
     requires com.almasb.fxgl.all;
+    requires jdk.compiler;
 
     opens com.turksat46.schiffgehtunter to javafx.fxml;
     exports com.turksat46.schiffgehtunter;
