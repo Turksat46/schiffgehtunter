@@ -5,24 +5,20 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<VBox alignment="CENTER" spacing="20.0" style="-fx-background-image: url('images/gedreht.jpeg');"
-      xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.turksat46.schiffgehtunter.HelloController">
+<VBox alignment="CENTER" spacing="20.0" style="-fx-background-image: url('images/gedreht.jpeg');" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.turksat46.schiffgehtunter.HelloController">
     <padding>
-        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
     </padding>
 
     <Label text="Schiffe versenken">
         <font>
-            <Font name="Roboto Light" size="26.0"/>
+            <Font name="Roboto Light" size="26.0" />
         </font>
     </Label>
 
-    <Label fx:id="welcomeText"/>
-    <Button onAction="#onHelloButtonClick" text="Neues Spiel starten"/>
-    <Button mnemonicParsing="false" prefHeight="26.0" prefWidth="120.0" text="Spiel finden"/>
-    <Button mnemonicParsing="false" onAction="#onSettingsButtonClick" prefHeight="26.0" prefWidth="118.0"
-            text="Einstellungen"/>
-    <Button mnemonicParsing="false" onAction="#onExitButtonClick" prefHeight="26.0" prefWidth="123.0"
-            text="Spiel beenden"/>
+    <Label fx:id="welcomeText" />
+    <Button onAction="#onHelloButtonClick" text="Neues Spiel starten" />
+    <Button mnemonicParsing="false" prefHeight="26.0" prefWidth="120.0" text="Spiel finden" />
+    <Button mnemonicParsing="false" onAction="#onSettingsButtonClick" prefHeight="26.0" prefWidth="118.0" text="Einstellungen" />
+    <Button mnemonicParsing="false" onAction="#onExitButtonClick" prefHeight="26.0" prefWidth="123.0" text="Spiel beenden" />
 </VBox>
