@@ -1,4 +1,4 @@
-package com.turksat46.schiffeversenken;
+package com.turksat46.schiffgehtunter;
 
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;

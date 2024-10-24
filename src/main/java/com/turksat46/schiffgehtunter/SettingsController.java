@@ -1,4 +1,4 @@
-package com.turksat46.schiffeversenken;
+package com.turksat46.schiffgehtunter;
 
 public class SettingsController {
 }
