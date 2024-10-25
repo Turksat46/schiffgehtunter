@@ -1,99 +1,98 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.*?>
+<?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.turksat46.schiffgehtunter.CreateGameController">
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.turksat46.schiffgehtunter.CreateGameController">
     <children>
         <VBox fx:id="singleplayer_ui" layoutX="4.0" prefHeight="326.0" prefWidth="592.0">
             <children>
                 <HBox prefHeight="39.0" prefWidth="592.0">
                     <children>
-                        <Button mnemonicParsing="false" onAction="#onBackPressed" prefHeight="43.0" prefWidth="149.0"
-                                text="Zurück">
+                        <Button mnemonicParsing="false" onAction="#onBackPressed" prefHeight="43.0" prefWidth="149.0" text="Zurück">
                             <HBox.margin>
-                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                             </HBox.margin>
                         </Button>
                         <Label alignment="CENTER" prefHeight="43.0" prefWidth="580.0" text="Neues Spiel erstellen">
                             <font>
-                                <Font size="29.0"/>
+                                <Font size="29.0" />
                             </font>
                             <HBox.margin>
-                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                             </HBox.margin>
                             <padding>
-                                <Insets right="50.0"/>
+                                <Insets right="50.0" />
                             </padding>
                         </Label>
                     </children>
                 </HBox>
                 <Separator prefWidth="200.0">
                     <VBox.margin>
-                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                     </VBox.margin>
                 </Separator>
                 <Label text="Spielfeldgröße (Höhe und Breite)">
                     <opaqueInsets>
-                        <Insets/>
+                        <Insets />
                     </opaqueInsets>
                     <VBox.margin>
-                        <Insets left="10.0"/>
+                        <Insets left="10.0" />
                     </VBox.margin>
                     <font>
-                        <Font size="18.0"/>
+                        <Font size="18.0" />
                     </font>
                 </Label>
                 <HBox prefHeight="41.0" prefWidth="592.0">
                     <children>
-                        <Slider blockIncrement="1.0" max="30.0" min="5.0" minorTickCount="25" prefHeight="65.0"
-                                prefWidth="514.0" showTickLabels="true" showTickMarks="true" snapToTicks="true"
-                                value="5.0">
+                        <Slider fx:id="groesseslider" blockIncrement="1.0" majorTickUnit="5.0" max="30.0" min="5.0" minorTickCount="4" prefHeight="65.0" prefWidth="514.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="5.0">
                             <HBox.margin>
-                                <Insets bottom="10.0" left="10.0" top="10.0"/>
+                                <Insets bottom="10.0" left="10.0" top="10.0" />
                             </HBox.margin>
+                     <cursor>
+                        <Cursor fx:constant="CLOSED_HAND" />
+                     </cursor>
                         </Slider>
-                        <TextField>
+                        <TextField fx:id="groessetextfield">
                             <HBox.margin>
-                                <Insets left="10.0" right="10.0" top="10.0"/>
+                                <Insets left="10.0" right="10.0" top="10.0" />
                             </HBox.margin>
                         </TextField>
                     </children>
                 </HBox>
                 <Separator prefWidth="200.0">
                     <VBox.margin>
-                        <Insets left="10.0" right="10.0"/>
+                        <Insets left="10.0" right="10.0" />
                     </VBox.margin>
                 </Separator>
                 <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
                     <children>
                         <Label prefHeight="116.0" prefWidth="599.0" text="KI-Schwierigkeit">
                             <font>
-                                <Font size="18.0"/>
+                                <Font size="18.0" />
                             </font>
                             <HBox.margin>
-                                <Insets left="10.0"/>
+                                <Insets left="10.0" />
                             </HBox.margin>
                         </Label>
                         <ChoiceBox fx:id="cb" prefHeight="26.0" prefWidth="403.0">
                             <padding>
-                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                             </padding>
                             <HBox.margin>
-                                <Insets right="10.0"/>
+                                <Insets right="10.0" />
                             </HBox.margin>
                         </ChoiceBox>
                     </children>
                 </HBox>
             </children>
         </VBox>
-        <Button layoutY="361.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="602.0" text="SPIEL STARTEN"
-                AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
+        <Button layoutY="361.0" mnemonicParsing="false" onAction="#startGame" prefHeight="38.0" prefWidth="602.0" text="SPIEL STARTEN" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
             <font>
-                <Font size="24.0"/>
+                <Font size="24.0" />
             </font>
         </Button>
     </children>
