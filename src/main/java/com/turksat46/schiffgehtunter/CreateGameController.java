@@ -37,12 +37,16 @@ public class CreateGameController {
 
         cb.setItems(FXCollections.observableArrayList("Noob", "Average", "Hardcore"));
         cb2.setItems(FXCollections.observableArrayList("Spieler vs. Computer", "Spieler vs. Spieler", "Computer vs. Computer"));
-        mainGameController = new MainGameController();
-        groessetextfield.setText(String.valueOf(groesseslider.getValue()));
-    }
+        groesseslider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            groessetextfield.setText(Double.toString(newValue.intValue()));
+        });
+        groessetextfield.textProperty().addListener((observable, oldValue, newValue) -> {
+            System.out.println("textfield changed from " + oldValue + " to " + newValue);
+                groesseslider.setValue(Double.valueOf(newValue));
+        });
 
-    public void updateTextField(){
-        groessetextfield.setText(String.valueOf(groesseslider.getValue()));
+        mainGameController = new MainGameController();
+
     }
 
     public void onPlayPressed() throws IOException {
@@ -63,4 +67,6 @@ public class CreateGameController {
         Stage stage = (Stage) cb.getScene().getWindow();
         stage.close();
     }
+
+
 }
