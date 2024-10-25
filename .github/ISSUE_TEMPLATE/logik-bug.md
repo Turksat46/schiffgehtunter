@@ -3,7 +3,7 @@ name: Logik-Bug
 about: Wenn etwas mit dem Spiel an sich nicht stimmt oder etwas nicht funktioniert,
   diesen Template nutzen
 title: ''
-labels: Logic/Software Issue
+labels: Logic/Software Issue, UI/UX
 assignees: ''
 
 ---
