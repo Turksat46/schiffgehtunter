@@ -1,26 +1,38 @@
 package com.turksat46.schiffgehtunter;
 
+import com.turksat46.schiffgehtunter.other.Feld;
+import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import javafx.stage.Stage;
 import javafx.scene.text.Text;
-import javafx.scene.layout.GridPane;
+import javafx.stage.Stage;
 
 public class Spielfeld {
 
+    public GridPane gridPane;
+    public int spielfeldgroesse;
     int zellengroesse;
     int[][] feld;
+
+    //TODO: Für die Felder eigene Klasse
+    Feld felder;
 
     public Spielfeld (int groesse){
         Stage stage = new Stage();
 
 
-        GridPane gridPane = new GridPane();
+        gridPane = new GridPane();
 
 
         this.feld= new int [groesse][groesse];
+
+        //TODO: richtig initialisieren und nutzen
+        felder = new Feld(feld);
 
         // Schleife zur Erstellung der Zellen (als Rectangle mit Text)
         for (int i = 0; i < groesse; i++) {
@@ -29,8 +41,11 @@ public class Spielfeld {
                 int col = j;
                 this.feld[row][col] = 0;
 
+                zellengroesse = getQuadratGroesse();
+
+
                 // Rechteck und Text erstellen
-                Rectangle cell = new Rectangle(30, 30);
+                Rectangle cell = new Rectangle(zellengroesse, zellengroesse);
                 cell.setFill(Color.LIGHTBLUE);
                 cell.setStroke(Color.BLACK);
 
@@ -50,15 +65,20 @@ public class Spielfeld {
                 gridPane.add(cellPane, j, i);
             }
         }
-
-        //TODO: Hier wird aber neue fenster geöffnet veruschen in alte Fenster zu bleiben
-        Scene scene = new Scene(gridPane);
-        stage.setTitle("spielfeld");
-        stage.setScene(scene);
-        stage.setWidth(320);
-        stage.setHeight(340);
-        stage.show();
     }
 
+    private int getQuadratGroesse() {
+        int groesse = 0;
+        if(spielfeldgroesse <= 5){
+            return 75;
+        }
+        else if (spielfeldgroesse > 5 && spielfeldgroesse <= 10) {
+            return 50;
+        } else if (spielfeldgroesse > 10 && spielfeldgroesse <= 20) {
+            return 30;
+        }else{
+            return 20;
+        }
+    }
 
 }
