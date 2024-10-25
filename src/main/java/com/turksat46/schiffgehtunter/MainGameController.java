@@ -24,6 +24,7 @@ public class MainGameController {
 
     @FXML
     public void initialize() {
+        //TODO: groesse-Wert richtig abfangen
         setupSpielfeld(5);
         spielerstackpane.getChildren().add(spielfeld.gridPane);
 
