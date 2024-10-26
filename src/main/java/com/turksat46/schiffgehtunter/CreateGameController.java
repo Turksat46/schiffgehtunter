@@ -41,7 +41,6 @@ public class CreateGameController {
             groessetextfield.setText(Double.toString(newValue.intValue()));
         });
         groessetextfield.textProperty().addListener((observable, oldValue, newValue) -> {
-            System.out.println("textfield changed from " + oldValue + " to " + newValue);
                 groesseslider.setValue(Double.valueOf(newValue));
         });
 
@@ -55,12 +54,17 @@ public class CreateGameController {
 
     public void startGame() throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("main-game-view.fxml"));
-
+        // Load the FXML file and create a new scene
         Stage stage = new Stage();
         stage.setTitle("Spiel");
         stage.setScene(new Scene(fxmlLoader.load()));
+
+        //init spielfeld
+        mainGameController = fxmlLoader.getController();
+        mainGameController.setupSpielfeld((int) groesseslider.getValue(), stage);
+
+        // Show the stage
         stage.show();
-        mainGameController.setupSpielfeld((int)groesseslider.getValue());
     }
 
     public void onBackPressed() {
