@@ -59,8 +59,10 @@ public class CreateGameController {
         Stage stage = new Stage();
         stage.setTitle("Spiel");
         stage.setScene(new Scene(fxmlLoader.load()));
+
+        mainGameController = fxmlLoader.getController();
+        mainGameController.setupSpielfeld((int)groesseslider.getValue(), stage);
         stage.show();
-        mainGameController.setupSpielfeld((int)groesseslider.getValue());
     }
 
     public void onBackPressed() {

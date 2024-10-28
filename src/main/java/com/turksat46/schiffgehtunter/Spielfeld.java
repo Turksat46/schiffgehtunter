@@ -18,16 +18,15 @@ public class Spielfeld {
     public int spielfeldgroesse;
     int zellengroesse;
     int[][] feld;
+    Stage stage;
 
     //TODO: Für die Felder eigene Klasse
     Feld felder;
 
-    public Spielfeld (int groesse){
-        Stage stage = new Stage();
+    public Spielfeld (int groesse, Stage stage){
 
-
+        this.stage = stage;
         gridPane = new GridPane();
-
 
         this.feld= new int [groesse][groesse];
 

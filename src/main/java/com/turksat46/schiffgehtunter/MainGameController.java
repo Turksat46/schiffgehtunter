@@ -22,19 +22,12 @@ public class MainGameController {
 
     int groesse;
 
-    @FXML
-    public void initialize() {
-        //TODO: groesse-Wert richtig abfangen
-        setupSpielfeld(5);
-        spielerstackpane.getChildren().add(spielfeld.gridPane);
 
-
-    }
-
-    public void setupSpielfeld(int groesse){
+    public void setupSpielfeld(int groesse, Stage stage){
         this.groesse = groesse;
-        spielfeld = new Spielfeld(groesse);
-
+        //setupSpielfeld(groesse);
+        spielfeld = new Spielfeld(groesse, stage);
+        spielerstackpane.getChildren().add(spielfeld.gridPane);
     }
 
 
