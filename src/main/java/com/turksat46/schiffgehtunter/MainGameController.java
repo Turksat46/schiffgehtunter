@@ -16,13 +16,26 @@ import javafx.stage.Stage;
 public class MainGameController {
     @FXML
     public GridPane spielerstackpane;
-    int groesse;
+    public Label label;
 
     Spielfeld spielfeld;
 
-    public void setupSpielfeld(int groesse, Stage stage) {
-        this.groesse = groesse;
-        spielfeld = new Spielfeld(groesse, stage);
+    int groesse;
+
+    @FXML
+    public void initialize() {
+        //TODO: groesse-Wert richtig abfangen
+        setupSpielfeld(5);
         spielerstackpane.getChildren().add(spielfeld.gridPane);
+
+
     }
+
+    public void setupSpielfeld(int groesse){
+        this.groesse = groesse;
+        spielfeld = new Spielfeld(groesse);
+
+    }
+
+
 }

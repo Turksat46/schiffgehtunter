@@ -11,7 +11,6 @@ module com.turksat46.schiffgehtunter {
     requires eu.hansolo.tilesfx;
     requires com.almasb.fxgl.all;
     requires jdk.compiler;
-    requires annotations;
 
     opens com.turksat46.schiffgehtunter to javafx.fxml;
     exports com.turksat46.schiffgehtunter;
