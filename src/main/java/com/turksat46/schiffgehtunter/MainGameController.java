@@ -23,10 +23,10 @@ public class MainGameController {
     int groesse;
 
 
-    public void setupSpielfeld(int groesse, Stage stage){
-        this.groesse = groesse;
+    public void setupSpielfeld(int hoehe, int breite, Stage stage){
+        //this.groesse = groesse;
         //setupSpielfeld(groesse);
-        spielfeld = new Spielfeld(groesse, stage);
+        spielfeld = new Spielfeld(hoehe, breite, stage);
         spielerstackpane.getChildren().add(spielfeld.gridPane);
     }
 

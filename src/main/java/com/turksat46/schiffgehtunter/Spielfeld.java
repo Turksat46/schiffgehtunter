@@ -23,19 +23,19 @@ public class Spielfeld {
     //TODO: Für die Felder eigene Klasse
     Feld felder;
 
-    public Spielfeld (int groesse, Stage stage){
+    public Spielfeld (int hoehe, int breite, Stage stage){
 
         this.stage = stage;
         gridPane = new GridPane();
 
-        this.feld= new int [groesse][groesse];
+        this.feld= new int [hoehe][breite];
 
         //TODO: richtig initialisieren und nutzen
         felder = new Feld(feld);
 
         // Schleife zur Erstellung der Zellen (als Rectangle mit Text)
-        for (int i = 0; i < groesse; i++) {
-            for (int j = 0; j < groesse; j++) {
+        for (int i = 0; i < hoehe; i++) {
+            for (int j = 0; j < breite; j++) {
                 int row = i;
                 int col = j;
                 this.feld[row][col] = 0;
