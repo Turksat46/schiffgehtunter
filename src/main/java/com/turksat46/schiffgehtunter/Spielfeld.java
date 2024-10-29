@@ -21,6 +21,8 @@ public class Spielfeld {
     Stage stage;
     Feld cell;
 
+    Boolean schiffesetzen = true;
+
     public Spielfeld (int hoehe, int breite, Stage stage){
         this.stage = stage;
         this.feld= new int [hoehe][breite];
@@ -68,8 +70,9 @@ public class Spielfeld {
 
                 // Klick-Event für jede Zelle und aktualisiert einen neuen wert später also das löschen
                 cellPane.setOnMouseClicked(event -> {
-                    feld[row][col] = 1;
-                    cellText.setText("1");
+                    cell.setzen();
+
+
                 });
 
                 // Zelle dem GridPane hinzufügen
