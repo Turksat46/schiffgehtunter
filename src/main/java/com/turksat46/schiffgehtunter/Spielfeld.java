@@ -19,19 +19,31 @@ public class Spielfeld {
     int zellengroesse;
     int[][] feld;
     Stage stage;
-
-    //TODO: Für die Felder eigene Klasse
-    Feld felder;
+    Feld cell;
 
     public Spielfeld (int hoehe, int breite, Stage stage){
-
         this.stage = stage;
-        gridPane = new GridPane();
-
         this.feld= new int [hoehe][breite];
+        initFeld(hoehe, breite);
+    }
 
-        //TODO: richtig initialisieren und nutzen
-        felder = new Feld(feld);
+    private int getQuadratGroesse() {
+        int groesse = 0;
+        if(spielfeldgroesse <= 5){
+            return 75;
+        }
+        else if (spielfeldgroesse > 5 && spielfeldgroesse <= 10) {
+            return 50;
+        } else if (spielfeldgroesse > 10 && spielfeldgroesse <= 20) {
+            return 30;
+        }else{
+            return 20;
+        }
+    }
+
+    private void initFeld(int hoehe, int breite){
+
+        gridPane = new GridPane();
 
         // Schleife zur Erstellung der Zellen (als Rectangle mit Text)
         for (int i = 0; i < hoehe; i++) {
@@ -44,7 +56,7 @@ public class Spielfeld {
 
 
                 // Rechteck und Text erstellen
-                Rectangle cell = new Rectangle(zellengroesse, zellengroesse);
+                Feld cell = new Feld(30, 30);
                 cell.setFill(Color.LIGHTBLUE);
                 cell.setStroke(Color.BLACK);
 
@@ -63,20 +75,6 @@ public class Spielfeld {
                 // Zelle dem GridPane hinzufügen
                 gridPane.add(cellPane, j, i);
             }
-        }
-    }
-
-    private int getQuadratGroesse() {
-        int groesse = 0;
-        if(spielfeldgroesse <= 5){
-            return 75;
-        }
-        else if (spielfeldgroesse > 5 && spielfeldgroesse <= 10) {
-            return 50;
-        } else if (spielfeldgroesse > 10 && spielfeldgroesse <= 20) {
-            return 30;
-        }else{
-            return 20;
         }
     }
 

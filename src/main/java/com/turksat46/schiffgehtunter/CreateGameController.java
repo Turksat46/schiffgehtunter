@@ -41,11 +41,12 @@ public class CreateGameController {
 
         cb.setItems(FXCollections.observableArrayList("Noob", "Average", "Hardcore"));
         cb2.setItems(FXCollections.observableArrayList("Spieler vs. Computer", "Spieler vs. Spieler", "Computer vs. Computer"));
+        groessehoehetextfield.setText(Double.toString(groessehoeheslider.getValue()));
+        groessebreitetextfield.setText(Double.toString(groessebreiteslider.getValue()));
         groessehoeheslider.valueProperty().addListener((observable, oldValue, newValue) -> {
             groessehoehetextfield.setText(Double.toString(newValue.intValue()));
         });
         groessehoehetextfield.textProperty().addListener((observable, oldValue, newValue) -> {
-            System.out.println("textfield changed from " + oldValue + " to " + newValue);
                 groessehoeheslider.setValue(Double.valueOf(newValue));
         });
 
@@ -53,7 +54,6 @@ public class CreateGameController {
             groessebreitetextfield.setText(Double.toString(newValue.intValue()));
         });
         groessebreitetextfield.textProperty().addListener((observable, oldValue, newValue) ->{
-            System.out.println("textfield changed from " + oldValue + " to " + newValue);
             groessebreiteslider.setValue(Double.valueOf(newValue));
         });
         mainGameController = new MainGameController();
