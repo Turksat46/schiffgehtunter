@@ -79,6 +79,7 @@ public class Spielfeld {
                 gridPane.add(cellPane, j, i);
             }
         }
+
     }
 
 }

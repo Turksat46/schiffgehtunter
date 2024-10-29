@@ -76,9 +76,14 @@ public class CreateGameController {
         stage.show();
     }
 
-    public void onBackPressed() {
-        Stage stage = (Stage) cb.getScene().getWindow();
-        stage.close();
+    public void onBackPressed() throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("Hello-view.fxml"));
+        Stage stage = new Stage();
+        stage.setTitle("Hauptmenü");
+        stage.setScene(new Scene(fxmlLoader.load()));
+        stage.show();
+        Stage thisstage = (Stage) cb.getScene().getWindow();
+        thisstage.close();
     }
 
 
