@@ -25,13 +25,9 @@ public class CreateGameController {
     ChoiceBox cb2 = new ChoiceBox();
 
     @FXML
-    Slider groessehoeheslider = new Slider();
+    Slider groesseslider = new Slider();
     @FXML
-    Slider groessebreiteslider = new Slider();
-    @FXML
-    TextField groessehoehetextfield = new TextField();
-    @FXML
-    TextField groessebreitetextfield = new TextField();
+    TextField groessetextfield = new TextField();
 
     MainGameController mainGameController;
 
@@ -41,21 +37,13 @@ public class CreateGameController {
 
         cb.setItems(FXCollections.observableArrayList("Noob", "Average", "Hardcore"));
         cb2.setItems(FXCollections.observableArrayList("Spieler vs. Computer", "Spieler vs. Spieler", "Computer vs. Computer"));
-        groessehoehetextfield.setText(Double.toString(groessehoeheslider.getValue()));
-        groessebreitetextfield.setText(Double.toString(groessebreiteslider.getValue()));
-        groessehoeheslider.valueProperty().addListener((observable, oldValue, newValue) -> {
-            groessehoehetextfield.setText(Double.toString(newValue.intValue()));
+        groesseslider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            groessetextfield.setText(Double.toString(newValue.intValue()));
         });
-        groessehoehetextfield.textProperty().addListener((observable, oldValue, newValue) -> {
-                groessehoeheslider.setValue(Double.valueOf(newValue));
+        groessetextfield.textProperty().addListener((observable, oldValue, newValue) -> {
+            groesseslider.setValue(Double.valueOf(newValue));
         });
 
-        groessebreiteslider.valueProperty().addListener((observable, oldValue, newValue) -> {
-            groessebreitetextfield.setText(Double.toString(newValue.intValue()));
-        });
-        groessebreitetextfield.textProperty().addListener((observable, oldValue, newValue) ->{
-            groessebreiteslider.setValue(Double.valueOf(newValue));
-        });
         mainGameController = new MainGameController();
 
     }
@@ -72,7 +60,7 @@ public class CreateGameController {
         stage.setScene(new Scene(fxmlLoader.load()));
 
         mainGameController = fxmlLoader.getController();
-        mainGameController.setupSpielfeld((int)groessehoeheslider.getValue(),(int)groessebreiteslider.getValue(), stage);
+        mainGameController.setupSpielfeld((int)groesseslider.getValue(), stage);
         stage.show();
     }
 
