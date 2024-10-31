@@ -16,9 +16,10 @@ public class Spielfeld {
     Feld cell;
 
 
-    public Spielfeld (int groesse, Stage stage){
+    public Spielfeld (int groesse, Stage stage, GridPane spielerstackpane){
         this.stage = stage;
         this.feld= new int [groesse][groesse];
+        this.gridPane = spielerstackpane; // VLT nicht in attribut rein sondern eif direkt des benutzen
         initFeld(groesse);
     }
 
@@ -37,8 +38,6 @@ public class Spielfeld {
     }
 
     private void initFeld(int groesse){
-
-        gridPane = new GridPane();
 
         // Schleife zur Erstellung der Zellen (als Rectangle mit Text)
         for (int i = 0; i < groesse; i++) {

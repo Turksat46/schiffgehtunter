@@ -59,7 +59,6 @@ public class CreateGameController {
 
         mainGameController = fxmlLoader.getController();
         mainGameController.setupSpielfeld((int)groesseslider.getValue(), stage);
-        stage.show();
     }
 
     public void onBackPressed() throws IOException {
