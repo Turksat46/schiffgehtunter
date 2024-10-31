@@ -6,10 +6,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.Slider;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -22,6 +19,7 @@ public class CreateGameController {
 
     @FXML
     ChoiceBox cb = new ChoiceBox();
+    @FXML
     ChoiceBox cb2 = new ChoiceBox();
 
     @FXML
@@ -36,7 +34,7 @@ public class CreateGameController {
     public void initialize() {
 
         cb.setItems(FXCollections.observableArrayList("Noob", "Average", "Hardcore"));
-        cb2.setItems(FXCollections.observableArrayList("Spieler vs. Computer", "Spieler vs. Spieler", "Computer vs. Computer"));
+        cb2.setItems(FXCollections.observableArrayList("Spieler vs. Computer",new Separator(), "Spieler vs. Spieler", "Computer vs. Computer"));
         groesseslider.valueProperty().addListener((observable, oldValue, newValue) -> {
             groessetextfield.setText(Double.toString(newValue.intValue()));
         });
