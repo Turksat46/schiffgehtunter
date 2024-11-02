@@ -37,7 +37,7 @@ public class MainGameController {
     }
 
     public void handleClick(int posx, int posy){
-        //System.out.println(posx + " " + posy);
+        System.out.println("Clicked at: " + posx + ", " + posy);
         //
         /*TODO: prüfe die aktuelle State*/
 

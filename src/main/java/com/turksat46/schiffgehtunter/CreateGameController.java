@@ -67,6 +67,8 @@ public class CreateGameController {
         mainGameController = fxmlLoader.getController();
         mainGameController.setCurrentMode(cb2.getSelectionModel().getSelectedIndex());
         mainGameController.setupSpielfeld((int)groesseslider.getValue(), stage);
+        Stage thisstage = (Stage) cb.getScene().getWindow();
+        thisstage.close();
     }
 
     public void onBackPressed() throws IOException {
