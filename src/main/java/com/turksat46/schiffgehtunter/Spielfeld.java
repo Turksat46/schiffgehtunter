@@ -17,7 +17,7 @@ public class Spielfeld {
     int groesse;
     Stage stage;
     ArrayList<Ship> schiffe = new ArrayList<>();
-
+    MainGameController mainGameController;
 
 
     public Spielfeld (int groesse, Stage stage, GridPane spielerstackpane){
@@ -25,6 +25,8 @@ public class Spielfeld {
         this.feld= new int [groesse][groesse];
         this.gridPane = spielerstackpane;
         this.groesse = groesse;
+
+        mainGameController = new MainGameController();
 
         initFeld();
     }
@@ -97,7 +99,8 @@ public class Spielfeld {
                    //feld[cell.getPosX()][cell.getPosY()] = 1; evtl nur mit Feld klasse machen und nicht mit der feld vairable
                    // System.out.println(feld[cell.getPosX()][cell.getPosY()]);#
 
-                    placeShip();
+                    //placeShip();
+                    mainGameController.handleClick(col, row);
                 });
 
                 // Zelle dem GridPane hinzufügen

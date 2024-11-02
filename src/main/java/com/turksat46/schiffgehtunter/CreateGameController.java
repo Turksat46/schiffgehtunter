@@ -31,10 +31,17 @@ public class CreateGameController {
 
     ObservableList<Difficulty> difficulties = FXCollections.observableArrayList();
 
-    public void initialize() {
+    ObservableList<String> skillLevels = FXCollections.observableArrayList("Noob", "Average", "Hardcore");
+    ObservableList<String> gameModes = FXCollections.observableArrayList("Spieler vs. Computer", "Spieler vs. Spieler", "Computer vs. Computer");
 
-        cb.setItems(FXCollections.observableArrayList("Noob", "Average", "Hardcore"));
-        cb2.setItems(FXCollections.observableArrayList("Spieler vs. Computer",new Separator(), "Spieler vs. Spieler", "Computer vs. Computer"));
+
+    public void initialize() {
+        cb.setItems(skillLevels);
+        cb2.setItems(gameModes);
+
+        cb.setValue(skillLevels.get(0));
+        cb2.setValue(gameModes.get(0));
+        groessetextfield.setText(Double.toString(groesseslider.getValue()));
         groesseslider.valueProperty().addListener((observable, oldValue, newValue) -> {
             groessetextfield.setText(Double.toString(newValue.intValue()));
         });
@@ -58,6 +65,7 @@ public class CreateGameController {
         stage.setScene(new Scene(fxmlLoader.load()));
 
         mainGameController = fxmlLoader.getController();
+        mainGameController.setCurrentMode(cb2.getSelectionModel().getSelectedIndex());
         mainGameController.setupSpielfeld((int)groesseslider.getValue(), stage);
     }
 
