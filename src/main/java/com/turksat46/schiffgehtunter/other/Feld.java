@@ -28,6 +28,7 @@ public class Feld extends Rectangle {
 
     }
 
+    //For beautyprinting NICHT FÜR LOGIK NUTZEN
     public int getPosX() {return posX+1;}
 
     public int getPosY() {return posY+1;}

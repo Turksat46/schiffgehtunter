@@ -38,7 +38,26 @@ public class MainGameController {
 
     public void handleClick(int posx, int posy){
         //System.out.println(posx + " " + posy);
+        //
+        /*TODO: prüfe die aktuelle State*/
 
+        switch (currentState){
+            //Schiffe setzen
+            case 0:
+                break;
+
+            //Schiffe erschießen
+            case 1:
+                break;
+
+            //Schiffe beobachten (Spieler: Klicks ignorieren)
+            case 2:
+                break;
+
+            default:
+                //Errorstate, weil es nicht mehr als 3 states gibt
+
+        }
     }
 
 }
