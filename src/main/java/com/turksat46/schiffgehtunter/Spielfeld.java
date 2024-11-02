@@ -1,6 +1,5 @@
 package com.turksat46.schiffgehtunter;
 import com.turksat46.schiffgehtunter.other.Feld;
-import javafx.scene.Scene;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
@@ -14,7 +13,6 @@ public class Spielfeld {
     int[][] feld;
     int groesse;
     Stage stage;
-    Feld cell;
 
 
     public Spielfeld (int groesse, Stage stage, GridPane spielerstackpane){
@@ -23,11 +21,6 @@ public class Spielfeld {
         this.gridPane = spielerstackpane;
         this.groesse = groesse;
         initFeld();
-    }
-
-    private double getQuadratGroesse(double windowWidth, double windowHeight) {
-        // Calculate cell size based on the smaller of width or height divided by grid size
-        return Math.min(windowWidth, windowHeight) / groesse;
     }
 
 
@@ -74,9 +67,7 @@ public class Spielfeld {
 
             }
         }
-
         stage.show();
-
     }
 
 }
