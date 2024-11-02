@@ -14,8 +14,6 @@ public class MainGameController {
     
     public void setupSpielfeld(int groesse, Stage stage){
         spielfeld = new Spielfeld(groesse, stage, spielerstackpane);
-        stage.show();
-        System.out.println(stage.getWidth());
     }
 
 

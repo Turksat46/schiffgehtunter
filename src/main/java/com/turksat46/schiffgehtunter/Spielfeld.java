@@ -1,5 +1,6 @@
 package com.turksat46.schiffgehtunter;
 import com.turksat46.schiffgehtunter.other.Feld;
+import javafx.scene.Scene;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
@@ -9,9 +10,9 @@ import javafx.stage.Stage;
 public class Spielfeld {
 
     public GridPane gridPane;
-    public int spielfeldgroesse;
     int zellengroesse;
     int[][] feld;
+    int groesse;
     Stage stage;
     Feld cell;
 
@@ -19,25 +20,28 @@ public class Spielfeld {
     public Spielfeld (int groesse, Stage stage, GridPane spielerstackpane){
         this.stage = stage;
         this.feld= new int [groesse][groesse];
-        this.gridPane = spielerstackpane; // VLT nicht in attribut rein sondern eif direkt des benutzen
-        initFeld(groesse);
+        this.gridPane = spielerstackpane;
+        this.groesse = groesse;
+        initFeld();
     }
 
-    private int getQuadratGroesse() {
-        int groesse = 0;
-        if(spielfeldgroesse <= 5){
-            return 75;
-        }
-        else if (spielfeldgroesse > 5 && spielfeldgroesse <= 10) {
-            return 50;
-        } else if (spielfeldgroesse > 10 && spielfeldgroesse <= 20) {
-            return 30;
-        }else{
-            return 20;
-        }
+    private double getQuadratGroesse(double windowWidth, double windowHeight) {
+        // Calculate cell size based on the smaller of width or height divided by grid size
+        return Math.min(windowWidth, windowHeight) / groesse;
     }
 
-    private void initFeld(int groesse){
+
+    private void initFeld(){
+
+        if(groesse <=5 ){
+            zellengroesse=75;
+        }else if(groesse > 5 && groesse <= 10){
+            zellengroesse=50;
+        }else if(groesse > 10 && groesse <= 20){
+            zellengroesse=30;
+        }else {
+            zellengroesse=20;
+        }
 
         // Schleife zur Erstellung der Zellen (als Rectangle mit Text)
         for (int i = 0; i < groesse; i++) {
@@ -46,10 +50,8 @@ public class Spielfeld {
                 int col = j;
                 this.feld[row][col] = 0;
 
-                zellengroesse = getQuadratGroesse();
-
                 // Rechteck und Text erstellen
-                Feld cell = new Feld(30, 30);
+                Feld cell = new Feld(zellengroesse, zellengroesse);
                 cell.setFill(Color.LIGHTBLUE);
                 cell.setStroke(Color.BLACK);
 
@@ -59,6 +61,7 @@ public class Spielfeld {
                 StackPane cellPane = new StackPane();
                 cellPane.getChildren().addAll(cell, cellText);
 
+
                 // Klick-Event für jede Zelle und aktualisiert einen neuen wert später also das löschen
                 cellPane.setOnMouseClicked(event -> {
                     cell.setzen();
@@ -66,8 +69,13 @@ public class Spielfeld {
 
                 // Zelle dem GridPane hinzufügen
                 gridPane.add(cellPane, j, i);
+                gridPane.setMinHeight(zellengroesse*groesse);
+                gridPane.setMinWidth(zellengroesse*groesse);
+
             }
         }
+
+        stage.show();
 
     }
 
