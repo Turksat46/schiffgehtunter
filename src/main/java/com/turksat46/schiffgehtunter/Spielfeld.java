@@ -1,10 +1,13 @@
 package com.turksat46.schiffgehtunter;
 import com.turksat46.schiffgehtunter.other.Feld;
+import com.turksat46.schiffgehtunter.other.Ship;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Spielfeld {
 
@@ -13,6 +16,8 @@ public class Spielfeld {
     int[][] feld;
     int groesse;
     Stage stage;
+    ArrayList<Ship> schiffe = new ArrayList<>();
+
 
 
     public Spielfeld (int groesse, Stage stage, GridPane spielerstackpane){
@@ -20,6 +25,7 @@ public class Spielfeld {
         this.feld= new int [groesse][groesse];
         this.gridPane = spielerstackpane;
         this.groesse = groesse;
+
         initFeld();
     }
 
@@ -28,13 +34,43 @@ public class Spielfeld {
 
         if(groesse <=5 ){
             zellengroesse=75;
+            schiffe.add(new Ship("Zerstörer", 2));
+            schiffe.add(new Ship("Zerstörer", 2));
         }else if(groesse > 5 && groesse <= 10){
             zellengroesse=50;
+            schiffe.add(new Ship("Zerstörer", 2));
+            schiffe.add(new Ship("Zerstörer", 2));
+            schiffe.add(new Ship("U-Boot", 3));
+            schiffe.add(new Ship("U-Boot", 3));
         }else if(groesse > 10 && groesse <= 20){
             zellengroesse=30;
+            schiffe.add(new Ship("Zerstörer", 2));
+            schiffe.add(new Ship("Zerstörer", 2));
+            schiffe.add(new Ship("Zerstörer", 2));
+            schiffe.add(new Ship("U-Boot", 3));
+            schiffe.add(new Ship("Kreuzer", 3));
+            schiffe.add(new Ship("Kreuzer", 3));
+            schiffe.add(new Ship("Schlachtschiff", 4));
+            schiffe.add(new Ship("Schlachtschiff", 4));
         }else {
             zellengroesse=20;
+            schiffe.add(new Ship("Zerstörer", 2));
+            schiffe.add(new Ship("Zerstörer", 2));
+            schiffe.add(new Ship("Zerstörer", 2));
+            schiffe.add(new Ship("Zerstörer", 2));
+            schiffe.add(new Ship("U-Boot", 3));
+            schiffe.add(new Ship("U-Boot", 3));
+            schiffe.add(new Ship("Kreuzer", 3));
+            schiffe.add(new Ship("Schlachtschiff", 4));
+            schiffe.add(new Ship("Schlachtschiff", 4));
+            schiffe.add(new Ship("Flugzeugträger", 5));
         }
+
+        System.out.println("Anzahl der Schiffe: " + schiffe.size());
+        for (Ship schiff : schiffe) {
+            System.out.println("Schiff: " + schiff.getName() + ", Groesse: " + schiff.getGroesse());
+        }
+
 
         // Schleife zur Erstellung der Zellen (als Rectangle mit Text)
         for (int i = 0; i < groesse; i++) {
@@ -44,7 +80,7 @@ public class Spielfeld {
                 this.feld[row][col] = 0;
 
                 // Rechteck und Text erstellen
-                Feld cell = new Feld(zellengroesse, zellengroesse);
+                Feld cell = new Feld(zellengroesse, zellengroesse, row, col);
                 cell.setFill(Color.LIGHTBLUE);
                 cell.setStroke(Color.BLACK);
 
