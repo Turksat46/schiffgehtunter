@@ -6,7 +6,7 @@ import javafx.scene.shape.Rectangle;
 
 public class Feld extends Rectangle {
 
-    private int gesetzt=0;
+    private boolean gesetzt;
     private int posX, posY;
     int hoehe, breite;
 
@@ -19,16 +19,20 @@ public class Feld extends Rectangle {
         this.posY = posY;
     }
 
-    public void setzen(){
 
-        if(gesetzt == 0){
-            System.out.println("leer oder schon abgeschossen");
-            gesetzt = 1;
-        }else if (gesetzt == 1){
-            gesetzt = 0;
-            System.out.println("getroffen");
-        }
+    public boolean pruefengesetzt() {
+        return gesetzt;
     }
+
+    public void setzen(int x, int y) {
+
+    }
+
+    public int getPosX() {return posX+1;}
+
+    public int getPosY() {return posY+1;}
+
+
 
 
 

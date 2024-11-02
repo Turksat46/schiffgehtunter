@@ -79,7 +79,7 @@ public class Spielfeld {
                 int col = j;
                 this.feld[row][col] = 0;
 
-                // Rechteck und Text erstellen
+                // Rechteck und Text erstellen und position der zelle
                 Feld cell = new Feld(zellengroesse, zellengroesse, row, col);
                 cell.setFill(Color.LIGHTBLUE);
                 cell.setStroke(Color.BLACK);
@@ -93,7 +93,11 @@ public class Spielfeld {
 
                 // Klick-Event für jede Zelle und aktualisiert einen neuen wert später also das löschen
                 cellPane.setOnMouseClicked(event -> {
-                    cell.setzen();
+                    //System.out.println("ist cell gesetzt ? "+cell.pruefengesetzt());
+                   //feld[cell.getPosX()][cell.getPosY()] = 1; evtl nur mit Feld klasse machen und nicht mit der feld vairable
+                   // System.out.println(feld[cell.getPosX()][cell.getPosY()]);#
+
+                    placeShip();
                 });
 
                 // Zelle dem GridPane hinzufügen
@@ -104,6 +108,10 @@ public class Spielfeld {
             }
         }
         stage.show();
+    }
+
+    public void placeShip(){
+        //TODO: noch implementieren aber eher mit der class Feld ud nicht mit der variable feld
     }
 
 }
