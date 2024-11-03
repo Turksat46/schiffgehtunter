@@ -45,7 +45,7 @@
                   <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                </padding>
             </Button>
-            <Button mnemonicParsing="false" prefHeight="26.0" prefWidth="311.0" style="-fx-background-color: red;" text="Spiel beenden">
+            <Button mnemonicParsing="false" onAction="#closeGame" prefHeight="26.0" prefWidth="311.0" style="-fx-background-color: red;" text="Spiel beenden">
                <VBox.margin>
                   <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                </VBox.margin>
@@ -56,7 +56,7 @@
             <Separator prefWidth="200.0" />
          </children>
       </VBox>
-      <Button mnemonicParsing="false" style="-fx-background-color: lightgreen;" text="Fortsetzen" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
+      <Button fx:id="continuebutton" mnemonicParsing="false" onAction="#continueGame" style="-fx-background-color: lightgreen;" text="Fortsetzen" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
          <padding>
             <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
          </padding>
