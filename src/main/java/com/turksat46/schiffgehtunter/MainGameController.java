@@ -1,6 +1,7 @@
 package com.turksat46.schiffgehtunter;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
@@ -24,8 +25,10 @@ public class MainGameController {
 
     public void setupSpielfeld(int groesse, Stage stage){
         spielfeld = new Spielfeld(groesse, stage, spielerstackpane);
+
         currentState = 0;
     }
+
 
     public int getCurrentState(){
         return currentState;

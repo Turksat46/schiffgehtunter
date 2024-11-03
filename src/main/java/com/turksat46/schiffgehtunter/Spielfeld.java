@@ -1,11 +1,18 @@
 package com.turksat46.schiffgehtunter;
 import com.turksat46.schiffgehtunter.other.Feld;
 import com.turksat46.schiffgehtunter.other.Ship;
+import javafx.event.EventHandler;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,10 +34,32 @@ public class Spielfeld {
         this.groesse = groesse;
 
         mainGameController = new MainGameController();
+        stage.getScene().setOnKeyPressed(new EventHandler<KeyEvent>() {
+
+            @Override
+            public void handle(KeyEvent keyEvent) {
+                if(keyEvent.getCode() == KeyCode.ESCAPE){
+                    //Spiel pausieren
+                    try {
+                        openPause();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                }
+            }
+        });
 
         initFeld();
     }
 
+    public void openPause() throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("PauseGame.fxml"));
+        Stage stage = new Stage();
+        stage.setTitle("Pause");
+        stage.setScene(new Scene(loader.load()));
+        stage.show();
+    }
 
     private void initFeld(){
 
