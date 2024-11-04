@@ -11,10 +11,8 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 public class Spielfeld {
 
@@ -34,32 +32,10 @@ public class Spielfeld {
         this.groesse = groesse;
 
         mainGameController = new MainGameController();
-        stage.getScene().setOnKeyPressed(new EventHandler<KeyEvent>() {
-
-            @Override
-            public void handle(KeyEvent keyEvent) {
-                if(keyEvent.getCode() == KeyCode.ESCAPE){
-                    //Spiel pausieren
-                    try {
-                        openPause();
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-
-                }
-            }
-        });
 
         initFeld();
     }
 
-    public void openPause() throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("PauseGame.fxml"));
-        Stage stage = new Stage();
-        stage.setTitle("Pause");
-        stage.setScene(new Scene(loader.load()));
-        stage.show();
-    }
 
     private void initFeld(){
 
@@ -123,13 +99,8 @@ public class Spielfeld {
                 cellPane.getChildren().addAll(cell, cellText);
 
 
-                // Klick-Event für jede Zelle und aktualisiert einen neuen wert später also das löschen
+                // Klick-Event für jede Zelle
                 cellPane.setOnMouseClicked(event -> {
-                    //System.out.println("ist cell gesetzt ? "+cell.pruefengesetzt());
-                   //feld[cell.getPosX()][cell.getPosY()] = 1; evtl nur mit Feld klasse machen und nicht mit der feld vairable
-                   // System.out.println(feld[cell.getPosX()][cell.getPosY()]);#
-
-                    //placeShip();
                     mainGameController.handleClick(col, row);
                 });
 
@@ -142,9 +113,4 @@ public class Spielfeld {
         }
         stage.show();
     }
-
-    public void placeShip(){
-        //TODO: noch implementieren aber eher mit der class Feld ud nicht mit der variable feld
-    }
-
 }
