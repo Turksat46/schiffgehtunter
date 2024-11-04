@@ -1,5 +1,4 @@
 package com.turksat46.schiffgehtunter;
-
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -21,10 +20,16 @@ public class MainGameController {
     public int currentMode;
 
 
+
     public void setupSpiel(int groesse, Stage stage){
         spielfeld = new Spielfeld(groesse, stage, spielerstackpane);
         currentState = 0;
+        pausieren(stage);
 
+
+    }
+
+    public void pausieren(Stage stage){
         stage.getScene().setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent keyEvent) {
