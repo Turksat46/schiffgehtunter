@@ -65,8 +65,7 @@ public class CreateGameController {
         stage.setScene(new Scene(fxmlLoader.load()));
 
         mainGameController = fxmlLoader.getController();
-        mainGameController.setCurrentMode(cb2.getSelectionModel().getSelectedIndex());
-        mainGameController.setupSpiel((int)groesseslider.getValue(), stage);
+        mainGameController.setupSpiel((int)groesseslider.getValue(), stage, cb2.getSelectionModel().getSelectedIndex() );
         Stage thisstage = (Stage) cb.getScene().getWindow();
         thisstage.close();
     }

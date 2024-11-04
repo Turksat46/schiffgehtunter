@@ -21,12 +21,11 @@ public class MainGameController {
 
 
 
-    public void setupSpiel(int groesse, Stage stage){
+    public void setupSpiel(int groesse, Stage stage, int currentMode){
         spielfeld = new Spielfeld(groesse, stage, spielerstackpane);
-        currentState = 0;
+        this.currentMode = currentMode;
+        System.out.println("Mode selected and set to: " + mode[currentMode]);
         pausieren(stage);
-
-
     }
 
     public void pausieren(Stage stage){
@@ -50,14 +49,6 @@ public class MainGameController {
         });
     }
 
-    public int getCurrentState(){
-        return currentState;
-    }
-
-    public void setCurrentMode(int modeposition){
-        currentMode = modeposition;
-        System.out.println("Mode selected and set to: " + mode[currentMode]);
-    }
 
     public void handleClick(int posx, int posy){
         System.out.println("Clicked at: " + posx + ", " + posy);
