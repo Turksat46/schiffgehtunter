@@ -23,10 +23,14 @@ public class MainGameController {
     public int groesse;
     GridPane feld;
 
+    //TODO: Hier vllt bekannte Paare eintragen?
+    public int[][] paare;
+
 
 
     public void setupSpiel(int groesse, Stage stage, int currentMode){
         this.spielfeld = new Spielfeld(groesse, stage, spielerstackpane);
+        paare = new int[groesse][groesse];
         System.out.println(this.spielfeld);
         this.currentMode = currentMode;
         this.groesse = groesse;
@@ -112,6 +116,8 @@ public class MainGameController {
                             neighborSet = true;
                             spielfeld.felder[x][y].setFill(Color.GREEN);
                             spielfeld.felder[posx][posy].setFill(Color.GREEN);
+                            paare[x][y] = 1;
+                            paare[posx][posy] = 1;
                             break;
                         }
                     }
