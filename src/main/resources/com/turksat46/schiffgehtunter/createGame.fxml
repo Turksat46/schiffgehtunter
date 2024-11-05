@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.turksat46.schiffgehtunter.CreateGameController">
+<AnchorPane prefHeight="500.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.turksat46.schiffgehtunter.CreateGameController">
     <children>
         <VBox fx:id="singleplayer_ui" layoutX="4.0" prefHeight="326.0" prefWidth="592.0">
             <children>
@@ -35,12 +35,12 @@
                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                     </VBox.margin>
                 </Separator>
-                <Label text="Spielfeldgröße (Höhe und Breite)">
+                <Label text="Spielfeldgröße">
                     <opaqueInsets>
                         <Insets />
                     </opaqueInsets>
                     <VBox.margin>
-                        <Insets left="10.0" />
+                        <Insets bottom="10.0" left="10.0" />
                     </VBox.margin>
                     <font>
                         <Font size="18.0" />
@@ -87,7 +87,58 @@
                             </HBox.margin>
                         </ChoiceBox>
                     </children>
+               <padding>
+                  <Insets bottom="10.0" top="10.0" />
+               </padding>
                 </HBox>
+            <HBox alignment="CENTER" layoutX="10.0" layoutY="197.0" prefHeight="100.0" prefWidth="200.0">
+               <children>
+                  <Label prefHeight="116.0" prefWidth="599.0" text="Spielstrategie">
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                     <HBox.margin>
+                        <Insets left="10.0" />
+                     </HBox.margin>
+                  </Label>
+                  <ChoiceBox fx:id="cb2" prefHeight="26.0" prefWidth="403.0">
+                     <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                     </padding>
+                     <HBox.margin>
+                        <Insets right="10.0" />
+                     </HBox.margin>
+                  </ChoiceBox>
+               </children>
+               <padding>
+                  <Insets bottom="10.0" top="10.0" />
+               </padding>
+            </HBox>
+            <HBox prefHeight="100.0" prefWidth="200.0">
+               <children>
+                  <Label text="Oder alternativ">
+                     <HBox.margin>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                     </HBox.margin>
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <Separator prefHeight="20.0" prefWidth="450.0">
+                     <HBox.margin>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                     </HBox.margin>
+                  </Separator>
+               </children>
+            </HBox>
+            <Button mnemonicParsing="false" text="Spiel laden">
+               <VBox.margin>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+               </VBox.margin>
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Button>
             </children>
         </VBox>
         <Button layoutY="361.0" mnemonicParsing="false" onAction="#startGame" prefHeight="38.0" prefWidth="602.0" text="SPIEL STARTEN" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">

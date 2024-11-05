@@ -2,28 +2,43 @@ package com.turksat46.schiffgehtunter.other;
 
 //Dies ist die Klasse für ein einzelnes Feld
 
-public class Feld {
+import javafx.scene.shape.Rectangle;
 
-    //Für Debugging
-    int wert = 0;
-    int[][] position;
-    public Feld(int[][] position){
-        this.position = position;
+public class Feld extends Rectangle {
+
+    private boolean gesetzt;
+    private int posX, posY;
+    int hoehe, breite;
+
+    public Feld(int h, int b, int posX, int posY) {
+        this.hoehe = h;
+        this.setHeight((double)h);
+        this.breite = b;
+        this.setWidth((double)b);
+        this.posX = posX;
+        this.posY = posY;
     }
 
-    public int[][] getPosition(){
-        return position;
+
+    public boolean pruefengesetzt() {
+        return gesetzt;
     }
 
-    public void setWert(int[][] position, int wert){
-        this.wert = wert;
+    public void setzen(int x, int y) {
+
     }
 
-    public int getWert(int[][] position){
-        return wert;
+    public Rectangle getFeld() {
+        return this;
     }
 
-    public void selectingFeld(int x, int y){
-        System.out.println("Feld selecting");
-    }
+    //For beautyprinting NICHT FÜR LOGIK NUTZEN
+    public int getPosX() {return posX+1;}
+
+    public int getPosY() {return posY+1;}
+
+
+
+
+
 }

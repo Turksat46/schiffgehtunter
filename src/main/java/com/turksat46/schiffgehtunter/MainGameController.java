@@ -1,40 +1,85 @@
 package com.turksat46.schiffgehtunter;
-
+import com.turksat46.schiffgehtunter.other.Feld;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.fxml.JavaFXBuilderFactory;
 import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Label;
-import javafx.scene.control.Slider;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import java.io.IOException;
 
 public class MainGameController {
     @FXML
     public GridPane spielerstackpane;
-    public Label label;
+    public Spielfeld spielfeld;
+    //Drei States: place = Schiffe platzieren offense = Angriff defense = Verteidigung bzw. auf Angriff vom Gegner warten
+    public String[] state = {"place", "offense", "defense"};
+    public String[] mode = {"PvsC", "PvsP", "CvsC"};
+    public int currentState;
+    public int currentMode;
 
-    Spielfeld spielfeld;
-
-    int groesse;
-
-    @FXML
-    public void initialize() {
-        //TODO: groesse-Wert richtig abfangen
-        setupSpielfeld(5);
-        spielerstackpane.getChildren().add(spielfeld.gridPane);
+    GridPane feld;
 
 
+
+    public void setupSpiel(int groesse, Stage stage, int currentMode){
+        this.spielfeld = new Spielfeld(groesse, stage, spielerstackpane);
+        System.out.println(this.spielfeld);
+        this.currentMode = currentMode;
+        System.out.println("Mode selected and set to: " + mode[currentMode]);
+        pausieren(stage);
     }
 
-    public void setupSpielfeld(int groesse){
-        this.groesse = groesse;
-        spielfeld = new Spielfeld(groesse);
+    public void pausieren(Stage stage){
+        stage.getScene().setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent keyEvent) {
+                if(keyEvent.getCode() == KeyCode.ESCAPE){
+                    //Spiel pausieren
+                    try {
+                        FXMLLoader loader = new FXMLLoader(getClass().getResource("PauseGame.fxml"));
+                        Stage stage = new Stage();
+                        stage.setTitle("Pause");
+                        stage.setScene(new Scene(loader.load()));
+                        stage.show();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
 
+                }
+            }
+        });
+    }
+
+
+    public void handleClick(Spielfeld spielfeld, int posx, int posy){
+        System.out.println("Clicked at: " + posx + ", " + posy);
+        //
+        /*TODO: prüfe die aktuelle State*/
+
+        switch (currentState){
+            //Schiffe setzen
+            case 0:
+                spielfeld.selectFeld(posx, posy);
+                break;
+
+            //Schiffe erschießen
+            case 1:
+                break;
+
+            //Schiffe beobachten (Spieler: Klicks ignorieren)
+            case 2:
+                break;
+
+            default:
+                //Errorstate, weil es nicht mehr als 3 states gibt
+        }
+    }
+
+    public void setFeld(GridPane feld){
+        this.feld = feld;
     }
 
 

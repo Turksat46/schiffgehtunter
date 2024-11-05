@@ -6,10 +6,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.Slider;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -22,6 +19,7 @@ public class CreateGameController {
 
     @FXML
     ChoiceBox cb = new ChoiceBox();
+    @FXML
     ChoiceBox cb2 = new ChoiceBox();
 
     @FXML
@@ -33,16 +31,22 @@ public class CreateGameController {
 
     ObservableList<Difficulty> difficulties = FXCollections.observableArrayList();
 
-    public void initialize() {
+    ObservableList<String> skillLevels = FXCollections.observableArrayList("Noob", "Average", "Hardcore");
+    ObservableList<String> gameModes = FXCollections.observableArrayList("Spieler vs. Computer", "Spieler vs. Spieler", "Computer vs. Computer");
 
-        cb.setItems(FXCollections.observableArrayList("Noob", "Average", "Hardcore"));
-        cb2.setItems(FXCollections.observableArrayList("Spieler vs. Computer", "Spieler vs. Spieler", "Computer vs. Computer"));
+
+    public void initialize() {
+        cb.setItems(skillLevels);
+        cb2.setItems(gameModes);
+
+        cb.setValue(skillLevels.get(0));
+        cb2.setValue(gameModes.get(0));
+        groessetextfield.setText(Double.toString(groesseslider.getValue()));
         groesseslider.valueProperty().addListener((observable, oldValue, newValue) -> {
             groessetextfield.setText(Double.toString(newValue.intValue()));
         });
         groessetextfield.textProperty().addListener((observable, oldValue, newValue) -> {
-            System.out.println("textfield changed from " + oldValue + " to " + newValue);
-                groesseslider.setValue(Double.valueOf(newValue));
+            groesseslider.setValue(Double.valueOf(newValue));
         });
 
         mainGameController = new MainGameController();
@@ -59,13 +63,21 @@ public class CreateGameController {
         Stage stage = new Stage();
         stage.setTitle("Spiel");
         stage.setScene(new Scene(fxmlLoader.load()));
-        stage.show();
-        mainGameController.setupSpielfeld((int)groesseslider.getValue());
+
+        mainGameController = fxmlLoader.getController();
+        mainGameController.setupSpiel((int)groesseslider.getValue(), stage, cb2.getSelectionModel().getSelectedIndex() );
+        Stage thisstage = (Stage) cb.getScene().getWindow();
+        thisstage.close();
     }
 
-    public void onBackPressed() {
-        Stage stage = (Stage) cb.getScene().getWindow();
-        stage.close();
+    public void onBackPressed() throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("Hello-view.fxml"));
+        Stage stage = new Stage();
+        stage.setTitle("Hauptmenü");
+        stage.setScene(new Scene(fxmlLoader.load()));
+        stage.show();
+        Stage thisstage = (Stage) cb.getScene().getWindow();
+        thisstage.close();
     }
 
 

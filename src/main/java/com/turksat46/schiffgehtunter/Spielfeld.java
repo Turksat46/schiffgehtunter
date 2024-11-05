@@ -1,38 +1,84 @@
 package com.turksat46.schiffgehtunter;
-
 import com.turksat46.schiffgehtunter.other.Feld;
-import javafx.scene.Node;
+import com.turksat46.schiffgehtunter.other.Ship;
+import javafx.event.EventHandler;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import java.io.IOException;
+import java.util.ArrayList;
 
 public class Spielfeld {
 
     public GridPane gridPane;
-    public int spielfeldgroesse;
     int zellengroesse;
     int[][] feld;
+    Feld[][] felder;
+    int groesse;
+    Stage stage;
+    ArrayList<Ship> schiffe = new ArrayList<>();
+    MainGameController mainGameController;
 
-    //TODO: Für die Felder eigene Klasse
-    Feld felder;
-
-    public Spielfeld (int groesse){
-        Stage stage = new Stage();
-
-
-        gridPane = new GridPane();
-
-
+    public Spielfeld (int groesse, Stage stage, GridPane spielerstackpane){
+        this.stage = stage;
         this.feld= new int [groesse][groesse];
+        this.gridPane = spielerstackpane;
+        this.groesse = groesse;
+        felder = new Feld[groesse][groesse];
+        mainGameController = new MainGameController();
 
-        //TODO: richtig initialisieren und nutzen
-        felder = new Feld(feld);
+        initFeld();
+    }
+
+
+    private void initFeld(){
+
+        if(groesse <=5 ){
+            zellengroesse=75;
+            schiffe.add(new Ship("Zerstörer", 2));
+            schiffe.add(new Ship("Zerstörer", 2));
+        }else if(groesse > 5 && groesse <= 10){
+            zellengroesse=50;
+            schiffe.add(new Ship("Zerstörer", 2));
+            schiffe.add(new Ship("Zerstörer", 2));
+            schiffe.add(new Ship("U-Boot", 3));
+            schiffe.add(new Ship("U-Boot", 3));
+        }else if(groesse > 10 && groesse <= 20){
+            zellengroesse=30;
+            schiffe.add(new Ship("Zerstörer", 2));
+            schiffe.add(new Ship("Zerstörer", 2));
+            schiffe.add(new Ship("Zerstörer", 2));
+            schiffe.add(new Ship("U-Boot", 3));
+            schiffe.add(new Ship("Kreuzer", 3));
+            schiffe.add(new Ship("Kreuzer", 3));
+            schiffe.add(new Ship("Schlachtschiff", 4));
+            schiffe.add(new Ship("Schlachtschiff", 4));
+        }else {
+            zellengroesse=20;
+            schiffe.add(new Ship("Zerstörer", 2));
+            schiffe.add(new Ship("Zerstörer", 2));
+            schiffe.add(new Ship("Zerstörer", 2));
+            schiffe.add(new Ship("Zerstörer", 2));
+            schiffe.add(new Ship("U-Boot", 3));
+            schiffe.add(new Ship("U-Boot", 3));
+            schiffe.add(new Ship("Kreuzer", 3));
+            schiffe.add(new Ship("Schlachtschiff", 4));
+            schiffe.add(new Ship("Schlachtschiff", 4));
+            schiffe.add(new Ship("Flugzeugträger", 5));
+        }
+
+        System.out.println("Anzahl der Schiffe: " + schiffe.size());
+        for (Ship schiff : schiffe) {
+            System.out.println("Schiff: " + schiff.getName() + ", Groesse: " + schiff.getGroesse());
+        }
+
 
         // Schleife zur Erstellung der Zellen (als Rectangle mit Text)
         for (int i = 0; i < groesse; i++) {
@@ -41,12 +87,11 @@ public class Spielfeld {
                 int col = j;
                 this.feld[row][col] = 0;
 
-                zellengroesse = getQuadratGroesse();
-
-
-                // Rechteck und Text erstellen
-                Rectangle cell = new Rectangle(zellengroesse, zellengroesse);
+                // Rechteck und Text erstellen und position der zelle
+                Feld cell = new Feld(zellengroesse, zellengroesse, row, col);
+                felder[row][col] = cell;
                 cell.setFill(Color.LIGHTBLUE);
+
                 cell.setStroke(Color.BLACK);
 
                 Text cellText = new Text(String.valueOf(feld[row][col]));
@@ -55,30 +100,24 @@ public class Spielfeld {
                 StackPane cellPane = new StackPane();
                 cellPane.getChildren().addAll(cell, cellText);
 
-                // Klick-Event für jede Zelle und aktualisiert einen neuen wert später also das löschen
+
+                // Klick-Event für jede Zelle
                 cellPane.setOnMouseClicked(event -> {
-                    feld[row][col] = 1;
-                    cellText.setText("1");
+                    mainGameController.handleClick(this, row, col);
                 });
 
                 // Zelle dem GridPane hinzufügen
                 gridPane.add(cellPane, j, i);
+                gridPane.setMinHeight(zellengroesse*groesse);
+                gridPane.setMinWidth(zellengroesse*groesse);
+
             }
         }
+        mainGameController.setFeld(gridPane);
+        stage.show();
     }
 
-    private int getQuadratGroesse() {
-        int groesse = 0;
-        if(spielfeldgroesse <= 5){
-            return 75;
-        }
-        else if (spielfeldgroesse > 5 && spielfeldgroesse <= 10) {
-            return 50;
-        } else if (spielfeldgroesse > 10 && spielfeldgroesse <= 20) {
-            return 30;
-        }else{
-            return 20;
-        }
+    public void selectFeld(int posx, int posy){
+        felder[posx][posy].setFill(Color.BLUE);
     }
-
 }
