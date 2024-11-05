@@ -7,6 +7,7 @@ import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import java.io.IOException;
 
@@ -109,6 +110,8 @@ public class MainGameController {
                     if (x != posx || y != posy) { // Nicht das aktuelle Feld prüfen
                         if (spielfeld.felder[x][y].gesetzt) {
                             neighborSet = true;
+                            spielfeld.felder[x][y].setFill(Color.GREEN);
+                            spielfeld.felder[posx][posy].setFill(Color.GREEN);
                             break;
                         }
                     }
