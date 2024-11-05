@@ -2,6 +2,7 @@ package com.turksat46.schiffgehtunter;
 import com.turksat46.schiffgehtunter.other.Feld;
 import com.turksat46.schiffgehtunter.other.Ship;
 import javafx.event.EventHandler;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
@@ -19,18 +20,18 @@ public class Spielfeld {
     public GridPane gridPane;
     int zellengroesse;
     int[][] feld;
+    Feld[][] felder;
     int groesse;
     Stage stage;
     ArrayList<Ship> schiffe = new ArrayList<>();
     MainGameController mainGameController;
-
 
     public Spielfeld (int groesse, Stage stage, GridPane spielerstackpane){
         this.stage = stage;
         this.feld= new int [groesse][groesse];
         this.gridPane = spielerstackpane;
         this.groesse = groesse;
-
+        felder = new Feld[groesse][groesse];
         mainGameController = new MainGameController();
 
         initFeld();
@@ -88,6 +89,7 @@ public class Spielfeld {
 
                 // Rechteck und Text erstellen und position der zelle
                 Feld cell = new Feld(zellengroesse, zellengroesse, row, col);
+                felder[row][col] = cell;
                 cell.setFill(Color.LIGHTBLUE);
 
                 cell.setStroke(Color.BLACK);
@@ -101,7 +103,7 @@ public class Spielfeld {
 
                 // Klick-Event für jede Zelle
                 cellPane.setOnMouseClicked(event -> {
-                    mainGameController.handleClick(col, row);
+                    mainGameController.handleClick(this, col, row);
                 });
 
                 // Zelle dem GridPane hinzufügen
@@ -111,6 +113,11 @@ public class Spielfeld {
 
             }
         }
+        mainGameController.setFeld(gridPane);
         stage.show();
+    }
+
+    public void selectFeld(int posx, int posy){
+        felder[posx][posy].setFill(Color.BLUE);
     }
 }

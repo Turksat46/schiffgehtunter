@@ -1,4 +1,5 @@
 package com.turksat46.schiffgehtunter;
+import com.turksat46.schiffgehtunter.other.Feld;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -12,17 +13,20 @@ import java.io.IOException;
 public class MainGameController {
     @FXML
     public GridPane spielerstackpane;
-    Spielfeld spielfeld;
+    public Spielfeld spielfeld;
     //Drei States: place = Schiffe platzieren offense = Angriff defense = Verteidigung bzw. auf Angriff vom Gegner warten
     public String[] state = {"place", "offense", "defense"};
     public String[] mode = {"PvsC", "PvsP", "CvsC"};
     public int currentState;
     public int currentMode;
 
+    GridPane feld;
+
 
 
     public void setupSpiel(int groesse, Stage stage, int currentMode){
-        spielfeld = new Spielfeld(groesse, stage, spielerstackpane);
+        this.spielfeld = new Spielfeld(groesse, stage, spielerstackpane);
+        System.out.println(this.spielfeld);
         this.currentMode = currentMode;
         System.out.println("Mode selected and set to: " + mode[currentMode]);
         pausieren(stage);
@@ -50,7 +54,7 @@ public class MainGameController {
     }
 
 
-    public void handleClick(int posx, int posy){
+    public void handleClick(Spielfeld spielfeld, int posx, int posy){
         System.out.println("Clicked at: " + posx + ", " + posy);
         //
         /*TODO: prüfe die aktuelle State*/
@@ -58,6 +62,7 @@ public class MainGameController {
         switch (currentState){
             //Schiffe setzen
             case 0:
+                spielfeld.selectFeld(posx, posy);
                 break;
 
             //Schiffe erschießen
@@ -72,5 +77,10 @@ public class MainGameController {
                 //Errorstate, weil es nicht mehr als 3 states gibt
         }
     }
+
+    public void setFeld(GridPane feld){
+        this.feld = feld;
+    }
+
 
 }
