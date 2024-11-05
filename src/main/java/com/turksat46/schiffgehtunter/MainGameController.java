@@ -77,7 +77,7 @@ public class MainGameController {
                         System.out.println("Nachbarfeld ist gewaehlt");
                     }
                 }else{
-                    System.out.println("Spielfeld felder bereits gewählt");
+                    System.out.println("Spielfeld bereits gewählt");
                 }
                 break;
 
