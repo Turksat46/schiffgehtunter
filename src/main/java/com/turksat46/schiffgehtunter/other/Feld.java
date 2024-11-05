@@ -6,7 +6,7 @@ import javafx.scene.shape.Rectangle;
 
 public class Feld extends Rectangle {
 
-    private boolean gesetzt;
+    public boolean gesetzt;
     private int posX, posY;
     int hoehe, breite;
 

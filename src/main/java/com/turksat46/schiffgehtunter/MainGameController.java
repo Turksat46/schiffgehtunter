@@ -19,7 +19,7 @@ public class MainGameController {
     public String[] mode = {"PvsC", "PvsP", "CvsC"};
     public int currentState;
     public int currentMode;
-
+    public int groesse;
     GridPane feld;
 
 
@@ -28,7 +28,13 @@ public class MainGameController {
         this.spielfeld = new Spielfeld(groesse, stage, spielerstackpane);
         System.out.println(this.spielfeld);
         this.currentMode = currentMode;
+        this.groesse = groesse;
+        currentState = 0;
         System.out.println("Mode selected and set to: " + mode[currentMode]);
+        System.out.println("State selected and set to: " + state[currentState]);
+
+        stage.setTitle("Spiel: Schiffe platzieren");
+
         pausieren(stage);
     }
 
@@ -62,7 +68,17 @@ public class MainGameController {
         switch (currentState){
             //Schiffe setzen
             case 0:
-                spielfeld.selectFeld(posx, posy);
+                //TODO: Hier eventuell prüfen, ob man Schiff setzen kann
+
+                if(!spielfeld.felder[posx][posy].gesetzt){
+                    spielfeld.felder[posx][posy].gesetzt = true;
+                    spielfeld.selectFeld(posx, posy);
+                    if(nachbarFeldGewaehlt(spielfeld, posx, posy)){
+                        System.out.println("Nachbarfeld ist gewaehlt");
+                    }
+                }else{
+                    System.out.println("Spielfeld felder bereits gewählt");
+                }
                 break;
 
             //Schiffe erschießen
@@ -82,5 +98,33 @@ public class MainGameController {
         this.feld = feld;
     }
 
+
+    public boolean nachbarFeldGewaehlt(Spielfeld spielfeld, int posx, int posy){
+        // Prüfen, ob ein Nachbarfeld bereits gesetzt ist
+        boolean neighborSet = false;
+        for (int x = posx - 1; x <= posx + 1; x++) {
+            for (int y = posy - 1; y <= posy + 1; y++) {
+                // Überprüfen, ob die Koordinaten innerhalb des Spielfelds liegen
+                if (x >= 0 && x < spielfeld.groesse && y >= 0 && y < spielfeld.groesse) {
+                    if (x != posx || y != posy) { // Nicht das aktuelle Feld prüfen
+                        if (spielfeld.felder[x][y].gesetzt) {
+                            neighborSet = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            if (neighborSet) {
+                continue;
+            }
+        }
+
+        if (!neighborSet) {
+            return false;
+        } else {
+            System.out.println("Ein Nachbarfeld ist bereits belegt.");
+            return true;
+        }
+    }
 
 }
