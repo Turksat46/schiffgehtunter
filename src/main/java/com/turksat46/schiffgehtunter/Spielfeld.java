@@ -103,7 +103,7 @@ public class Spielfeld {
 
                 // Klick-Event für jede Zelle
                 cellPane.setOnMouseClicked(event -> {
-                    mainGameController.handleClick(this, col, row);
+                    mainGameController.handleClick(this, row, col);
                 });
 
                 // Zelle dem GridPane hinzufügen
