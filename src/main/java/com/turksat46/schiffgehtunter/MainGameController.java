@@ -17,6 +17,9 @@ public class MainGameController {
     public Spielfeld spielfeld;
     //Drei States: place = Schiffe platzieren offense = Angriff defense = Verteidigung bzw. auf Angriff vom Gegner warten
     public String[] state = {"place", "offense", "defense"};
+
+    //Spielmodis
+    //P = Spieler, C=Computer
     public String[] mode = {"PvsC", "PvsP", "CvsC"};
     public int currentState;
     public int currentMode;
@@ -107,6 +110,8 @@ public class MainGameController {
     public boolean nachbarFeldGewaehlt(Spielfeld spielfeld, int posx, int posy){
         // Prüfen, ob ein Nachbarfeld bereits gesetzt ist
         boolean neighborSet = false;
+        int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+
         for (int x = posx - 1; x <= posx + 1; x++) {
             for (int y = posy - 1; y <= posy + 1; y++) {
                 // Überprüfen, ob die Koordinaten innerhalb des Spielfelds liegen
@@ -116,8 +121,8 @@ public class MainGameController {
                             neighborSet = true;
                             spielfeld.felder[x][y].setFill(Color.GREEN);
                             spielfeld.felder[posx][posy].setFill(Color.GREEN);
-                            paare[x][y] = 1;
-                            paare[posx][posy] = 1;
+                            //paare[x][y] = 1;
+                            //paare[posx][posy] = 1;
                             break;
                         }
                     }
@@ -128,11 +133,37 @@ public class MainGameController {
             }
         }
 
+        // Prüfe die Nachbarschaft und bestimme die Paarlänge
+        int maxLength = 1; // Mindestens das aktuelle Feld
+        for (int[] dir : directions) {
+            int x = posx + dir[0];
+            int y = posy + dir[1];
+
+            if (x >= 0 && x < spielfeld.groesse && y >= 0 && y < spielfeld.groesse && spielfeld.felder[x][y].gesetzt) {
+                maxLength = Math.max(maxLength, getPairLength(spielfeld, x, y, dir[0], dir[1]) + 1);
+            }
+        }
+
+
+
+        System.out.println("Die Länge des Paares beträgt: " + maxLength);
+
         if (!neighborSet) {
             return false;
         } else {
             System.out.println("Ein Nachbarfeld ist bereits belegt.");
             return true;
+        }
+    }
+
+    private int getPairLength(Spielfeld spielfeld, int x, int y, int dx, int dy) {
+        int nx = x + dx;
+        int ny = y + dy;
+
+        if (nx < 0 || nx >= spielfeld.groesse || ny < 0 || ny >= spielfeld.groesse || !spielfeld.felder[nx][ny].gesetzt) {
+            return 0;
+        } else {
+            return 1 + getPairLength(spielfeld, nx, ny, dx, dy);
         }
     }
 

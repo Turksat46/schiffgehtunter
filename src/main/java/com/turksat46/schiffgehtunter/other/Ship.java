@@ -7,6 +7,7 @@ public class Ship {
     //private img
     private int groesse;
 
+
     public Ship(String name, int groesse ){
         this.name = name;
         this.groesse = groesse;
