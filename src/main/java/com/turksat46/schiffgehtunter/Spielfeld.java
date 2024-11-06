@@ -40,6 +40,7 @@ public class Spielfeld {
 
     private void initFeld(){
 
+        //TODO: Diese if-Abfragen bitte abschaffen und dem Nutzer eine Chance beim Entscheiden geben >:(
         if(groesse <=5 ){
             zellengroesse=75;
             schiffe.add(new Ship("Zerstörer", 2));
