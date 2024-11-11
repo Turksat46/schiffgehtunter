@@ -131,14 +131,23 @@
                   </Separator>
                </children>
             </HBox>
-            <Button mnemonicParsing="false" text="Spiel laden">
-               <VBox.margin>
-                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-               </VBox.margin>
-               <font>
-                  <Font size="18.0" />
-               </font>
-            </Button>
+            <HBox prefHeight="100.0" prefWidth="200.0">
+               <children>
+                  <Button mnemonicParsing="false" onAction="#openLoadFileDialog" text="Spiel laden">
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                     <HBox.margin>
+                        <Insets left="10.0" />
+                     </HBox.margin>
+                  </Button>
+                  <Label fx:id="ladenhinweislabel" prefHeight="40.0" prefWidth="437.0">
+                     <HBox.margin>
+                        <Insets left="10.0" />
+                     </HBox.margin>
+                  </Label>
+               </children>
+            </HBox>
             </children>
         </VBox>
         <Button layoutY="361.0" mnemonicParsing="false" onAction="#startGame" prefHeight="38.0" prefWidth="602.0" text="SPIEL STARTEN" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">

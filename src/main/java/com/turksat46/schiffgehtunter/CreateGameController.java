@@ -1,5 +1,6 @@
 package com.turksat46.schiffgehtunter;
 
+import com.turksat46.schiffgehtunter.filemanagement.SaveFileManager;
 import com.turksat46.schiffgehtunter.other.Difficulty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -27,7 +28,11 @@ public class CreateGameController {
     @FXML
     TextField groessetextfield = new TextField();
 
+    @FXML
+    Label ladenhinweislabel = new Label();
+
     MainGameController mainGameController;
+    SaveFileManager saveFileManager;
 
     ObservableList<Difficulty> difficulties = FXCollections.observableArrayList();
 
@@ -50,7 +55,7 @@ public class CreateGameController {
         });
 
         mainGameController = new MainGameController();
-
+        saveFileManager = new SaveFileManager();
     }
 
     public void onPlayPressed() throws IOException {
@@ -80,5 +85,9 @@ public class CreateGameController {
         thisstage.close();
     }
 
+    public void openLoadFileDialog() {
+        ladenhinweislabel.setText("Bitte eine Save-Datei im Dialog öffnen...");
+        saveFileManager.openFileChooser();
 
+    }
 }
