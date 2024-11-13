@@ -11,6 +11,7 @@ module com.turksat46.schiffgehtunter {
     requires eu.hansolo.tilesfx;
     requires com.almasb.fxgl.all;
     requires jdk.compiler;
+    requires org.tensorflow.core.api;
 
     opens com.turksat46.schiffgehtunter to javafx.fxml;
     exports com.turksat46.schiffgehtunter;
