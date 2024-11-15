@@ -68,7 +68,7 @@ public class MainGameController {
     }
 
 
-    public void handleClick(Spielfeld spielfeld, int posx, int posy){
+    public void handlePrimaryClick(Spielfeld spielfeld, int posx, int posy){
         System.out.println("Clicked at: " + posx + ", " + posy);
         //
         /*TODO: prüfe die aktuelle State*/
@@ -90,6 +90,37 @@ public class MainGameController {
                 break;
 
             //Schiffe erschießen
+            case 1:
+                break;
+
+            //Schiffe beobachten (Spieler: Klicks ignorieren)
+            case 2:
+                break;
+
+            default:
+                //Errorstate, weil es nicht mehr als 3 states gibt
+        }
+    }
+
+    public void handleSecondaryClick(Spielfeld spielfeld, int posx, int posy){
+        System.out.println("Right-Clicked at: " + posx + ", " + posy);
+        //
+        /*TODO: prüfe die aktuelle State*/
+
+        switch (currentState){
+            //Schiffe entfernen
+            case 0:
+                //TODO: Hier eventuell prüfen, ob man Schiff setzen kann
+
+                if(spielfeld.felder[posx][posy].gesetzt){
+                    spielfeld.felder[posx][posy].gesetzt = false;
+                    spielfeld.deselectRowAndColumn(spielfeld, posx, posy);
+                    System.out.println("Feld wurde abgewählt");
+                }else{
+                    System.out.println("Feld ist nicht gewählt");
+                }
+                break;
+
             case 1:
                 break;
 
