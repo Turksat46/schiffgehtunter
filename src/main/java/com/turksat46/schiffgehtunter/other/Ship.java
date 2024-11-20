@@ -2,25 +2,53 @@ package com.turksat46.schiffgehtunter.other;
 
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Ship {
 
     private String name;
-    List<Integer> location;
+    public List <int[]> location;
     //private img
     private int groesse;
 
 
 
-    public Ship(String name, int groesse ){
+    public  Ship(String name, int groesse ){
         this.name = name;
         this.groesse = groesse;
-        location = List.of(0,0);
+        location = new  ArrayList<>();
     }
 
-    public void setLocation(int x, int y, int x1, int y1){
-        //location.set(0,{x,y});
+    public void addLocation(int x, int y){
+        if (location.size() < groesse) {
+            location.add(new int[]{x, y});
+        }
+        else {
+            System.out.println("Schiff hat bereits maximalgröße");
+        }
+    }
+
+    public int[][] getLocations(){
+        int[][] result = new int[location.size()][2];
+           for (int i = 0; i < location.size(); i++) {
+               result[i] = location.get(i);
+           }
+        return result;
+    }
+
+    public String getLocationsString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        for (int i = 0; i < location.size(); i++) {
+            int[] loc = location.get(i);
+            sb.append("{").append(loc[0]).append(", ").append(loc[1]).append("}");
+            if (i < location.size() - 1) {
+                sb.append(", ");
+            }
+        }
+        sb.append("]");
+        return sb.toString();
     }
 
     public String getName (){

@@ -15,6 +15,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Spielfeld {
 
@@ -46,6 +47,7 @@ public class Spielfeld {
             zellengroesse=75;
             schiffe.add(new Ship("Zerstörer", 2));
             schiffe.add(new Ship("Zerstörer", 2));
+            //schiffe.get(0).addLocation(1,2);      //Location für schiff hinzufügen
         }else if(groesse > 5 && groesse <= 10){
             zellengroesse=50;
             schiffe.add(new Ship("Zerstörer", 2));
@@ -77,6 +79,7 @@ public class Spielfeld {
         }
 
         System.out.println("Anzahl der Schiffe: " + schiffe.size());
+        //System.out.println(schiffe.get(0).getLocationsString());      //Ausgabe für location
         for (Ship schiff : schiffe) {
             System.out.println("Schiff: " + schiff.getName() + ", Groesse: " + schiff.getGroesse());
         }
