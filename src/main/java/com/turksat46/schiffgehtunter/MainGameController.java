@@ -9,14 +9,22 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+
+import java.awt.*;
 import java.io.IOException;
 
 public class MainGameController {
     @FXML
     public GridPane spielerstackpane;
+    @FXML
+    public GridPane gegnerstackpane;
+
     public Spielfeld spielfeld;
     //Drei States: place = Schiffe platzieren offense = Angriff defense = Verteidigung bzw. auf Angriff vom Gegner warten
     public String[] state = {"place", "offense", "defense"};
+
+    public int gesamtlänge = 5;
+    public int platzierteLänge = 0;
 
     //Spielmodis
     //P = Spieler, C=Computer
@@ -28,8 +36,6 @@ public class MainGameController {
 
     //TODO: Hier vllt bekannte Paare eintragen?
     public int[][] paare;
-
-
 
     public void setupSpiel(int groesse, Stage stage, int currentMode){
         this.spielfeld = new Spielfeld(groesse, stage, spielerstackpane);
@@ -43,10 +49,17 @@ public class MainGameController {
 
         stage.setTitle("Spiel: Schiffe platzieren");
 
-        pausieren(stage);
+        setPausierenEventHandler(stage);
     }
 
-    public void pausieren(Stage stage){
+    public void setupGegnerFeld(int groesse, Stage stage) {
+
+        Spielfeld gegnerspielfeld = new Spielfeld(groesse, stage, gegnerstackpane);
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        stage.setX((screenSize.width - stage.getWidth()) / 2 - stage.getWidth());
+    }
+
+    public void setPausierenEventHandler(Stage stage){
         stage.getScene().setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent keyEvent) {
@@ -77,16 +90,19 @@ public class MainGameController {
             //Schiffe setzen
             case 0:
                 //TODO: Hier eventuell prüfen, ob man Schiff setzen kann
-
-                if(!spielfeld.felder[posx][posy].gesetzt){
-                    spielfeld.felder[posx][posy].gesetzt = true;
-                    spielfeld.selectFeld(posx, posy);
-                    if(nachbarFeldGewaehlt(spielfeld, posx, posy)){
-                        System.out.println("Nachbarfeld ist gewaehlt");
+                if(platzierteLänge <= gesamtlänge){
+                    if(!spielfeld.felder[posx][posy].gesetzt){
+                        spielfeld.felder[posx][posy].gesetzt = true;
+                        spielfeld.selectFeld(posx, posy);
+                        platzierteLänge++;
+                        if(nachbarFeldGewaehlt(spielfeld, posx, posy)){
+                            System.out.println("Nachbarfeld ist gewaehlt");
+                        }
+                    }else{
+                        System.out.println("Spielfeld bereits gewählt");
                     }
-                }else{
-                    System.out.println("Spielfeld bereits gewählt");
                 }
+
                 break;
 
             //Schiffe erschießen
@@ -111,14 +127,16 @@ public class MainGameController {
             //Schiffe entfernen
             case 0:
                 //TODO: Hier eventuell prüfen, ob man Schiff setzen kann
-
-                if(spielfeld.felder[posx][posy].gesetzt){
-                    spielfeld.felder[posx][posy].gesetzt = false;
-                    spielfeld.deselectRowAndColumn(spielfeld, posx, posy);
-                    System.out.println("Feld wurde abgewählt");
-                }else{
-                    System.out.println("Feld ist nicht gewählt");
+                if(platzierteLänge >= 0){
+                    if(spielfeld.felder[posx][posy].gesetzt){
+                        spielfeld.felder[posx][posy].gesetzt = false;
+                        spielfeld.deselectRowAndColumn(spielfeld, posx, posy);
+                        System.out.println("Feld wurde abgewählt");
+                    }else{
+                        System.out.println("Feld ist nicht gewählt");
+                    }
                 }
+
                 break;
 
             case 1:

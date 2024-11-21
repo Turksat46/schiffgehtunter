@@ -10,6 +10,7 @@ public class Ship {
     private String name;
     public List <int[]> location;
     //private img
+
     private int groesse;
 
 
