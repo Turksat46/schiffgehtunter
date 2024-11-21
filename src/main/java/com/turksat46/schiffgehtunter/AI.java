@@ -15,9 +15,7 @@ public class AI {
 
     }
 
-    public int getNextMove(){
-
-
+    public void getNextMove(){
 
     }
 }
