@@ -75,7 +75,7 @@ public class CreateGameController {
         gegnerstage.setScene(new Scene(gegnerfxmlLoader.load()));
 
         mainGameController = fxmlLoader.getController();
-        mainGameController.setupSpiel((int)groesseslider.getValue(), stage, cb2.getSelectionModel().getSelectedIndex() );
+        mainGameController.setupSpiel((int)groesseslider.getValue(), stage, cb.getSelectionModel().getSelectedIndex() ,cb2.getSelectionModel().getSelectedIndex() );
 
         mainGameController = gegnerfxmlLoader.getController();
         mainGameController.setupGegnerFeld((int)groesseslider.getValue(), gegnerstage);

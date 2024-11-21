@@ -31,22 +31,26 @@ public class MainGameController {
     public String[] mode = {"PvsC", "PvsP", "CvsC"};
     public int currentState;
     public int currentMode;
+    public int currentDifficulty;
     public int groesse;
     GridPane feld;
 
     //TODO: Hier vllt bekannte Paare eintragen?
     public int[][] paare;
 
-    public void setupSpiel(int groesse, Stage stage, int currentMode){
+    AI bot;
+
+    public void setupSpiel(int groesse, Stage stage, int currentDifficulty, int currentMode){
         this.spielfeld = new Spielfeld(groesse, stage, spielerstackpane);
         paare = new int[groesse][groesse];
         System.out.println(this.spielfeld);
         this.currentMode = currentMode;
         this.groesse = groesse;
         currentState = 0;
+        this.currentDifficulty = currentDifficulty;
         System.out.println("Mode selected and set to: " + mode[currentMode]);
         System.out.println("State selected and set to: " + state[currentState]);
-
+        bot = new AI(currentDifficulty, groesse);
         stage.setTitle("Spiel: Schiffe platzieren");
 
         setPausierenEventHandler(stage);
@@ -123,9 +127,8 @@ public class MainGameController {
         //
         /*TODO: prüfe die aktuelle State*/
 
-        switch (currentState){
+        if (currentState == 0){
             //Schiffe entfernen
-            case 0:
                 //TODO: Hier eventuell prüfen, ob man Schiff setzen kann
                 if(platzierteLänge >= 0){
                     if(spielfeld.felder[posx][posy].gesetzt){
@@ -136,18 +139,6 @@ public class MainGameController {
                         System.out.println("Feld ist nicht gewählt");
                     }
                 }
-
-                break;
-
-            case 1:
-                break;
-
-            //Schiffe beobachten (Spieler: Klicks ignorieren)
-            case 2:
-                break;
-
-            default:
-                //Errorstate, weil es nicht mehr als 3 states gibt
         }
     }
 
