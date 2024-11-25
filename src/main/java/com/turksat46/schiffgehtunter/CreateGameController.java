@@ -1,5 +1,4 @@
 package com.turksat46.schiffgehtunter;
-
 import com.turksat46.schiffgehtunter.filemanagement.SaveFileManager;
 import com.turksat46.schiffgehtunter.other.Difficulty;
 import javafx.collections.FXCollections;
@@ -9,9 +8,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
-
 import java.io.IOException;
-import java.util.ArrayList;
+
 
 public class CreateGameController {
 
@@ -35,7 +33,6 @@ public class CreateGameController {
     SaveFileManager saveFileManager;
 
     ObservableList<Difficulty> difficulties = FXCollections.observableArrayList();
-
     ObservableList<String> skillLevels = FXCollections.observableArrayList("Noob", "Average", "Hardcore");
     ObservableList<String> gameModes = FXCollections.observableArrayList("Spieler vs. Computer", "Spieler vs. Spieler", "Computer vs. Computer");
 
@@ -67,11 +64,11 @@ public class CreateGameController {
         FXMLLoader gegnerfxmlLoader = new FXMLLoader(getClass().getResource("gegner-game-view.fxml"));
 
         Stage stage = new Stage();
-        stage.setTitle("Spiel");
+        stage.setTitle("Spielerfeld");
         stage.setScene(new Scene(fxmlLoader.load()));
 
         Stage gegnerstage = new Stage();
-        gegnerstage.setTitle("Spiel: Gegnerfeld");
+        gegnerstage.setTitle("Gegnerfeld");
         gegnerstage.setScene(new Scene(gegnerfxmlLoader.load()));
 
         mainGameController = fxmlLoader.getController();

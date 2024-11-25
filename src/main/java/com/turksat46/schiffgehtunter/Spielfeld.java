@@ -1,29 +1,19 @@
 package com.turksat46.schiffgehtunter;
 import com.turksat46.schiffgehtunter.other.Feld;
 import com.turksat46.schiffgehtunter.other.Ship;
-import javafx.event.EventHandler;
-import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-
 public class Spielfeld {
 
     public GridPane gridPane;
-    int zellengroesse;
+    int zellengroesse, groesse;
     int[][] feld;
     Feld[][] felder;
-    int groesse;
     Stage stage;
     ArrayList<Ship> schiffe = new ArrayList<>();
     MainGameController mainGameController;

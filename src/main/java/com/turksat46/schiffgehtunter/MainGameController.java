@@ -1,5 +1,4 @@
 package com.turksat46.schiffgehtunter;
-import com.turksat46.schiffgehtunter.other.Feld;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -9,41 +8,24 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-
 import java.awt.*;
 import java.io.IOException;
 
 public class MainGameController {
     @FXML
-    public GridPane spielerstackpane;
-    @FXML
-    public GridPane gegnerstackpane;
-
-    public Spielfeld spielfeld;
-    //Drei States: place = Schiffe platzieren offense = Angriff defense = Verteidigung bzw. auf Angriff vom Gegner warten
-    public String[] state = {"place", "offense", "defense"};
-
-    public int gesamtlänge = 5;
-    public int platzierteLänge = 0;
-
-    //Spielmodis
-    //P = Spieler, C=Computer
-    public String[] mode = {"PvsC", "PvsP", "CvsC"};
-    public int currentState;
-    public int currentMode;
-    public int currentDifficulty;
-    public int groesse;
+    public GridPane spielerstackpane, gegnerstackpane;
+    public int currentState, currentMode, currentDifficulty, groesse;
     GridPane feld;
-
-    //TODO: Hier vllt bekannte Paare eintragen?
-    public int[][] paare;
-
     AI bot;
 
+    //Drei States: place = Schiffe platzieren offense = Angriff defense = Verteidigung bzw. auf Angriff vom Gegner warten
+    public String[] state = {"place", "offense", "defense"};
+    //Spielmodus P = Spieler, C=Computer
+    public String[] mode = {"PvsC", "PvsP", "CvsC"};
+
+
     public void setupSpiel(int groesse, Stage stage, int currentDifficulty, int currentMode){
-        this.spielfeld = new Spielfeld(groesse, stage, spielerstackpane);
-        paare = new int[groesse][groesse];
-        System.out.println(this.spielfeld);
+        Spielfeld spielerfeld = new Spielfeld(groesse, stage, spielerstackpane);
         this.currentMode = currentMode;
         this.groesse = groesse;
         currentState = 0;
@@ -51,7 +33,6 @@ public class MainGameController {
         System.out.println("Mode selected and set to: " + mode[currentMode]);
         System.out.println("State selected and set to: " + state[currentState]);
         bot = new AI(currentDifficulty, groesse);
-        stage.setTitle("Spiel: Schiffe platzieren");
 
         setPausierenEventHandler(stage);
     }
@@ -94,18 +75,15 @@ public class MainGameController {
             //Schiffe setzen
             case 0:
                 //TODO: Hier eventuell prüfen, ob man Schiff setzen kann
-                if(platzierteLänge <= gesamtlänge){
+
                     if(!spielfeld.felder[posx][posy].gesetzt){
                         spielfeld.felder[posx][posy].gesetzt = true;
                         spielfeld.selectFeld(posx, posy);
-                        platzierteLänge++;
+
                         if(nachbarFeldGewaehlt(spielfeld, posx, posy)){
                             System.out.println("Nachbarfeld ist gewaehlt");
                         }
-                    }else{
-                        System.out.println("Spielfeld bereits gewählt");
                     }
-                }
 
                 break;
 
@@ -130,15 +108,12 @@ public class MainGameController {
         if (currentState == 0){
             //Schiffe entfernen
                 //TODO: Hier eventuell prüfen, ob man Schiff setzen kann
-                if(platzierteLänge >= 0){
+
                     if(spielfeld.felder[posx][posy].gesetzt){
                         spielfeld.felder[posx][posy].gesetzt = false;
                         spielfeld.deselectRowAndColumn(spielfeld, posx, posy);
                         System.out.println("Feld wurde abgewählt");
-                    }else{
-                        System.out.println("Feld ist nicht gewählt");
                     }
-                }
         }
     }
 
