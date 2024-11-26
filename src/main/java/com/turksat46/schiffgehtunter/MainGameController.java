@@ -1,4 +1,5 @@
 package com.turksat46.schiffgehtunter;
+import com.turksat46.schiffgehtunter.other.Ship;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -10,6 +11,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import java.awt.*;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class MainGameController {
     @FXML
@@ -67,32 +69,21 @@ public class MainGameController {
 
 
     public void handlePrimaryClick(Spielfeld spielfeld, int posx, int posy){
-        System.out.println("Clicked at: " + posx + ", " + posy);
-        //
-        /*TODO: prüfe die aktuelle State*/
-
-        switch (currentState){
+       switch (currentState){
             //Schiffe setzen
             case 0:
-                //TODO: Hier eventuell prüfen, ob man Schiff setzen kann
-
-                    if(!spielfeld.felder[posx][posy].gesetzt){
-                        spielfeld.felder[posx][posy].gesetzt = true;
-                        spielfeld.selectFeld(posx, posy);
-
-                        if(nachbarFeldGewaehlt(spielfeld, posx, posy)){
-                            System.out.println("Nachbarfeld ist gewaehlt");
-                        }
-                    }
-
+                if(spielfeld.schiffe.isEmpty()) {return;}
+                placeShip(spielfeld,posx, posy);
                 break;
 
             //Schiffe erschießen
             case 1:
+                shootShip(spielfeld, posx, posy);
                 break;
 
             //Schiffe beobachten (Spieler: Klicks ignorieren)
             case 2:
+                watchShip(spielfeld, posx, posy);
                 break;
 
             default:
@@ -101,19 +92,13 @@ public class MainGameController {
     }
 
     public void handleSecondaryClick(Spielfeld spielfeld, int posx, int posy){
-        System.out.println("Right-Clicked at: " + posx + ", " + posy);
-        //
-        /*TODO: prüfe die aktuelle State*/
-
         if (currentState == 0){
             //Schiffe entfernen
-                //TODO: Hier eventuell prüfen, ob man Schiff setzen kann
-
-                    if(spielfeld.felder[posx][posy].gesetzt){
-                        spielfeld.felder[posx][posy].gesetzt = false;
-                        spielfeld.deselectRowAndColumn(spielfeld, posx, posy);
-                        System.out.println("Feld wurde abgewählt");
-                    }
+            if(spielfeld.felder[posx][posy].gesetzt){
+                spielfeld.felder[posx][posy].gesetzt = false;
+                spielfeld.deselectRowAndColumn(spielfeld, posx, posy);
+                System.out.println("Feld wurde abgewählt");
+            }
         }
     }
 
@@ -122,22 +107,16 @@ public class MainGameController {
     }
 
 
-    public boolean nachbarFeldGewaehlt(Spielfeld spielfeld, int posx, int posy){
-        // Prüfen, ob ein Nachbarfeld bereits gesetzt ist
-        boolean neighborSet = false;
+    public int nachbarFeldGewaehlt(Spielfeld spielfeld, int posx, int posy){
         int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
 
         for (int[] dir : directions) {
             int x = posx + dir[0];
             int y = posy + dir[1];
 
-
-
             // Überprüfen, ob die Koordinaten innerhalb des Spielfelds liegen
             if (x >= 0 && x < spielfeld.groesse && y >= 0 && y < spielfeld.groesse) {
                 if (spielfeld.felder[x][y].gesetzt) {
-                    neighborSet = true;
-
                     // Färbe das aktuelle und das Nachbarfeld grün
                     spielfeld.felder[x][y].setFill(Color.GREEN);
                     spielfeld.felder[posx][posy].setFill(Color.GREEN);
@@ -156,16 +135,7 @@ public class MainGameController {
             maxLength = Math.max(maxLength, lengthInDir + 1);
         }
 
-
-
-        System.out.println("Die Länge des Paares beträgt: " + maxLength);
-
-        if (!neighborSet) {
-            return false;
-        } else {
-            System.out.println("Ein Nachbarfeld ist bereits belegt.");
-            return true;
-        }
+        return maxLength;
     }
 
     private int getPairLength(Spielfeld spielfeld, int x, int y, int dx, int dy) {
@@ -180,6 +150,33 @@ public class MainGameController {
             ny += dy;
         }
         return length;
+    }
+
+    private void placeShip(Spielfeld spielfeld, int posx, int posy){
+
+            if (!spielfeld.felder[posx][posy].gesetzt) {
+                spielfeld.felder[posx][posy].gesetzt = true;
+                spielfeld.selectFeld(posx, posy);
+
+                // Entferne das passende Schiff aus der Liste
+                int nachbarWert = nachbarFeldGewaehlt(spielfeld, posx, posy); // Berechnung nur einmal
+                boolean entfernt = spielfeld.schiffe.removeIf(schiff -> schiff == nachbarWert);
+
+                if (entfernt) {
+                    System.out.println("Schiff mit Wert " + nachbarWert + " aus der Liste entfernt.");
+                } else {
+                    System.out.println("Kein Schiff mit Wert " + nachbarWert + " in der Liste gefunden.");
+                }
+
+            }
+    }
+
+    private void  shootShip(Spielfeld spielfeld, int posx, int posy){
+        System.out.println("schiffe erschießen");
+    }
+
+    private void  watchShip(Spielfeld spielfeld, int posx, int posy){
+        System.out.println("schiffe beobachten ");
     }
 
 }

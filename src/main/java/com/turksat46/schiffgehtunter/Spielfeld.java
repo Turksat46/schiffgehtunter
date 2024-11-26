@@ -1,13 +1,14 @@
 package com.turksat46.schiffgehtunter;
 import com.turksat46.schiffgehtunter.other.Feld;
-import com.turksat46.schiffgehtunter.other.Ship;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+
 import java.util.ArrayList;
+
 public class Spielfeld {
 
     public GridPane gridPane;
@@ -15,8 +16,8 @@ public class Spielfeld {
     int[][] feld;
     Feld[][] felder;
     Stage stage;
-    ArrayList<Ship> schiffe = new ArrayList<>();
     MainGameController mainGameController;
+    ArrayList<Integer> schiffe= new ArrayList<>();
 
     public Spielfeld (int groesse, Stage stage, GridPane spielerstackpane){
         this.stage = stage;
@@ -32,48 +33,20 @@ public class Spielfeld {
 
     private void initFeld(){
 
-        //TODO: Diese if-Abfragen bitte abschaffen und dem Nutzer eine Chance beim Entscheiden geben >:(
         if(groesse <=5 ){
             zellengroesse=75;
-            schiffe.add(new Ship("Zerstörer", 2));
-            schiffe.add(new Ship("Zerstörer", 2));
-            //schiffe.get(0).addLocation(1,2);      //Location für schiff hinzufügen
+            this.schiffe.add(2);
+
         }else if(groesse > 5 && groesse <= 10){
             zellengroesse=50;
-            schiffe.add(new Ship("Zerstörer", 2));
-            schiffe.add(new Ship("Zerstörer", 2));
-            schiffe.add(new Ship("U-Boot", 3));
-            schiffe.add(new Ship("U-Boot", 3));
+
         }else if(groesse > 10 && groesse <= 20){
             zellengroesse=30;
-            schiffe.add(new Ship("Zerstörer", 2));
-            schiffe.add(new Ship("Zerstörer", 2));
-            schiffe.add(new Ship("Zerstörer", 2));
-            schiffe.add(new Ship("U-Boot", 3));
-            schiffe.add(new Ship("Kreuzer", 3));
-            schiffe.add(new Ship("Kreuzer", 3));
-            schiffe.add(new Ship("Schlachtschiff", 4));
-            schiffe.add(new Ship("Schlachtschiff", 4));
+
         }else {
             zellengroesse=20;
-            schiffe.add(new Ship("Zerstörer", 2));
-            schiffe.add(new Ship("Zerstörer", 2));
-            schiffe.add(new Ship("Zerstörer", 2));
-            schiffe.add(new Ship("Zerstörer", 2));
-            schiffe.add(new Ship("U-Boot", 3));
-            schiffe.add(new Ship("U-Boot", 3));
-            schiffe.add(new Ship("Kreuzer", 3));
-            schiffe.add(new Ship("Schlachtschiff", 4));
-            schiffe.add(new Ship("Schlachtschiff", 4));
-            schiffe.add(new Ship("Flugzeugträger", 5));
-        }
 
-        System.out.println("Anzahl der Schiffe: " + schiffe.size());
-        //System.out.println(schiffe.get(0).getLocationsString());      //Ausgabe für location
-        for (Ship schiff : schiffe) {
-            System.out.println("Schiff: " + schiff.getName() + ", Groesse: " + schiff.getGroesse());
         }
-
 
         // Schleife zur Erstellung der Zellen (als Rectangle mit Text)
         for (int i = 0; i < groesse; i++) {
