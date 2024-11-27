@@ -18,15 +18,16 @@ public class Spielfeld {
     Stage stage;
     MainGameController mainGameController;
     ArrayList<Integer> schiffe= new ArrayList<>();
+    boolean istGegnerFeld;
 
-    public Spielfeld (int groesse, Stage stage, GridPane spielerstackpane){
+    public Spielfeld (int groesse, Stage stage, GridPane spielerstackpane, boolean istGegnerFeld){
         this.stage = stage;
         this.feld= new int [groesse][groesse];
         this.gridPane = spielerstackpane;
         this.groesse = groesse;
         felder = new Feld[groesse][groesse];
         mainGameController = new MainGameController();
-
+        this.istGegnerFeld = istGegnerFeld;
         initFeld();
     }
 
@@ -92,7 +93,12 @@ public class Spielfeld {
     }
 
     public void selectFeld(int posx, int posy){
-        felder[posx][posy].setFill(Color.BLUE);
+        //TODO: Eventuell hier die Farbe ändern, wenn ein Schiff angeklickt wird
+        if(istGegnerFeld){
+            felder[posx][posy].setFill(Color.RED);
+        }else{
+            felder[posx][posy].setFill(Color.BLUE);
+        }
     }
 
     public void deselectRowAndColumn(Spielfeld spielfeld, int posx, int posy) {
