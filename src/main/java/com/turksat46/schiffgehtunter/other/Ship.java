@@ -15,7 +15,7 @@ public class Ship {
 
 
 
-    public  Ship(String name, int groesse ){
+    public Ship(String name, int groesse ){
         this.name = name;
         this.groesse = groesse;
         location = new  ArrayList<>();
@@ -27,6 +27,22 @@ public class Ship {
         }
         else {
             System.out.println("Schiff hat bereits maximalgröße");
+        }
+    }
+
+    //Location List<int[]> auf einmal hinzufügen
+    public void addAllLocations(List<int[]> positions) {
+        if (positions.size() > groesse - location.size()) {
+            System.out.println("Zu viele Positionen: Es können maximal " + (groesse - location.size()) + " weitere Positionen hinzugefügt werden.");
+            return;
+        }
+        for (int[] pos : positions) {
+            if (location.size() < groesse) {
+                location.add(pos);
+            } else {
+                System.out.println("Schiff hat Maximalgröße erreicht, keine weiteren Positionen werden hinzugefügt.");
+                break;
+            }
         }
     }
 

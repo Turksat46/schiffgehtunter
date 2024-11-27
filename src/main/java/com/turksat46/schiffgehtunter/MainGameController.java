@@ -12,6 +12,7 @@ import javafx.stage.Stage;
 import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainGameController {
     @FXML
@@ -158,18 +159,54 @@ public class MainGameController {
         return length;
     }
 
+    //Gibt sortierte Positionen benachbarter gesetzter Felder zurück.
+    private List<int[]> getPairPositionen(Spielfeld spielfeld, int posx, int posy) {
+        List<int[]> positionen = new ArrayList<>();
+
+        int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+
+        for (int[] dir : directions) {
+            int x = posx + dir[0];
+            int y = posy + dir[1];
+            while (x >= 0 && x < spielfeld.groesse && y >= 0 && y < spielfeld.groesse) {
+                if (spielfeld.felder[x][y].gesetzt) {
+                    positionen.add(new int[]{x, y});
+                } else {
+                    break;
+                }
+                x += dir[0];
+                y += dir[1];
+            }
+        }
+        positionen.add(new int[]{posx, posy});
+
+        positionen.sort((p1, p2) -> {
+            if (p1[0] != p2[0]) {
+                return Integer.compare(p1[0], p2[0]);
+            } else {
+                return Integer.compare(p1[1], p2[1]);
+            }
+        });
+
+        return positionen;
+    }
+
+
     private void placeShip(Spielfeld spielfeld, int posx, int posy){
             if (!spielfeld.felder[posx][posy].gesetzt) {
                 spielfeld.felder[posx][posy].gesetzt = true;
                 spielfeld.selectFeld(posx, posy);
+            // Entferne das passende Schiff aus der Liste
+            int nachbarWert = nachbarFeldGewaehlt(spielfeld, posx, posy); // Berechnung nur einmal
+            boolean entfernt = spielfeld.schiffe.removeIf(schiff -> schiff == nachbarWert);
 
-                // Entferne das passende Schiff aus der Liste
-                int nachbarWert = nachbarFeldGewaehlt(spielfeld, posx, posy); // Berechnung nur einmal
-                boolean entfernt = spielfeld.schiffe.removeIf(schiff -> schiff == nachbarWert);
+            if (entfernt) {
 
-                if (entfernt) {
-                    System.out.println("Schiff mit Wert " + nachbarWert + " aus der Liste entfernt.");
-                    if (spielfeld.schiffe.isEmpty()) {
+                System.out.println("Schiff mit Wert " + nachbarWert + " aus der Liste entfernt.");
+                Ship s = new Ship("test",nachbarWert); //Ship Objekt erstellen der passenden Größe
+                s.addAllLocations(getPairPositionen(spielfeld, posx, posy)); //Add locations des Schiffes
+                System.out.println("Aktuelle Positionen des Schiffs: " + s.getLocationsString());
+                if (spielfeld.schiffe.isEmpty()) {
                         System.out.println("State wird auf 1 gesetzt");
                         currentState++;
                     }
@@ -177,7 +214,7 @@ public class MainGameController {
                     System.out.println("Kein Schiff mit Wert " + nachbarWert + " in der Liste gefunden.");
                 }
 
-            }
+        }
     }
 
     private void  shootShip(Spielfeld spielfeld, int posx, int posy){
