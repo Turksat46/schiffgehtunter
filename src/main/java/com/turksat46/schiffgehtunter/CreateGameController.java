@@ -1,12 +1,15 @@
 package com.turksat46.schiffgehtunter;
 import com.turksat46.schiffgehtunter.filemanagement.SaveFileManager;
 import com.turksat46.schiffgehtunter.other.Difficulty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import java.io.IOException;
 
@@ -29,6 +32,9 @@ public class CreateGameController {
     @FXML
     Label ladenhinweislabel = new Label();
 
+    @FXML
+    HBox kiDifficultyUI = new HBox();
+
     MainGameController mainGameController;
     SaveFileManager saveFileManager;
 
@@ -43,6 +49,14 @@ public class CreateGameController {
 
         cb.setValue(skillLevels.get(0));
         cb2.setValue(gameModes.get(0));
+
+        cb2.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
+                onStrategieChanged();
+            }
+        });
+
         groessetextfield.setText(Double.toString(groesseslider.getValue()));
         groesseslider.valueProperty().addListener((observable, oldValue, newValue) -> {
             groessetextfield.setText(Double.toString(newValue.intValue()));
@@ -53,6 +67,14 @@ public class CreateGameController {
 
         mainGameController = new MainGameController();
         saveFileManager = new SaveFileManager();
+    }
+
+    public void onStrategieChanged(){
+        if(cb2.getSelectionModel().getSelectedIndex() == 0){
+            kiDifficultyUI.setVisible(true);
+        }else{
+            kiDifficultyUI.setVisible(false);
+        }
     }
 
     public void onPlayPressed() throws IOException {

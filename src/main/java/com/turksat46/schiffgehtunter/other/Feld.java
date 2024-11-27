@@ -10,6 +10,7 @@ public class Feld extends Rectangle {
     public boolean istSchiff;
     private int posX, posY;
     int hoehe, breite;
+    public boolean wurdeGetroffen;
 
     public Feld(int h, int b, int posX, int posY) {
         this.hoehe = h;
