@@ -16,21 +16,18 @@ import java.util.ArrayList;
 public class MainGameController {
     @FXML
     public GridPane spielerstackpane, gegnerstackpane;
-    public static int currentState, currentMode, currentDifficulty, groesse;
+    public int currentState, currentMode, currentDifficulty, groesse;
     GridPane feld;
     AI bot;
 
-    Spielfeld spielerspielfeld;
-    Spielfeld gegnerspielfeld;
-
-    //Drei States: place = Schiffe platzieren, offense = Angriff, defense = Verteidigung bzw. auf Angriff vom Gegner warten
+    //Drei States: place = Schiffe platzieren offense = Angriff defense = Verteidigung bzw. auf Angriff vom Gegner warten
     public String[] state = {"place", "offense", "defense"};
     //Spielmodus P = Spieler, C=Computer
     public String[] mode = {"PvsC", "PvsP", "CvsC"};
 
 
     public void setupSpiel(int groesse, Stage stage, int currentDifficulty, int currentMode){
-        spielerspielfeld = new Spielfeld(groesse, stage, spielerstackpane, false);
+        Spielfeld spielerfeld = new Spielfeld(groesse, stage, spielerstackpane, false);
         this.currentMode = currentMode;
         this.groesse = groesse;
         currentState = 0;
@@ -43,7 +40,8 @@ public class MainGameController {
     }
 
     public void setupGegnerFeld(int groesse, Stage stage) {
-        gegnerspielfeld = new Spielfeld(groesse, stage, gegnerstackpane, true);
+
+        Spielfeld gegnerspielfeld = new Spielfeld(groesse, stage, gegnerstackpane, true);
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         stage.setX((screenSize.width - stage.getWidth()) / 2 - stage.getWidth());
     }
@@ -71,20 +69,15 @@ public class MainGameController {
 
 
     public void handlePrimaryClick(Spielfeld spielfeld, int posx, int posy){
-        System.out.println(currentState);
-       switch (currentState){
+        switch (currentState){
             //Schiffe setzen
             case 0:
-                if(!spielfeld.istGegnerFeld){
-                    placeShip(spielfeld,posx, posy);
-                }else{
-                    System.out.println("Spielfeld ist gegner");
-                }
+                if(spielfeld.schiffe.isEmpty()) {return;}
+                placeShip(spielfeld,posx, posy);
                 break;
 
             //Schiffe erschießen
             case 1:
-                System.out.println("Klick mit State 1 entdeckt");
                 shootShip(spielfeld, posx, posy);
                 break;
 
@@ -112,6 +105,7 @@ public class MainGameController {
     public void setFeld(GridPane feld){
         this.feld = feld;
     }
+
 
     public int nachbarFeldGewaehlt(Spielfeld spielfeld, int posx, int posy){
         int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
@@ -159,33 +153,29 @@ public class MainGameController {
     }
 
     private void placeShip(Spielfeld spielfeld, int posx, int posy){
-            if (!spielfeld.felder[posx][posy].gesetzt) {
-                spielfeld.felder[posx][posy].gesetzt = true;
-                spielfeld.selectFeld(posx, posy);
 
-                // Entferne das passende Schiff aus der Liste
-                int nachbarWert = nachbarFeldGewaehlt(spielfeld, posx, posy); // Berechnung nur einmal
-                boolean entfernt = spielfeld.schiffe.removeIf(schiff -> schiff == nachbarWert);
+        if (!spielfeld.felder[posx][posy].gesetzt) {
+            spielfeld.felder[posx][posy].gesetzt = true;
+            spielfeld.selectFeld(posx, posy);
 
-                if (entfernt) {
-                    System.out.println("Schiff mit Wert " + nachbarWert + " aus der Liste entfernt.");
-                    if (spielfeld.schiffe.isEmpty()) {
-                        System.out.println("State wird auf 1 gesetzt");
-                        currentState++;
-                    }
-                } else {
-                    System.out.println("Kein Schiff mit Wert " + nachbarWert + " in der Liste gefunden.");
+            // Entferne das passende Schiff aus der Liste
+            int nachbarWert = nachbarFeldGewaehlt(spielfeld, posx, posy); // Berechnung nur einmal
+            for (int i = 0; i < spielfeld.schiffe.size(); i++) {
+                if (spielfeld.schiffe.get(i).equals(nachbarWert)) { // Vergleich des Inhalts
+                    spielfeld.schiffe.remove(i); // Entfernt das Element
+                    break; // Nach dem ersten Treffer abbrechen
                 }
 
             }
+
+
+            System.out.println("ALSO IN ARRAY LIST IST GERADE DRINNEN: " + spielfeld.schiffe);
+
+        }
     }
 
     private void  shootShip(Spielfeld spielfeld, int posx, int posy){
         System.out.println("schiffe erschießen");
-        if(spielfeld.istGegnerFeld){
-            spielfeld.selectFeld(posx,posy);
-            currentState = 2;
-        }
     }
 
     private void  watchShip(Spielfeld spielfeld, int posx, int posy){
