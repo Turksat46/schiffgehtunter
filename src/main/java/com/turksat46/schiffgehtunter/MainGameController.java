@@ -72,7 +72,7 @@ public class MainGameController {
 
     public void handlePrimaryClick(Spielfeld spielfeld, int posx, int posy){
         System.out.println(currentState);
-       switch (currentState){
+        switch (currentState){
             //Schiffe setzen
             case 0:
                 if(!spielfeld.istGegnerFeld){
@@ -159,25 +159,25 @@ public class MainGameController {
     }
 
     private void placeShip(Spielfeld spielfeld, int posx, int posy){
-            if (!spielfeld.felder[posx][posy].gesetzt) {
-                spielfeld.felder[posx][posy].gesetzt = true;
-                spielfeld.selectFeld(posx, posy);
+        if (!spielfeld.felder[posx][posy].gesetzt) {
+            spielfeld.felder[posx][posy].gesetzt = true;
+            spielfeld.selectFeld(posx, posy);
 
-                // Entferne das passende Schiff aus der Liste
-                int nachbarWert = nachbarFeldGewaehlt(spielfeld, posx, posy); // Berechnung nur einmal
-                boolean entfernt = spielfeld.schiffe.removeIf(schiff -> schiff == nachbarWert);
+            // Entferne das passende Schiff aus der Liste
+            int nachbarWert = nachbarFeldGewaehlt(spielfeld, posx, posy); // Berechnung nur einmal
+            boolean entfernt = spielfeld.schiffe.removeIf(schiff -> schiff == nachbarWert);
 
-                if (entfernt) {
-                    System.out.println("Schiff mit Wert " + nachbarWert + " aus der Liste entfernt.");
-                    if (spielfeld.schiffe.isEmpty()) {
-                        System.out.println("State wird auf 1 gesetzt");
-                        currentState++;
-                    }
-                } else {
-                    System.out.println("Kein Schiff mit Wert " + nachbarWert + " in der Liste gefunden.");
+            if (entfernt) {
+                System.out.println("Schiff mit Wert " + nachbarWert + " aus der Liste entfernt.");
+                if (spielfeld.schiffe.isEmpty()) {
+                    System.out.println("State wird auf 1 gesetzt");
+                    currentState++;
                 }
-
+            } else {
+                System.out.println("Kein Schiff mit Wert " + nachbarWert + " in der Liste gefunden.");
             }
+
+        }
     }
 
     private void  shootShip(Spielfeld spielfeld, int posx, int posy){
