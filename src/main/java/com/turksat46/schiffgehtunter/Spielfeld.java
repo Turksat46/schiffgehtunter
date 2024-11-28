@@ -1,5 +1,6 @@
 package com.turksat46.schiffgehtunter;
 import com.turksat46.schiffgehtunter.other.Feld;
+import com.turksat46.schiffgehtunter.other.Ship;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
@@ -18,6 +19,7 @@ public class Spielfeld {
     Stage stage;
     MainGameController mainGameController;
     ArrayList<Integer> schiffe= new ArrayList<>();
+    public static ArrayList<Ship> ships = new ArrayList<>();
     boolean istGegnerFeld;
 
     public Spielfeld (int groesse, Stage stage, GridPane spielerstackpane, boolean istGegnerFeld){
@@ -37,6 +39,7 @@ public class Spielfeld {
         if(groesse <=5 ){
             zellengroesse=75;
             this.schiffe.add(2);
+            this.schiffe.add(3);
 
         }else if(groesse > 5 && groesse <= 10){
             zellengroesse=50;

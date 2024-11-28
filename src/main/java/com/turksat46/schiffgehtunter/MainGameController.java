@@ -205,7 +205,9 @@ public class MainGameController {
                 System.out.println("Schiff mit Wert " + nachbarWert + " aus der Liste entfernt.");
                 Ship s = new Ship("test",nachbarWert); //Ship Objekt erstellen der passenden Größe
                 s.addAllLocations(getPairPositionen(spielfeld, posx, posy)); //Add locations des Schiffes
+                Spielfeld.ships.add(s);
                 System.out.println("Aktuelle Positionen des Schiffs: " + s.getLocationsString());
+                System.out.println(Spielfeld.ships.toString());
                 if (spielfeld.schiffe.isEmpty()) {
                         System.out.println("State wird auf 1 gesetzt");
                         currentState++;
