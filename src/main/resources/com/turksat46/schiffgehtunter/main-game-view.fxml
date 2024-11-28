@@ -4,8 +4,15 @@
 
 <AnchorPane xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.turksat46.schiffgehtunter.MainGameController">
    <children>
-      <GridPane fx:id="spielerstackpane">
+      <HBox fx:id="container">
+      <GridPane fx:id="spielerstackpane" style="-fx-start-margin: 10; ">
 
       </GridPane>
+
+
+      <GridPane fx:id="gegnerstackpane">
+
+      </GridPane>
+      </HBox>
    </children>
 </AnchorPane>
