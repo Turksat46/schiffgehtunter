@@ -6,9 +6,11 @@ import javafx.scene.shape.Rectangle;
 
 public class Feld extends Rectangle {
 
-    private boolean gesetzt;
+    public boolean gesetzt;
+    public boolean istSchiff;
     private int posX, posY;
     int hoehe, breite;
+    public boolean wurdeGetroffen;
 
     public Feld(int h, int b, int posX, int posY) {
         this.hoehe = h;

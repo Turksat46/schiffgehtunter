@@ -1,16 +1,18 @@
 package com.turksat46.schiffgehtunter;
-
+import com.turksat46.schiffgehtunter.filemanagement.SaveFileManager;
 import com.turksat46.schiffgehtunter.other.Difficulty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
-
 import java.io.IOException;
-import java.util.ArrayList;
+
 
 public class CreateGameController {
 
@@ -27,10 +29,16 @@ public class CreateGameController {
     @FXML
     TextField groessetextfield = new TextField();
 
+    @FXML
+    Label ladenhinweislabel = new Label();
+
+    @FXML
+    HBox kiDifficultyUI = new HBox();
+
     MainGameController mainGameController;
+    SaveFileManager saveFileManager;
 
     ObservableList<Difficulty> difficulties = FXCollections.observableArrayList();
-
     ObservableList<String> skillLevels = FXCollections.observableArrayList("Noob", "Average", "Hardcore");
     ObservableList<String> gameModes = FXCollections.observableArrayList("Spieler vs. Computer", "Spieler vs. Spieler", "Computer vs. Computer");
 
@@ -41,6 +49,14 @@ public class CreateGameController {
 
         cb.setValue(skillLevels.get(0));
         cb2.setValue(gameModes.get(0));
+
+        cb2.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
+                onStrategieChanged();
+            }
+        });
+
         groessetextfield.setText(Double.toString(groesseslider.getValue()));
         groesseslider.valueProperty().addListener((observable, oldValue, newValue) -> {
             groessetextfield.setText(Double.toString(newValue.intValue()));
@@ -50,7 +66,15 @@ public class CreateGameController {
         });
 
         mainGameController = new MainGameController();
+        saveFileManager = new SaveFileManager();
+    }
 
+    public void onStrategieChanged(){
+        if(cb2.getSelectionModel().getSelectedIndex() == 0){
+            kiDifficultyUI.setVisible(true);
+        }else{
+            kiDifficultyUI.setVisible(false);
+        }
     }
 
     public void onPlayPressed() throws IOException {
@@ -59,13 +83,21 @@ public class CreateGameController {
 
     public void startGame() throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("main-game-view.fxml"));
+        FXMLLoader gegnerfxmlLoader = new FXMLLoader(getClass().getResource("gegner-game-view.fxml"));
 
         Stage stage = new Stage();
-        stage.setTitle("Spiel");
+        stage.setTitle("Spielerfeld");
         stage.setScene(new Scene(fxmlLoader.load()));
 
+        Stage gegnerstage = new Stage();
+        gegnerstage.setTitle("Gegnerfeld");
+        gegnerstage.setScene(new Scene(gegnerfxmlLoader.load()));
+
         mainGameController = fxmlLoader.getController();
-        mainGameController.setupSpiel((int)groesseslider.getValue(), stage, cb2.getSelectionModel().getSelectedIndex() );
+        mainGameController.setupSpiel((int)groesseslider.getValue(), stage, cb.getSelectionModel().getSelectedIndex() ,cb2.getSelectionModel().getSelectedIndex() );
+
+        mainGameController = gegnerfxmlLoader.getController();
+        mainGameController.setupGegnerFeld((int)groesseslider.getValue(), gegnerstage);
         Stage thisstage = (Stage) cb.getScene().getWindow();
         thisstage.close();
     }
@@ -80,5 +112,9 @@ public class CreateGameController {
         thisstage.close();
     }
 
+    public void openLoadFileDialog() {
+        ladenhinweislabel.setText("Bitte eine Save-Datei im Dialog öffnen...");
+        saveFileManager.openFileChooser();
 
+    }
 }

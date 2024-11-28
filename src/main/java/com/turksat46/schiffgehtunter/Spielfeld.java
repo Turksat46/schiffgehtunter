@@ -1,39 +1,33 @@
 package com.turksat46.schiffgehtunter;
 import com.turksat46.schiffgehtunter.other.Feld;
-import com.turksat46.schiffgehtunter.other.Ship;
-import javafx.event.EventHandler;
-import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import java.io.IOException;
+
 import java.util.ArrayList;
 
 public class Spielfeld {
 
     public GridPane gridPane;
-    int zellengroesse;
+    int zellengroesse, groesse;
     int[][] feld;
     Feld[][] felder;
-    int groesse;
     Stage stage;
-    ArrayList<Ship> schiffe = new ArrayList<>();
     MainGameController mainGameController;
+    ArrayList<Integer> schiffe= new ArrayList<>();
+    boolean istGegnerFeld;
 
-    public Spielfeld (int groesse, Stage stage, GridPane spielerstackpane){
+    public Spielfeld (int groesse, Stage stage, GridPane spielerstackpane, boolean istGegnerFeld){
         this.stage = stage;
         this.feld= new int [groesse][groesse];
         this.gridPane = spielerstackpane;
         this.groesse = groesse;
         felder = new Feld[groesse][groesse];
         mainGameController = new MainGameController();
-
+        this.istGegnerFeld = istGegnerFeld;
         initFeld();
     }
 
@@ -42,43 +36,18 @@ public class Spielfeld {
 
         if(groesse <=5 ){
             zellengroesse=75;
-            schiffe.add(new Ship("Zerstörer", 2));
-            schiffe.add(new Ship("Zerstörer", 2));
+            this.schiffe.add(2);
+
         }else if(groesse > 5 && groesse <= 10){
             zellengroesse=50;
-            schiffe.add(new Ship("Zerstörer", 2));
-            schiffe.add(new Ship("Zerstörer", 2));
-            schiffe.add(new Ship("U-Boot", 3));
-            schiffe.add(new Ship("U-Boot", 3));
+
         }else if(groesse > 10 && groesse <= 20){
             zellengroesse=30;
-            schiffe.add(new Ship("Zerstörer", 2));
-            schiffe.add(new Ship("Zerstörer", 2));
-            schiffe.add(new Ship("Zerstörer", 2));
-            schiffe.add(new Ship("U-Boot", 3));
-            schiffe.add(new Ship("Kreuzer", 3));
-            schiffe.add(new Ship("Kreuzer", 3));
-            schiffe.add(new Ship("Schlachtschiff", 4));
-            schiffe.add(new Ship("Schlachtschiff", 4));
+
         }else {
             zellengroesse=20;
-            schiffe.add(new Ship("Zerstörer", 2));
-            schiffe.add(new Ship("Zerstörer", 2));
-            schiffe.add(new Ship("Zerstörer", 2));
-            schiffe.add(new Ship("Zerstörer", 2));
-            schiffe.add(new Ship("U-Boot", 3));
-            schiffe.add(new Ship("U-Boot", 3));
-            schiffe.add(new Ship("Kreuzer", 3));
-            schiffe.add(new Ship("Schlachtschiff", 4));
-            schiffe.add(new Ship("Schlachtschiff", 4));
-            schiffe.add(new Ship("Flugzeugträger", 5));
-        }
 
-        System.out.println("Anzahl der Schiffe: " + schiffe.size());
-        for (Ship schiff : schiffe) {
-            System.out.println("Schiff: " + schiff.getName() + ", Groesse: " + schiff.getGroesse());
         }
-
 
         // Schleife zur Erstellung der Zellen (als Rectangle mit Text)
         for (int i = 0; i < groesse; i++) {
@@ -103,7 +72,13 @@ public class Spielfeld {
 
                 // Klick-Event für jede Zelle
                 cellPane.setOnMouseClicked(event -> {
-                    mainGameController.handleClick(this, row, col);
+                    if (event.getButton()== MouseButton.PRIMARY) {
+                        mainGameController.handlePrimaryClick(this, row, col);
+                    }
+                    else if (event.getButton()== MouseButton.SECONDARY) {
+                        mainGameController.handleSecondaryClick(this, row, col);
+                    }
+
                 });
 
                 // Zelle dem GridPane hinzufügen
@@ -118,6 +93,56 @@ public class Spielfeld {
     }
 
     public void selectFeld(int posx, int posy){
-        felder[posx][posy].setFill(Color.BLUE);
+        //TODO: Eventuell hier die Farbe ändern, wenn ein Schiff angeklickt wird
+        if(istGegnerFeld){
+            felder[posx][posy].setFill(Color.RED);
+        }else{
+            felder[posx][posy].setFill(Color.BLUE);
+        }
+    }
+
+    public void deselectRowAndColumn(Spielfeld spielfeld, int posx, int posy) {
+        felder[posx][posy].setFill(Color.LIGHTBLUE);
+        spielfeld.felder[posx][posy].gesetzt = false;
+
+        // Horizontale Richtung: Nach links
+        for (int x = posx - 1; x >= 0; x--) {
+            if (spielfeld.felder[x][posy].gesetzt) {
+                spielfeld.felder[x][posy].gesetzt = false;
+                felder[x][posy].setFill(Color.LIGHTBLUE);
+            } else {
+                break; // Stoppen, wenn ein freies Feld gefunden wird
+            }
+        }
+
+        // Horizontale Richtung: Nach rechts
+        for (int x = posx + 1; x < spielfeld.groesse; x++) {
+            if (spielfeld.felder[x][posy].gesetzt) {
+                spielfeld.felder[x][posy].gesetzt = false;
+                felder[x][posy].setFill(Color.LIGHTBLUE);
+            } else {
+                break; // Stoppen, wenn ein freies Feld gefunden wird
+            }
+        }
+
+        // Vertikale Richtung: Nach oben
+        for (int y = posy - 1; y >= 0; y--) {
+            if (spielfeld.felder[posx][y].gesetzt) {
+                spielfeld.felder[posx][y].gesetzt = false;
+                felder[posx][y].setFill(Color.LIGHTBLUE);
+            } else {
+                break; // Stoppen, wenn ein freies Feld gefunden wird
+            }
+        }
+
+        // Vertikale Richtung: Nach unten
+        for (int y = posy + 1; y < spielfeld.felder[posx].length; y++) {
+            if (spielfeld.felder[posx][y].gesetzt) {
+                spielfeld.felder[posx][y].gesetzt = false;
+                felder[posx][y].setFill(Color.LIGHTBLUE);
+            } else {
+                break; // Stoppen, wenn ein freies Feld gefunden wird
+            }
+        }
     }
 }
