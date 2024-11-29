@@ -16,16 +16,14 @@ public class Spielfeld {
     int zellengroesse, groesse;
     int[][] feld;
     Feld[][] felder;
-    Stage stage;
     MainGameController mainGameController;
     ArrayList<Integer> schiffe= new ArrayList<>();
     public static ArrayList<Ship> ships = new ArrayList<>();
     boolean istGegnerFeld;
 
-    public Spielfeld (int groesse, Stage stage, GridPane spielerstackpane, boolean istGegnerFeld){
-        this.stage = stage;
+    public Spielfeld (int groesse, boolean istGegnerFeld){
         this.feld= new int [groesse][groesse];
-        this.gridPane = spielerstackpane;
+        this.gridPane = new GridPane();
         this.groesse = groesse;
         felder = new Feld[groesse][groesse];
         mainGameController = new MainGameController();
@@ -35,6 +33,7 @@ public class Spielfeld {
 
 
     private void initFeld(){
+
 
         if(groesse <=5 ){
             zellengroesse=75;
@@ -86,13 +85,13 @@ public class Spielfeld {
 
                 // Zelle dem GridPane hinzufügen
                 gridPane.add(cellPane, j, i);
-                gridPane.setMinHeight(zellengroesse*groesse);
-                gridPane.setMinWidth(zellengroesse*groesse);
+               // gridPane.setMinHeight(zellengroesse*groesse);
+                //gridPane.setMinWidth(zellengroesse*groesse);
+
 
             }
         }
-        mainGameController.setFeld(gridPane);
-        stage.show();
+
     }
 
     public void selectFeld(int posx, int posy){

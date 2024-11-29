@@ -83,21 +83,17 @@ public class CreateGameController {
 
     public void startGame() throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("main-game-view.fxml"));
-        FXMLLoader gegnerfxmlLoader = new FXMLLoader(getClass().getResource("gegner-game-view.fxml"));
 
         Stage stage = new Stage();
         stage.setTitle("Spielerfeld");
         stage.setScene(new Scene(fxmlLoader.load()));
 
-        Stage gegnerstage = new Stage();
-        gegnerstage.setTitle("Gegnerfeld");
-        gegnerstage.setScene(new Scene(gegnerfxmlLoader.load()));
-
         mainGameController = fxmlLoader.getController();
         mainGameController.setupSpiel((int)groesseslider.getValue(), stage, cb.getSelectionModel().getSelectedIndex() ,cb2.getSelectionModel().getSelectedIndex() );
+        stage.show();
 
-        mainGameController = gegnerfxmlLoader.getController();
-        mainGameController.setupGegnerFeld((int)groesseslider.getValue(), gegnerstage);
+
+
         Stage thisstage = (Stage) cb.getScene().getWindow();
         thisstage.close();
     }

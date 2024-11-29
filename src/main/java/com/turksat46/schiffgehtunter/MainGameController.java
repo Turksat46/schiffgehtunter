@@ -3,10 +3,13 @@ import com.turksat46.schiffgehtunter.other.Ship;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import java.awt.*;
@@ -17,7 +20,9 @@ import java.util.List;
 public class MainGameController {
     @FXML
     public GridPane spielerstackpane, gegnerstackpane;
-    public static int currentState, currentMode, currentDifficulty, groesse;
+
+    @FXML public HBox container;
+   public static int currentState, currentMode, currentDifficulty, groesse;
     GridPane feld;
     AI bot;
 
@@ -31,7 +36,15 @@ public class MainGameController {
 
 
     public void setupSpiel(int groesse, Stage stage, int currentDifficulty, int currentMode){
-        spielerspielfeld = new Spielfeld(groesse, stage, spielerstackpane, false);
+        spielerspielfeld = new Spielfeld(groesse,  false);
+        gegnerspielfeld = new Spielfeld(groesse,  false);
+
+        spielerstackpane.getChildren().add(spielerspielfeld.gridPane);
+        gegnerstackpane.getChildren().add(gegnerspielfeld.gridPane);
+        // StackPane-Margen setzen
+        HBox.setMargin(spielerstackpane, new Insets(10, 10, 10, 10)); // Abstand für spielerstackpane
+        HBox.setMargin(gegnerstackpane, new Insets(10, 10, 10, 10)); // Abstand für gegnerstackpane
+
         this.currentMode = currentMode;
         this.groesse = groesse;
         currentState = 0;
@@ -41,12 +54,6 @@ public class MainGameController {
         bot = new AI(currentDifficulty, groesse);
 
         setPausierenEventHandler(stage);
-    }
-
-    public void setupGegnerFeld(int groesse, Stage stage) {
-        gegnerspielfeld = new Spielfeld(groesse, stage, gegnerstackpane, true);
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        stage.setX((screenSize.width - stage.getWidth()) / 2 - stage.getWidth());
     }
 
     public void setPausierenEventHandler(Stage stage){
@@ -73,7 +80,7 @@ public class MainGameController {
 
     public void handlePrimaryClick(Spielfeld spielfeld, int posx, int posy){
         System.out.println(currentState);
-       switch (currentState){
+        switch (currentState){
             //Schiffe setzen
             case 0:
                 if(!spielfeld.istGegnerFeld){
