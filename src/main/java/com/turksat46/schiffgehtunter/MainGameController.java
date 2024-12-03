@@ -24,7 +24,7 @@ public class MainGameController {
     @FXML public HBox container;
    public static int currentState, currentMode, currentDifficulty, groesse;
     GridPane feld;
-    AI bot;
+    private static AI bot;
 
     Spielfeld spielerspielfeld;
     Spielfeld gegnerspielfeld;
@@ -51,7 +51,7 @@ public class MainGameController {
         this.currentDifficulty = currentDifficulty;
         System.out.println("Mode selected and set to: " + mode[currentMode]);
         System.out.println("State selected and set to: " + state[currentState]);
-        bot = new AI(currentDifficulty, groesse);
+        bot = new AI(currentDifficulty, groesse, this);
 
         setPausierenEventHandler(stage);
     }
@@ -228,11 +228,19 @@ public class MainGameController {
 
     private void  shootShip(Spielfeld spielfeld, int posx, int posy){
         System.out.println("schiffe erschießen");
+
         if(spielfeld.istGegnerFeld){
+            currentState = 2;
             System.out.println("Feld ist gegnerfeld");
             spielfeld.selectFeld(posx,posy);
-            currentState = 2;
+            bot.receiveMove(posx, posy);
+
         }
+    }
+
+    public void receiveShoot(int posx, int posy){
+        spielerspielfeld.selectFeld(posx, posy, Color.DARKRED);
+        currentState = 1;
     }
 
     private void  watchShip(Spielfeld spielfeld, int posx, int posy){

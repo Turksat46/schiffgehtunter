@@ -101,6 +101,10 @@ public class Spielfeld {
             felder[posx][posy].setFill(Color.BLUE);
         }
     }
+    public void selectFeld(int posx, int posy, Color color){
+        //TODO: Eventuell hier die Farbe ändern, wenn ein Schiff angeklickt wird
+            felder[posx][posy].setFill(color);
+    }
 
     public void deselectRowAndColumn(Spielfeld spielfeld, int posx, int posy) {
         felder[posx][posy].setFill(Color.LIGHTBLUE);
