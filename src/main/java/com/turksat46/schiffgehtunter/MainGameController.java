@@ -37,7 +37,7 @@ public class MainGameController {
 
     public void setupSpiel(int groesse, Stage stage, int currentDifficulty, int currentMode){
         spielerspielfeld = new Spielfeld(groesse,  false);
-        gegnerspielfeld = new Spielfeld(groesse,  false);
+        gegnerspielfeld = new Spielfeld(groesse,  true);
 
         spielerstackpane.getChildren().add(spielerspielfeld.gridPane);
         gegnerstackpane.getChildren().add(gegnerspielfeld.gridPane);
@@ -229,6 +229,7 @@ public class MainGameController {
     private void  shootShip(Spielfeld spielfeld, int posx, int posy){
         System.out.println("schiffe erschießen");
         if(spielfeld.istGegnerFeld){
+            System.out.println("Feld ist gegnerfeld");
             spielfeld.selectFeld(posx,posy);
             currentState = 2;
         }
