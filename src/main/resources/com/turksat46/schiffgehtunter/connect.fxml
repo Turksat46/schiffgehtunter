@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane minWidth="-Infinity" prefHeight="137.0" prefWidth="350.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.turksat46.schiffgehtunter.netzwerk.Client">
+   <children>
+      <VBox prefHeight="160.0" prefWidth="350.0">
+         <children>
+            <HBox prefHeight="57.0" prefWidth="350.0">
+               <children>
+                  <Button fx:id="backButton" mnemonicParsing="false" prefHeight="74.0" prefWidth="80.0" text="Zurück">
+                     <HBox.margin>
+                        <Insets left="10.0" top="10.0" />
+                     </HBox.margin></Button>
+                  <Label alignment="CENTER" prefHeight="39.0" prefWidth="212.0" text="Mit Gegner verbinden" textAlignment="CENTER">
+                     <font>
+                        <Font size="21.0" />
+                     </font>
+                     <HBox.margin>
+                        <Insets left="10.0" top="10.0" />
+                     </HBox.margin></Label>
+               </children>
+            </HBox>
+            <Separator prefWidth="200.0">
+               <VBox.margin>
+                  <Insets top="10.0" />
+               </VBox.margin>
+            </Separator>
+            <HBox prefHeight="54.0" prefWidth="290.0">
+               <children>
+                  <TextField fx:id="ipInput" minWidth="-Infinity" prefHeight="26.0" prefWidth="224.0">
+                     <HBox.margin>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                     </HBox.margin>
+                  </TextField>
+                  <Button fx:id="connectButton" mnemonicParsing="false" prefHeight="26.0" prefWidth="86.0" text="Verbinden">
+                     <HBox.margin>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                     </HBox.margin>
+                  </Button>
+               </children>
+            </HBox>
+            <Label alignment="CENTER" prefHeight="18.0" prefWidth="336.0" text="Bitte geben Sie die IP-Adresse des Gegners ein" textAlignment="CENTER">
+               <VBox.margin>
+                  <Insets left="10.0" right="10.0" />
+               </VBox.margin>
+            </Label>
+            <ProgressBar fx:id="progressBar" prefHeight="26.0" prefWidth="326.0" progress="0.0">
+               <VBox.margin>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+               </VBox.margin>
+            </ProgressBar>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

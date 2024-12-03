@@ -18,7 +18,6 @@ public class Spielfeld {
     Feld[][] felder;
     MainGameController mainGameController;
     ArrayList<Integer> schiffe= new ArrayList<>();
-    public static ArrayList<Ship> ships = new ArrayList<>();
     boolean istGegnerFeld;
 
     public Spielfeld (int groesse, boolean istGegnerFeld){

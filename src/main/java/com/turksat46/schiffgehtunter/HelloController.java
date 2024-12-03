@@ -27,7 +27,7 @@ public class HelloController {
 
     @FXML
     protected void onMultiplayerClick() throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("createGame.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("connect.fxml"));
         Stage stage = new Stage();
         stage.setTitle("Spiel finden");
         stage.setScene(new Scene(fxmlLoader.load()));

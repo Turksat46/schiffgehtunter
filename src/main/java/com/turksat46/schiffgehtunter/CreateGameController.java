@@ -92,8 +92,6 @@ public class CreateGameController {
         mainGameController.setupSpiel((int)groesseslider.getValue(), stage, cb.getSelectionModel().getSelectedIndex() ,cb2.getSelectionModel().getSelectedIndex() );
         stage.show();
 
-
-
         Stage thisstage = (Stage) cb.getScene().getWindow();
         thisstage.close();
     }
