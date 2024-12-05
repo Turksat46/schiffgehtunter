@@ -19,6 +19,8 @@ public class Feld extends Rectangle {
         this.setWidth((double)b);
         this.posX = posX;
         this.posY = posY;
+        this.istSchiff = false;
+        this.wurdeGetroffen = false;
     }
 
 
