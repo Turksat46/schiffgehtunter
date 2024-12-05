@@ -34,6 +34,7 @@ public class Spielfeld {
 
     // TODO:Ich schaue hier noch ob wir des so lassen
     // soll bei kleinen felder random schiffsgroeße aufgewöhlt werden oder greedy benutzen ???
+    // TODO: IDEE ist jz umgedrehter greedy algorihtmus
     private void initFeld(){
 
         int[] schiffsGroessen = {5, 4, 3, 2}; // Größen der Schiffe
@@ -101,10 +102,6 @@ public class Spielfeld {
 
                 // Zelle dem GridPane hinzufügen
                 gridPane.add(cellPane, j, i);
-               // gridPane.setMinHeight(zellengroesse*groesse);
-                //gridPane.setMinWidth(zellengroesse*groesse);
-
-
             }
         }
 

@@ -201,33 +201,38 @@ public class MainGameController {
         return positionen;
     }
 
-
+// schau hier mal ob des nur ein vorkommen löscht aus array list ist noc unsiche
+    // und gucken ob des effizient ist wird ja immer geschlieift wenn man clicked
     private void placeShip(Spielfeld spielfeld, int posx, int posy){
             if (!spielfeld.felder[posx][posy].gesetzt) {
+                System.out.println(spielfeld.schiffe);
                 spielfeld.felder[posx][posy].gesetzt = true;
                 spielfeld.selectFeld(posx, posy);
             // Entferne das passende Schiff aus der Liste
             int nachbarWert = nachbarFeldGewaehlt(spielfeld, posx, posy); // Berechnung nur einmal
-            boolean entfernt = spielfeld.schiffe.removeIf(schiff -> schiff == nachbarWert);
 
-            if (entfernt) {
+               //Suche das Schiff in der Liste und entferne ein Vorkommen
+                for (int i = 0; i < spielfeld.schiffe.size(); i++) {
+                    int schiff = spielfeld.schiffe.get(i);
+                    if (schiff == nachbarWert) {
+                        spielfeld.schiffe.remove(i);
+                        // Da die Liste durch das Entfernen eines Elements kleiner wird,
+                        // muss der Index um eins reduziert werden, um das nächste Element korrekt zu überprüfen.
+                        i--;
+                       break;
+                    }
+                }
+                System.out.println(spielfeld.schiffe);
 
-                System.out.println("Schiff mit Wert " + nachbarWert + " aus der Liste entfernt.");
-                Ship s = new Ship("test",nachbarWert); //Ship Objekt erstellen der passenden Größe
-                s.addAllLocations(getPairPositionen(spielfeld, posx, posy)); //Add locations des Schiffes
-                //Spielfeld.ships.add(s);
-                System.out.println("Aktuelle Positionen des Schiffs: " + s.getLocationsString());
-                //System.out.println(Spielfeld.ships.toString());
                 if (spielfeld.schiffe.isEmpty()) {
                         System.out.println("State wird auf 1 gesetzt");
                         currentState++;
                     }
-                } else {
-                    System.out.println("Kein Schiff mit Wert " + nachbarWert + " in der Liste gefunden.");
                 }
 
         }
-    }
+
+
 
     private void  shootShip(Spielfeld spielfeld, int posx, int posy){
         System.out.println("schiffe erschießen");
