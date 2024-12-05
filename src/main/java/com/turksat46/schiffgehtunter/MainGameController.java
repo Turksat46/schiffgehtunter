@@ -22,6 +22,7 @@ public class MainGameController {
     public GridPane spielerstackpane, gegnerstackpane;
 
     @FXML public HBox container;
+    @FXML public HBox label1;
    public static int currentState, currentMode, currentDifficulty, groesse;
     GridPane feld;
     private static AI bot;
@@ -41,9 +42,11 @@ public class MainGameController {
 
         spielerstackpane.getChildren().add(spielerspielfeld.gridPane);
         gegnerstackpane.getChildren().add(gegnerspielfeld.gridPane);
+
         // StackPane-Margen setzen
         HBox.setMargin(spielerstackpane, new Insets(10, 10, 10, 10)); // Abstand für spielerstackpane
-        HBox.setMargin(gegnerstackpane, new Insets(10, 10, 10, 10)); // Abstand für gegnerstackpane
+        HBox.setMargin(gegnerstackpane, new Insets(10, 10, 10, 300)); // Abstand für gegnerstackpane
+
 
         this.currentMode = currentMode;
         this.groesse = groesse;
