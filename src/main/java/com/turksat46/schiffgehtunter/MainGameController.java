@@ -228,13 +228,17 @@ public class MainGameController {
 
     private void  shootShip(Spielfeld spielfeld, int posx, int posy){
         System.out.println("schiffe erschießen");
-
         if(spielfeld.istGegnerFeld){
-            currentState = 2;
-            System.out.println("Feld ist gegnerfeld");
-            spielfeld.selectFeld(posx,posy);
-            bot.receiveMove(posx, posy);
-
+            if(spielfeld.felder[posx][posy].wurdeGetroffen == false){
+                currentState = 2;
+                System.out.println("Feld ist gegnerfeld");
+                spielfeld.felder[posx][posy].wurdeGetroffen = true;
+                spielfeld.selectFeld(posx,posy);
+                bot.receiveMove(posx, posy);
+            }else{
+                //Feld wurde bereits getroffen
+                System.out.println("Feld wurde bereits getroffen. Klick wird ignoriert!");
+            }
         }
     }
 
