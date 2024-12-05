@@ -2,19 +2,21 @@ package com.turksat46.schiffgehtunter;
 
 import com.turksat46.schiffgehtunter.other.Position;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.io.Console;
+import java.util.*;
 import java.util.random.RandomGenerator;
 
 public class AI {
     int difficulty;
-    int[][] feld;
+    static int[][] feld;
     static int groesse;
 
-    List<Position> felder = new ArrayList<Position>();
+    static private Map<Integer, List<Position>> ships = new HashMap<>();
+    static private int shipId = 0;
 
-    MainGameController mainGameController;
+    static List<Position> felder = new ArrayList<Position>();
+
+    static MainGameController mainGameController;
 
     public AI(int difficulty, int groesse, MainGameController mainGameController){
         this.difficulty = difficulty;
@@ -26,7 +28,7 @@ public class AI {
 
     private void setShips() {
         //Platziere random Schiffe auf den Feldern
-        int mindestAnzahlSchiffe = (int)(groesse*groesse*0.3);
+        int mindestAnzahlSchiffe = (int)((groesse*groesse)*0.3);
         int currentAnzahlSchiffe = 0;
 
         List<Position> eventuelleStartPositionen = new ArrayList<>();
@@ -35,6 +37,10 @@ public class AI {
                 eventuelleStartPositionen.add(new Position(i, j));
             }
         }
+
+        shipId = 0; // Reset shipId
+        ships.clear(); // Clear the ships map
+
         while(currentAnzahlSchiffe < mindestAnzahlSchiffe){
             Collections.shuffle(eventuelleStartPositionen);
             Position startPosition = eventuelleStartPositionen.get(0);
@@ -52,18 +58,28 @@ public class AI {
             for(int i = 0; i < schiffGroesse; i++){
                 int x = horizontal ? startPosition.getX() + i : startPosition.getX();
                 int y = horizontal ? startPosition.getY() : startPosition.getY() + i;
+                System.out.println(x+ " " + y + "wurden markiert!");
+                // Check if the coordinates are within bounds
+                if (x >= groesse || y >= groesse) {
+                    kannPlatziertwerden = false;
+                    break;
+                }
+
                 if(feld[x][y] != 0){
                     kannPlatziertwerden = false;
                     break;
                 }
             }
-
+            List<Position> shipPositions = new ArrayList<>();
             if(kannPlatziertwerden){
                 for(int j = 0; j < schiffGroesse; j++){
                     int x = horizontal ? startPosition.getX() + j : startPosition.getX();
                     int y = horizontal ? startPosition.getY() : startPosition.getY() + j;
                     feld[x][y] = 1;
+                    shipPositions.add(new Position(x, y));
                 }
+                ships.put(shipId, shipPositions);
+                shipId++;
                 currentAnzahlSchiffe+=schiffGroesse;
 
                 for(int j = 0; j < schiffGroesse; j++){
@@ -72,7 +88,7 @@ public class AI {
                     for(int k = -1; k <= 1; k++){
                         for(int l = -1; l <= 1; l++){
                             if(x + k >= 0 && x + k < groesse && y + l >= 0 && y + l < groesse ){
-                                System.out.println("Schiff wurde an "+x+k+","+y+l+ " gesetzt.");
+                                System.out.println("Schiff wurde an "+(x+k)+","+(y+l)+ " gesetzt.");
                                 eventuelleStartPositionen.remove(new Position(x + k, y + l));
                             }
                         }
@@ -88,8 +104,24 @@ public class AI {
         //Angriff wurde initiiert, Gegenangriff starten
         if(feld[posx][posy] == 1){
             System.out.println(posx + " " + posy + " wurde getroffen!");
+            feld[posx][posy] = 0;
+            Map<Integer, List<Position>> shipsCopy = ships;
+
+            for (Map.Entry<Integer, List<Position>> entry : shipsCopy.entrySet()) {
+                List<Position> shipPositions = entry.getValue();
+                shipPositions.removeIf(p -> p.getX() == posx && p.getY() == posy);
+                if (shipPositions.isEmpty()) {
+                    System.out.println("Schiff " + entry.getKey() + " versenkt!");
+                    ships.remove(entry.getKey());
+                    if(ships.isEmpty()){
+                        //Spieler hat gewonnen
+                        mainGameController.handleWinForPlayer();
+                    }
+                }
+            }
             mainGameController.handleHit(posx, posy);
         }
+        //Gegenagriff
         while(true){
             int nextposx = RandomGenerator.getDefault().nextInt(0, groesse);
             int nextposy = RandomGenerator.getDefault().nextInt(0, groesse);

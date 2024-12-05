@@ -236,6 +236,15 @@ public class MainGameController {
         gegnerspielfeld.selectFeld(x,y,Color.GREEN);
     }
 
+    public void handleWinForPlayer(){
+        //TODO: @Elion mach was draus
+        System.out.println("Spieler hat gewonnen!");
+    }
+
+    public void handleWinForOpponent(){
+        //TODO: @Elion mach was draus
+        System.out.println("Gegner hat gewonnen!");
+    }
 
     private void  shootShip(Spielfeld spielfeld, int posx, int posy){
         System.out.println("schiffe erschießen");
