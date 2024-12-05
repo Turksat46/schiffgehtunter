@@ -9,6 +9,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class Spielfeld {
 
@@ -28,17 +29,33 @@ public class Spielfeld {
         mainGameController = new MainGameController();
         this.istGegnerFeld = istGegnerFeld;
         initFeld();
+
     }
 
-
+    // TODO:Ich schaue hier noch ob wir des so lassen
+    // soll bei kleinen felder random schiffsgroeße aufgewöhlt werden oder greedy benutzen ???
     private void initFeld(){
 
+        int[] schiffsGroessen = {5, 4, 3, 2}; // Größen der Schiffe
+        int totalCells = groesse * groesse; // Gesamtanzahl der Zellen im Spielfeld
+        int shipCount = (int) (totalCells * 0.3); // 30 % der Zellen für Schiffe
+
+
+        // Greedy-Algorithmus zum Auffüllen der Zellen
+        //des hier bei feldgroesse von 10+
+        for (int size : schiffsGroessen) {
+            while (shipCount >= size) {
+                schiffe.add(size); // Schiff hinzufügen
+                shipCount -= size; // Zellen zählen
+            }
+        }
+
+        // Ausgabe der Ergebnisse
+        System.out.println("Schiffe in Zellen: " + schiffe);
+        System.out.println("Verbleibende Zellen: " + shipCount);
 
         if(groesse <=5 ){
             zellengroesse=75;
-            this.schiffe.add(2);
-            this.schiffe.add(3);
-
         }else if(groesse > 5 && groesse <= 10){
             zellengroesse=50;
 
@@ -101,6 +118,7 @@ public class Spielfeld {
             felder[posx][posy].setFill(Color.BLUE);
         }
     }
+
     public void selectFeld(int posx, int posy, Color color){
         //TODO: Eventuell hier die Farbe ändern, wenn ein Schiff angeklickt wird
             felder[posx][posy].setFill(color);
