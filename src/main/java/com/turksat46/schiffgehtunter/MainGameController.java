@@ -230,8 +230,11 @@ public class MainGameController {
                     }
                 }
 
-        }
+    }
 
+    public void handleHit(int x, int y){
+        gegnerspielfeld.selectFeld(x,y,Color.GREEN);
+    }
 
 
     private void  shootShip(Spielfeld spielfeld, int posx, int posy){
