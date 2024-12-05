@@ -54,6 +54,7 @@ public class MainGameController {
         this.currentDifficulty = currentDifficulty;
         System.out.println("Mode selected and set to: " + mode[currentMode]);
         System.out.println("State selected and set to: " + state[currentState]);
+        System.out.println("Difficulty selected and set to: " + currentDifficulty);
         bot = new AI(currentDifficulty, groesse, this);
 
         setPausierenEventHandler(stage);

@@ -121,7 +121,35 @@ public class AI {
             }
             mainGameController.handleHit(posx, posy);
         }
-        //Gegenagriff
+
+        getNextMove();
+
+    }
+
+    public void getNextMove(){
+        switch (difficulty){
+            case 0:
+                easyMove();
+                break;
+            case 1:
+                midMove();
+                break;
+            case 2:
+                godlikeMove();
+                break;
+            default:
+                break;
+        }
+
+    }
+
+    private void godlikeMove() {
+    }
+
+    private void midMove() {
+    }
+
+    private void easyMove(){
         while(true){
             int nextposx = RandomGenerator.getDefault().nextInt(0, groesse);
             int nextposy = RandomGenerator.getDefault().nextInt(0, groesse);
@@ -137,11 +165,5 @@ public class AI {
             }
 
         }
-
-
-    }
-
-    public void getNextMove(){
-
     }
 }
