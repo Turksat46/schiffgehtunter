@@ -105,7 +105,7 @@ public class AI {
         if(feld[posx][posy] == 1){
             System.out.println(posx + " " + posy + " wurde getroffen!");
             feld[posx][posy] = 0;
-            Map<Integer, List<Position>> shipsCopy = ships;
+            Map<Integer, List<Position>> shipsCopy = new HashMap<>(ships);
 
             for (Map.Entry<Integer, List<Position>> entry : shipsCopy.entrySet()) {
                 List<Position> shipPositions = entry.getValue();
@@ -120,10 +120,9 @@ public class AI {
                 }
             }
             mainGameController.handleHit(posx, posy);
+
         }
-
         getNextMove();
-
     }
 
     public void getNextMove(){
@@ -143,10 +142,11 @@ public class AI {
 
     }
 
-    private void godlikeMove() {
+    private void midMove() {
+
     }
 
-    private void midMove() {
+    private void godlikeMove() {
     }
 
     private void easyMove(){
