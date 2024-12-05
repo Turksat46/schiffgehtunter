@@ -116,12 +116,15 @@ public class AI {
                     if(ships.isEmpty()){
                         //Spieler hat gewonnen
                         mainGameController.handleWinForPlayer();
+                        //Durch diesen Return wird der State niemals zurückgesetzt, sprich es ist kein weiterer Zug möglich (Feature-Bug :D)
+                        return;
                     }
                 }
             }
             mainGameController.handleHit(posx, posy);
 
         }
+
         getNextMove();
     }
 
