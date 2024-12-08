@@ -265,6 +265,7 @@ public class MainGameController {
 
     public void receiveShoot(int posx, int posy){
         spielerspielfeld.selectFeld(posx, posy, Color.DARKRED);
+        bot.receiveHit(posx, posy, spielerspielfeld.felder[posx][posy].istSchiff);
         currentState = 1;
     }
 

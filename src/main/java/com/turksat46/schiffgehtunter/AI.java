@@ -16,6 +16,8 @@ public class AI {
 
     static List<Position> felder = new ArrayList<Position>();
 
+    static List<Position> entdeckteSchiffe = new ArrayList<>();
+
     static MainGameController mainGameController;
 
     public AI(int difficulty, int groesse, MainGameController mainGameController){
@@ -126,6 +128,10 @@ public class AI {
         }
 
         getNextMove();
+    }
+
+    public void receiveHit(int x, int y, boolean isShip){
+        
     }
 
     public void getNextMove(){
