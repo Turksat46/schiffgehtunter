@@ -4,24 +4,31 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import java.awt.*;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 public class MainGameController {
     @FXML
     public GridPane spielerstackpane, gegnerstackpane;
 
+
     @FXML public HBox container;
+    @FXML public Pane images;
+
     @FXML public HBox label1;
    public static int currentState, currentMode, currentDifficulty, groesse;
     GridPane feld;
@@ -36,7 +43,7 @@ public class MainGameController {
     public String[] mode = {"PvsC", "PvsP", "CvsC"};
 
 
-    public void setupSpiel(int groesse, Stage stage, int currentDifficulty, int currentMode){
+    public void setupSpiel(int groesse, Stage stage, int currentDifficulty, int currentMode) throws FileNotFoundException {
         spielerspielfeld = new Spielfeld(groesse,  false);
         gegnerspielfeld = new Spielfeld(groesse,  true);
 
@@ -44,8 +51,22 @@ public class MainGameController {
         gegnerstackpane.getChildren().add(gegnerspielfeld.gridPane);
 
         // StackPane-Margen setzen
-        HBox.setMargin(spielerstackpane, new Insets(10, 10, 10, 10)); // Abstand für spielerstackpane
-        HBox.setMargin(gegnerstackpane, new Insets(10, 10, 10, 300)); // Abstand für gegnerstackpane
+        HBox.setMargin(spielerstackpane, new Insets(10, 10, 100, 10)); // Abstand für spielerstackpane
+        HBox.setMargin(gegnerstackpane, new Insets(10, 10, 100, 300)); // Abstand für gegnerstackpane
+
+        //creating the image object
+        InputStream stream = new FileInputStream("src/main/resources/com/turksat46/schiffgehtunter/images/pirateship.png");
+        Image image = new Image(stream);
+        //Creating the image view
+        ImageView imageView = new ImageView(image);
+        imageView.setFitWidth(100);
+        imageView.setFitHeight(100);
+        imageView.setPreserveRatio(true);
+
+
+
+        images.setLayoutY(500);
+        images.getChildren().add(imageView);
 
 
         this.currentMode = currentMode;
@@ -206,7 +227,6 @@ public class MainGameController {
     // und gucken ob des effizient ist wird ja immer geschlieift wenn man clicked
     private void placeShip(Spielfeld spielfeld, int posx, int posy){
             if (!spielfeld.felder[posx][posy].gesetzt) {
-                System.out.println(spielfeld.schiffe);
                 spielfeld.felder[posx][posy].gesetzt = true;
                 spielfeld.selectFeld(posx, posy);
             // Entferne das passende Schiff aus der Liste
@@ -217,13 +237,14 @@ public class MainGameController {
                     int schiff = spielfeld.schiffe.get(i);
                     if (schiff == nachbarWert) {
                         spielfeld.schiffe.remove(i);
+                        System.out.println("Schiff mit Wert " + nachbarWert + " aus der Liste entfernt.");
                         // Da die Liste durch das Entfernen eines Elements kleiner wird,
                         // muss der Index um eins reduziert werden, um das nächste Element korrekt zu überprüfen.
                         i--;
                        break;
                     }
                 }
-                System.out.println(spielfeld.schiffe);
+                System.out.println("Hier ist schiffe von spieler die zur Asuwahl stehen : " +spielfeld.schiffe);
 
                 if (spielfeld.schiffe.isEmpty()) {
                         System.out.println("State wird auf 1 gesetzt");

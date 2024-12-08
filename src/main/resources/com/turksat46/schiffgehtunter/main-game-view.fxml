@@ -5,6 +5,8 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.Group?>
 <AnchorPane xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.turksat46.schiffgehtunter.MainGameController">
    <children>
       <VBox fx:id="outercontainer">
@@ -39,6 +41,9 @@
             </GridPane>
          </HBox>
       </VBox>
+
+      <Pane fx:id="images">
+      </Pane>
 
    </children>
 </AnchorPane>
