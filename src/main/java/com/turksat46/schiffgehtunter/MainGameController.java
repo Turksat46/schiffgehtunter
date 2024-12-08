@@ -63,8 +63,14 @@ public class MainGameController {
         imageView.setFitHeight(100);
         imageView.setPreserveRatio(true);
 
-
-
+        imageView.setOnDragDone(event -> {
+            if (event.getTransferMode() == TransferMode.MOVE) {
+                System.out.println("Drag completed successfully.");
+                // Perform any clean-up or state changes if needed
+            } else {
+                System.out.println("Drag was canceled or not accepted.");
+            }
+        });
         images.setLayoutY(500);
         images.getChildren().add(imageView);
 
