@@ -55,7 +55,8 @@ public class MainGameController {
         HBox.setMargin(gegnerstackpane, new Insets(10, 10, 100, 300)); // Abstand für gegnerstackpane
 
         //creating the image object
-        InputStream stream = new FileInputStream("src/main/resources/com/turksat46/schiffgehtunter/images/pirateship.png");
+        //InputStream stream = new FileInputStream("src/main/resources/com/turksat46/schiffgehtunter/images/pirateship.png");
+        InputStream stream = getClass().getResourceAsStream("/com/turksat46/schiffgehtunter/images/pirateship.png");
         Image image = new Image(stream);
         //Creating the image view
         ImageView imageView = new ImageView(image);
