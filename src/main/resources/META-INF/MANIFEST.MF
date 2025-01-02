@@ -1,0 +1,22 @@
+Manifest-Version: 1.0
+Main-Class: com.turksat46.schiffgehtunter.Launcher
+Class-Path: javafx-fxml-17.0.6.jar tensorflow-core-native-1.0.0-rc.2-lin
+ ux-x86_64.jar javafx-graphics-17.0.6-win.jar jackson-annotations-2.14.2
+ .jar javafx-media-17.0.6-win.jar ikonli-core-12.3.1.jar ikonli-javafx-1
+ 2.3.1.jar javafx-web-17.0.6-win.jar kotlin-stdlib-1.8.10.jar tensorflow
+ -core-native-1.0.0-rc.2.jar fxgl-scene-17.3.jar javafx-swing-17.0.6.jar
+  fxgl-entity-17.3.jar protobuf-java-3.21.9.jar jackson-core-2.14.2.jar 
+ javafx-base-17.0.6.jar tilesfx-11.48.jar fxgl-core-17.3.jar util-4.0.17
+ .jar kotlin-stdlib-common-1.8.10.jar javacpp-1.5.10.jar javafx-controls
+ -17.0.6.jar javafx-fxml-17.0.6-win.jar javafx-base-17.0.6-win.jar fxgl-
+ gameplay-17.3.jar tensorflow-core-native-1.0.0-rc.2-windows-x86_64.jar 
+ tensorflow-core-platform-1.0.0-rc.2.jar javafx-web-17.0.6.jar lifecycle
+ -4.0.17.jar tensorflow-core-native-1.0.0-rc.2-macosx-x86_64.jar javafx-
+ graphics-17.0.6.jar javafx-media-17.0.6.jar jackson-databind-2.14.2.jar
+  javafx-swing-17.0.6-win.jar formsfx-core-11.6.0.jar controlsfx-11.1.2.
+ jar ndarray-1.0.0.jar tensorflow-core-native-1.0.0-rc.2-macosx-arm64.ja
+ r validatorfx-0.4.0.jar tensorflow-core-native-1.0.0-rc.2-linux-arm64.j
+ ar audio-4.0.17.jar storage-4.0.17.jar tensorflow-core-api-1.0.0-rc.2.j
+ ar javafx-controls-17.0.6-win.jar fxgl-17.3.jar fxgl-io-17.3.jar bootst
+ rapfx-core-0.4.0.jar annotations-13.0.jar
+
