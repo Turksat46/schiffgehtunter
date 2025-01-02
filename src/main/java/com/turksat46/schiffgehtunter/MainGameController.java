@@ -4,6 +4,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
+import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.image.ImageView;
@@ -13,6 +14,11 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.PhongMaterial;
+import javafx.scene.shape.Box;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Text;
+import javafx.scene.transform.Translate;
 import javafx.stage.Stage;
 import java.awt.*;
 import java.io.*;
@@ -54,26 +60,6 @@ public class MainGameController {
         HBox.setMargin(spielerstackpane, new Insets(10, 10, 100, 10)); // Abstand für spielerstackpane
         HBox.setMargin(gegnerstackpane, new Insets(10, 10, 100, 300)); // Abstand für gegnerstackpane
 
-        //creating the image object
-        InputStream stream = new FileInputStream("src/main/resources/com/turksat46/schiffgehtunter/images/pirateship.png");
-        Image image = new Image(stream);
-        //Creating the image view
-        ImageView imageView = new ImageView(image);
-        imageView.setFitWidth(100);
-        imageView.setFitHeight(100);
-        imageView.setPreserveRatio(true);
-
-        imageView.setOnDragDone(event -> {
-            if (event.getTransferMode() == TransferMode.MOVE) {
-                System.out.println("Drag completed successfully.");
-                // Perform any clean-up or state changes if needed
-            } else {
-                System.out.println("Drag was canceled or not accepted.");
-            }
-        });
-        images.setLayoutY(500);
-        images.getChildren().add(imageView);
-
 
         this.currentMode = currentMode;
         this.groesse = groesse;
@@ -84,7 +70,64 @@ public class MainGameController {
         System.out.println("Difficulty selected and set to: " + currentDifficulty);
         bot = new AI(currentDifficulty, groesse, this);
 
+        generateSchiffe();
+
         setPausierenEventHandler(stage);
+    }
+
+
+    private void generateSchiffe(){
+
+        int currentOffset = 0;
+        int offset = 100;
+        HBox hbox = null;
+        // hier richtige:
+        for (int size : spielerspielfeld.schiffe) {
+
+            // Neue HBox für jedes Schiff erstellen
+            hbox = new HBox();
+            hbox.setSpacing(10);
+            hbox.setTranslateY(currentOffset); // Y-Position für Versatz
+
+            // Rechtecke basierend auf der Größe des Schiffs hinzufügen
+            for (int i = 0; i < size; i++) {
+                Rectangle rectangle = new Rectangle();
+                rectangle.setWidth(spielerspielfeld.zellengroesse-10);
+                rectangle.setHeight(spielerspielfeld.zellengroesse-10);
+                rectangle.setFill(Color.RED);
+                rectangle.setStroke(Color.BLACK);
+
+                hbox.getChildren().add(rectangle); // Rechteck zur HBox hinzufügen
+            }
+            // Drag-and-Drop-Funktion hinzufügen
+            addDragAndDrop(hbox);
+
+            // Die HBox zum StackPane hinzufügen
+            spielerstackpane.getChildren().add(hbox);
+
+            currentOffset += offset;
+        }
+
+
+
+
+    }
+
+    private void addDragAndDrop(HBox hbox) {
+        final double[] initialMouseX = {0};
+        final double[] initialMouseY = {0};
+
+        hbox.setOnMousePressed(event -> {
+            // Startposition der Maus speichern
+            initialMouseX[0] = event.getSceneX() - hbox.getTranslateX();
+            initialMouseY[0] = event.getSceneY() - hbox.getTranslateY();
+        });
+
+        hbox.setOnMouseDragged(event -> {
+            // HBox an neue Position verschieben
+            hbox.setTranslateX(event.getSceneX() - initialMouseX[0]);
+            hbox.setTranslateY(event.getSceneY() - initialMouseY[0]);
+        });
     }
 
     public void setPausierenEventHandler(Stage stage){
