@@ -1,31 +1,21 @@
 package com.turksat46.schiffgehtunter;
-import com.turksat46.schiffgehtunter.other.Ship;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
-import javafx.scene.Group;
-import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.PhongMaterial;
-import javafx.scene.shape.Box;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Text;
-import javafx.scene.transform.Translate;
 import javafx.stage.Stage;
-import java.awt.*;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 
 public class MainGameController {
     @FXML
@@ -38,10 +28,14 @@ public class MainGameController {
     @FXML public HBox label1;
    public static int currentState, currentMode, currentDifficulty, groesse;
     GridPane feld;
+    Scene scene;
     private static AI bot;
+
+    boolean rotated;
 
     Spielfeld spielerspielfeld;
     Spielfeld gegnerspielfeld;
+
 
     //Drei States: place = Schiffe platzieren, offense = Angriff, defense = Verteidigung bzw. auf Angriff vom Gegner warten
     public String[] state = {"place", "offense", "defense"};
@@ -49,7 +43,7 @@ public class MainGameController {
     public String[] mode = {"PvsC", "PvsP", "CvsC"};
 
 
-    public void setupSpiel(int groesse, Stage stage, int currentDifficulty, int currentMode) throws FileNotFoundException {
+    public void setupSpiel(int groesse, Stage stage, int currentDifficulty, int currentMode, Scene scene) throws FileNotFoundException {
         spielerspielfeld = new Spielfeld(groesse,  false);
         gegnerspielfeld = new Spielfeld(groesse,  true);
 
@@ -63,6 +57,7 @@ public class MainGameController {
 
         this.currentMode = currentMode;
         this.groesse = groesse;
+        this.scene = scene;
         currentState = 0;
         this.currentDifficulty = currentDifficulty;
         System.out.println("Mode selected and set to: " + mode[currentMode]);
@@ -74,6 +69,52 @@ public class MainGameController {
 
         setPausierenEventHandler(stage);
     }
+
+    // mache hbox zu Vbox
+    private EventHandler<KeyEvent> createrRotateShiffe(HBox hbox){
+
+        // hier wird handler erstellt
+        EventHandler<KeyEvent> rotateShipFilter = event -> {
+            if (event.getCode() == KeyCode.R) {
+                System.out.println("Rotate ship");
+
+                // mache hbox zu vbox
+                // Aktuellen Zustand der HBox speichern
+                List<Rectangle> rectangles = new ArrayList<>();
+                for (var node : hbox.getChildren()) {
+                    if (node instanceof Rectangle) {
+                        rectangles.add((Rectangle) node);
+                    }
+                }
+
+                // Neue VBox erstellen und Rechtecke hinzufügen
+                VBox vbox = new VBox();
+                vbox.setSpacing(5); // Abstand zwischen den Rechtecken
+                vbox.getChildren().addAll(rectangles);
+
+                // Position der ursprünglichen HBox übernehmen
+                vbox.setTranslateX(hbox.getTranslateX());
+                vbox.setTranslateY(hbox.getTranslateY());
+
+                // Drag-and-Drop-Logik zur neuen VBox hinzufügen
+                //addDragAndDrop(vbox);
+
+                // Eltern-Container der HBox finden und die HBox durch die VBox ersetzen
+                if (hbox.getParent() instanceof Pane) {
+                    Pane parent = (Pane) hbox.getParent();
+                    parent.getChildren().remove(hbox);
+                    parent.getChildren().add(vbox);
+                }
+
+                //IDEE : variable um zu tracken ob R gedrückt wurde und basierend darauf schiffe erstellen und entweder Hbox oder Vbox erstellen
+                //IDEE: oder eif hier hbox zu vbox machen
+                //rotated = true;
+            }
+        };
+        return rotateShipFilter;
+    }
+
+
 
 
     private void generateSchiffe(){
@@ -113,21 +154,41 @@ public class MainGameController {
 
     }
 
+
     private void addDragAndDrop(HBox hbox) {
         final double[] initialMouseX = {0};
         final double[] initialMouseY = {0};
+
+        EventHandler<KeyEvent> rotateShipFilter = createrRotateShiffe(hbox);
 
         hbox.setOnMousePressed(event -> {
             // Startposition der Maus speichern
             initialMouseX[0] = event.getSceneX() - hbox.getTranslateX();
             initialMouseY[0] = event.getSceneY() - hbox.getTranslateY();
+
+            // füge hier den eventhandler hinzu
+            scene.addEventFilter(KeyEvent.KEY_PRESSED, rotateShipFilter);
+
+
         });
 
         hbox.setOnMouseDragged(event -> {
             // HBox an neue Position verschieben
             hbox.setTranslateX(event.getSceneX() - initialMouseX[0]);
             hbox.setTranslateY(event.getSceneY() - initialMouseY[0]);
+
+
         });
+
+        hbox.setOnMouseReleased(event -> {
+            // Aktion, wenn die Maus losgelassen wird
+            System.out.println("Losgelassen");
+
+            // entferne event sobald dragged fertig ist
+            scene.removeEventFilter(KeyEvent.KEY_PRESSED, rotateShipFilter);
+
+        });
+
     }
 
     public void setPausierenEventHandler(Stage stage){
