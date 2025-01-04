@@ -70,51 +70,53 @@ public class MainGameController {
         setPausierenEventHandler(stage);
     }
 
-    // mache hbox zu Vbox
-    private EventHandler<KeyEvent> createrRotateShiffe(HBox hbox){
-
-        // hier wird handler erstellt
-        EventHandler<KeyEvent> rotateShipFilter = event -> {
+    private EventHandler<KeyEvent> createrRotateShiffe(Pane pane) {
+        return event -> {
             if (event.getCode() == KeyCode.R) {
-                System.out.println("Rotate ship");
+                //System.out.println("Rotate ship");
 
-                // mache hbox zu vbox
-                // Aktuellen Zustand der HBox speichern
+                // Rechtecke aus der aktuellen Pane extrahieren
                 List<Rectangle> rectangles = new ArrayList<>();
-                for (var node : hbox.getChildren()) {
+                for (var node : pane.getChildren()) {
                     if (node instanceof Rectangle) {
                         rectangles.add((Rectangle) node);
                     }
                 }
 
-                // Neue VBox erstellen und Rechtecke hinzufügen
-                VBox vbox = new VBox();
-                vbox.setSpacing(5); // Abstand zwischen den Rechtecken
-                vbox.getChildren().addAll(rectangles);
+                Pane newPane;
 
-                // Position der ursprünglichen HBox übernehmen
-                vbox.setTranslateX(hbox.getTranslateX());
-                vbox.setTranslateY(hbox.getTranslateY());
-
-                // Drag-and-Drop-Logik zur neuen VBox hinzufügen
-                //addDragAndDrop(vbox);
-
-                // Eltern-Container der HBox finden und die HBox durch die VBox ersetzen
-                if (hbox.getParent() instanceof Pane) {
-                    Pane parent = (Pane) hbox.getParent();
-                    parent.getChildren().remove(hbox);
-                    parent.getChildren().add(vbox);
+                if (pane instanceof HBox) {
+                    // Erstellen einer VBox, wenn die aktuelle Pane eine HBox ist
+                    VBox vbox = new VBox();
+                    vbox.setSpacing(5); // Abstand zwischen den Rechtecken
+                    vbox.getChildren().addAll(rectangles);
+                    newPane = vbox;
+                } else if (pane instanceof VBox) {
+                    // Erstellen einer HBox, wenn die aktuelle Pane eine VBox ist
+                    HBox hbox = new HBox();
+                    hbox.setSpacing(10); // Abstand zwischen den Rechtecken
+                    hbox.getChildren().addAll(rectangles);
+                    newPane = hbox;
+                } else {
+                    return; // Keine Aktion, wenn die Pane weder HBox noch VBox ist
                 }
 
-                //IDEE : variable um zu tracken ob R gedrückt wurde und basierend darauf schiffe erstellen und entweder Hbox oder Vbox erstellen
-                //IDEE: oder eif hier hbox zu vbox machen
-                //rotated = true;
+                // Position der ursprünglichen Pane übernehmen
+                newPane.setTranslateX(pane.getTranslateX());
+                newPane.setTranslateY(pane.getTranslateY());
+
+                // Eltern-Container der aktuellen Pane finden und die Pane ersetzen
+                if (pane.getParent() instanceof Pane) {
+                    Pane parent = (Pane) pane.getParent();
+                    parent.getChildren().remove(pane);
+                    parent.getChildren().add(newPane);
+
+                    // Drag-and-Drop-Logik zur neuen Pane hinzufügen
+                    addDragAndDrop(newPane);
+                }
             }
         };
-        return rotateShipFilter;
     }
-
-
 
 
     private void generateSchiffe(){
@@ -155,40 +157,35 @@ public class MainGameController {
     }
 
 
-    private void addDragAndDrop(HBox hbox) {
+
+    private void addDragAndDrop(Pane pane) {
         final double[] initialMouseX = {0};
         final double[] initialMouseY = {0};
 
-        EventHandler<KeyEvent> rotateShipFilter = createrRotateShiffe(hbox);
+        EventHandler<KeyEvent> rotateShipFilter = createrRotateShiffe(pane);
 
-        hbox.setOnMousePressed(event -> {
+        pane.setOnMousePressed(event -> {
             // Startposition der Maus speichern
-            initialMouseX[0] = event.getSceneX() - hbox.getTranslateX();
-            initialMouseY[0] = event.getSceneY() - hbox.getTranslateY();
+            initialMouseX[0] = event.getSceneX() - pane.getTranslateX();
+            initialMouseY[0] = event.getSceneY() - pane.getTranslateY();
 
-            // füge hier den eventhandler hinzu
+            // Eventhandler hinzufügen
             scene.addEventFilter(KeyEvent.KEY_PRESSED, rotateShipFilter);
-
-
         });
 
-        hbox.setOnMouseDragged(event -> {
-            // HBox an neue Position verschieben
-            hbox.setTranslateX(event.getSceneX() - initialMouseX[0]);
-            hbox.setTranslateY(event.getSceneY() - initialMouseY[0]);
-
-
+        pane.setOnMouseDragged(event -> {
+            // Pane an neue Position verschieben
+            pane.setTranslateX(event.getSceneX() - initialMouseX[0]);
+            pane.setTranslateY(event.getSceneY() - initialMouseY[0]);
         });
 
-        hbox.setOnMouseReleased(event -> {
+        pane.setOnMouseReleased(event -> {
             // Aktion, wenn die Maus losgelassen wird
-            System.out.println("Losgelassen");
+            //System.out.println("Losgelassen");
 
-            // entferne event sobald dragged fertig ist
+            // Eventhandler entfernen
             scene.removeEventFilter(KeyEvent.KEY_PRESSED, rotateShipFilter);
-
         });
-
     }
 
     public void setPausierenEventHandler(Stage stage){
