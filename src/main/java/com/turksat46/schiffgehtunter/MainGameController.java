@@ -88,17 +88,17 @@ public class MainGameController {
                 if (pane instanceof HBox) {
                     // Erstellen einer VBox, wenn die aktuelle Pane eine HBox ist
                     VBox vbox = new VBox();
-                    vbox.setSpacing(5); // Abstand zwischen den Rechtecken
+                    vbox.setSpacing(5);
                     vbox.getChildren().addAll(rectangles);
                     newPane = vbox;
                 } else if (pane instanceof VBox) {
                     // Erstellen einer HBox, wenn die aktuelle Pane eine VBox ist
                     HBox hbox = new HBox();
-                    hbox.setSpacing(10); // Abstand zwischen den Rechtecken
+                    hbox.setSpacing(10);
                     hbox.getChildren().addAll(rectangles);
                     newPane = hbox;
                 } else {
-                    return; // Keine Aktion, wenn die Pane weder HBox noch VBox ist
+                    return;
                 }
 
                 // Position der ursprünglichen Pane übernehmen
@@ -111,7 +111,7 @@ public class MainGameController {
                     parent.getChildren().remove(pane);
                     parent.getChildren().add(newPane);
 
-                    // Drag-and-Drop-Logik zur neuen Pane hinzufügen
+                    // Drag and drop Logik zur neuen Pane hinzufügen
                     addDragAndDrop(newPane);
                 }
             }
@@ -132,7 +132,6 @@ public class MainGameController {
             hbox.setSpacing(10);
             hbox.setTranslateY(currentOffset); // Y-Position für Versatz
 
-            // Rechtecke basierend auf der Größe des Schiffs hinzufügen
             for (int i = 0; i < size; i++) {
                 Rectangle rectangle = new Rectangle();
                 rectangle.setWidth(spielerspielfeld.zellengroesse-10);
@@ -140,23 +139,17 @@ public class MainGameController {
                 rectangle.setFill(Color.RED);
                 rectangle.setStroke(Color.BLACK);
 
-                hbox.getChildren().add(rectangle); // Rechteck zur HBox hinzufügen
+                hbox.getChildren().add(rectangle);
             }
-            // Drag-and-Drop-Funktion hinzufügen
+            // Drag-and-Drop hinzufügen
             addDragAndDrop(hbox);
 
-            // Die HBox zum StackPane hinzufügen
+
             spielerstackpane.getChildren().add(hbox);
 
             currentOffset += offset;
         }
-
-
-
-
     }
-
-
 
     private void addDragAndDrop(Pane pane) {
         final double[] initialMouseX = {0};
@@ -165,11 +158,11 @@ public class MainGameController {
         EventHandler<KeyEvent> rotateShipFilter = createrRotateShiffe(pane);
 
         pane.setOnMousePressed(event -> {
-            // Startposition der Maus speichern
+
             initialMouseX[0] = event.getSceneX() - pane.getTranslateX();
             initialMouseY[0] = event.getSceneY() - pane.getTranslateY();
 
-            // Eventhandler hinzufügen
+
             scene.addEventFilter(KeyEvent.KEY_PRESSED, rotateShipFilter);
         });
 
@@ -181,16 +174,7 @@ public class MainGameController {
 
         pane.setOnMouseReleased(event -> {
             // Aktion, wenn die Maus losgelassen wird
-            //System.out.println("Losgelassen");
-
-            // Eventhandler entfernen
             scene.removeEventFilter(KeyEvent.KEY_PRESSED, rotateShipFilter);
-        });
-        // Setze ein DragDetected-Ereignis auf das Quellrechteck
-        pane.setOnDragDetected(event -> {
-            pane.startDragAndDrop(TransferMode.COPY);
-            System.out.println("Dragging started" + spielerstackpane.getChildren());
-            event.consume();
         });
 
     }

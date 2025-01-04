@@ -21,55 +21,65 @@ public class WorldGeneration extends Application {
 
     @Override
     public void start(Stage stage) {
-        // Erstellen von zwei VBox-Boxen
-        VBox box1 = new VBox(10);
-        box1.setStyle("-fx-border-color: black; -fx-padding: 20; -fx-pref-width: 200; -fx-pref-height: 200;");
-
-        VBox box2 = new VBox(10);
-        box2.setStyle("-fx-border-color: black; -fx-padding: 20; -fx-pref-width: 200; -fx-pref-height: 200;");
-
-        // Erstellen eines Rechtecks zum Ziehen
-        Rectangle draggableRectangle = new Rectangle(50, 50, Color.BLUE);
-
-        // Drag and Drop Ereignisse
-        draggableRectangle.setOnDragDetected(event -> {
-            Dragboard db = draggableRectangle.startDragAndDrop(TransferMode.MOVE);
-            event.consume();
-        });
-
-        // Ereignis für box1
-        box1.setOnDragEntered((DragEvent event) -> {
-            if (event.getGestureSource() != box1 && event.getDragboard().hasContent(DataFormat.PLAIN_TEXT)) {
-                box1.setStyle("-fx-border-color: green;");
+        // GridPane erstellen
+        GridPane gridPane = new GridPane();
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                Button button = new Button("Button " + (i * 3 + j + 1));
+                gridPane.add(button, j, i);
             }
+        }
+
+        // VBox erstellen, die über dem GridPane "hovered"
+        HBox hoverBox = new HBox();
+        hoverBox.setStyle("-fx-background-color: rgba(255, 255, 0, 1);");
+        hoverBox.setMinSize(200, 100); // Größe der Box
+        hoverBox.setVisible(true); // Start als unsichtbar
+
+        final double[] initialMouseX = {0};
+        final double[] initialMouseY = {0};
+
+        // Setze die Position der hoverBox bei MousePressed
+        hoverBox.setOnMousePressed(event -> {
+            initialMouseX[0] = event.getSceneX() - hoverBox.getTranslateX();
+            initialMouseY[0] = event.getSceneY() - hoverBox.getTranslateY();
+        });
+
+        // Bewege die hoverBox bei MouseDragged
+        hoverBox.setOnMouseDragged(event -> {
+            hoverBox.setTranslateX(event.getSceneX() - initialMouseX[0]);
+            hoverBox.setTranslateY(event.getSceneY() - initialMouseY[0]);
+        });
+
+        // Drag-Event für das GridPane
+        gridPane.setOnDragDetected(event -> {
+            Dragboard db = gridPane.startDragAndDrop(TransferMode.MOVE);
+            ClipboardContent content = new ClipboardContent();
+            content.putString("Some data");
+            db.setContent(content);
+            System.out.println("hallo");
             event.consume();
         });
 
-        // Ereignis für box2
-        box2.setOnDragEntered((DragEvent event) -> {
-            if (event.getGestureSource() != box2 && event.getDragboard().hasContent(DataFormat.PLAIN_TEXT)) {
-                box2.setStyle("-fx-border-color: green;");
-            }
+        gridPane.setOnDragEntered(event -> {
+            hoverBox.setLayoutX(event.getSceneX() - 100);
+            hoverBox.setLayoutY(event.getSceneY() - 50);
+            hoverBox.setVisible(true);
+
+            System.out.println("hallo");
             event.consume();
         });
 
-        // Reset der Boxen, wenn der Drag-Vorgang die Box verlässt
-        box1.setOnDragExited(event -> {
-            box1.setStyle("-fx-border-color: black;");
+        gridPane.setOnDragExited(event -> {
+            hoverBox.setVisible(false);
             event.consume();
         });
 
-        box2.setOnDragExited(event -> {
-            box2.setStyle("-fx-border-color: black;");
-            event.consume();
-        });
+        // Root-Layout erstellen
+        Pane root = new Pane(); // Verwende Pane, um die Positionierung der Box zu ermöglichen
+        root.getChildren().addAll(gridPane, hoverBox);
 
-        // Füge die Boxen und das Rechteck zur Szene hinzu
-        box1.getChildren().add(new Label("Box 1"));
-        box2.getChildren().add(new Label("Box 2"));
-        VBox root = new VBox(20, draggableRectangle, box1, box2);
-
-        Scene scene = new Scene(root, 400, 400);
+        Scene scene = new Scene(root, 400, 300);
         stage.setScene(scene);
         stage.show();
     }
