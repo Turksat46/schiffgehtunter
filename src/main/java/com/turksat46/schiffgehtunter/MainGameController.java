@@ -19,7 +19,7 @@ import java.util.List;
 
 public class MainGameController {
     @FXML
-    public GridPane spielerstackpane, gegnerstackpane;
+    public Pane spielerstackpane, gegnerstackpane;
 
 
     @FXML public HBox container;
@@ -186,6 +186,13 @@ public class MainGameController {
             // Eventhandler entfernen
             scene.removeEventFilter(KeyEvent.KEY_PRESSED, rotateShipFilter);
         });
+        // Setze ein DragDetected-Ereignis auf das Quellrechteck
+        pane.setOnDragDetected(event -> {
+            pane.startDragAndDrop(TransferMode.COPY);
+            System.out.println("Dragging started" + spielerstackpane.getChildren());
+            event.consume();
+        });
+
     }
 
     public void setPausierenEventHandler(Stage stage){

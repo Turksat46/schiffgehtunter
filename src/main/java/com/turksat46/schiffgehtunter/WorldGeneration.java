@@ -1,15 +1,19 @@
 package com.turksat46.schiffgehtunter;
 
 import javafx.application.Application;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.input.*;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Text;
 import javafx.scene.transform.Translate;
 import javafx.stage.Stage;
 
@@ -17,85 +21,59 @@ public class WorldGeneration extends Application {
 
     @Override
     public void start(Stage stage) {
-        // Pane als Container für die Szene
-        // Pane als Container für die Szene
-        Pane pane = new Pane();
+        // Erstellen von zwei VBox-Boxen
+        VBox box1 = new VBox(10);
+        box1.setStyle("-fx-border-color: black; -fx-padding: 20; -fx-pref-width: 200; -fx-pref-height: 200;");
 
-        // Rechteck erstellen
-        Rectangle rectangle = new Rectangle();
-        rectangle.setWidth(50);
-        rectangle.setHeight(50);
-        rectangle.setX(300);
-        rectangle.setY(300);
-        rectangle.setFill(Color.RED);
-        rectangle.setStroke(Color.BLACK);
+        VBox box2 = new VBox(10);
+        box2.setStyle("-fx-border-color: black; -fx-padding: 20; -fx-pref-width: 200; -fx-pref-height: 200;");
 
-        // Rechteck erstellen
-        Rectangle rectangle1 = new Rectangle();
-        rectangle1.setWidth(50);
-        rectangle1.setHeight(50);
-        rectangle1.setFill(Color.RED);
-        rectangle1.setStroke(Color.BLACK);
+        // Erstellen eines Rechtecks zum Ziehen
+        Rectangle draggableRectangle = new Rectangle(50, 50, Color.BLUE);
 
-        // Rechteck erstellen
-        Rectangle rectangle2 = new Rectangle();
-        rectangle2.setWidth(50);
-        rectangle2.setHeight(50);
-        rectangle2.setFill(Color.RED);
-        rectangle2.setStroke(Color.BLACK);
-
-        // Rechteck erstellen
-        Rectangle rectangle3 = new Rectangle();
-        rectangle3.setWidth(50);
-        rectangle3.setHeight(50);
-        rectangle3.setFill(Color.RED);
-        rectangle3.setStroke(Color.BLACK);
-
-        HBox hbox = new HBox(rectangle1, rectangle2, rectangle3);
-
-
-        //Drag-and-Drop-Logik für das Rechteck
-        hbox.setOnMousePressed(event -> {
-            hbox.setUserData(new double[]{event.getSceneX(), event.getSceneY()});
+        // Drag and Drop Ereignisse
+        draggableRectangle.setOnDragDetected(event -> {
+            Dragboard db = draggableRectangle.startDragAndDrop(TransferMode.MOVE);
+            event.consume();
         });
 
-        hbox.setOnMouseDragged(event -> {
-            double[] start = (double[]) hbox.getUserData();
-            double deltaX = event.getSceneX() - start[0];
-            double deltaY = event.getSceneY() - start[1];
-
-            // Rechteck verschieben
-            hbox.setLayoutX(hbox.getLayoutX() + deltaX);
-            hbox.setLayoutY(hbox.getLayoutY() + deltaY);
-            hbox.setUserData(new double[]{event.getSceneX(), event.getSceneY()});
+        // Ereignis für box1
+        box1.setOnDragEntered((DragEvent event) -> {
+            if (event.getGestureSource() != box1 && event.getDragboard().hasContent(DataFormat.PLAIN_TEXT)) {
+                box1.setStyle("-fx-border-color: green;");
+            }
+            event.consume();
         });
 
-        // Rechteck dem Pane hinzufügen
-        pane.getChildren().add(hbox);
+        // Ereignis für box2
+        box2.setOnDragEntered((DragEvent event) -> {
+            if (event.getGestureSource() != box2 && event.getDragboard().hasContent(DataFormat.PLAIN_TEXT)) {
+                box2.setStyle("-fx-border-color: green;");
+            }
+            event.consume();
+        });
 
-        System.out.println(hbox.getLayoutX());
-        pane.getChildren().add(rectangle);
+        // Reset der Boxen, wenn der Drag-Vorgang die Box verlässt
+        box1.setOnDragExited(event -> {
+            box1.setStyle("-fx-border-color: black;");
+            event.consume();
+        });
 
-        // Szene und Stage erstellen
-        Scene scene = new Scene(pane, 800, 600);
-        stage.setTitle("Drag and Drop mit Rechteck und Boxen");
+        box2.setOnDragExited(event -> {
+            box2.setStyle("-fx-border-color: black;");
+            event.consume();
+        });
+
+        // Füge die Boxen und das Rechteck zur Szene hinzu
+        box1.getChildren().add(new Label("Box 1"));
+        box2.getChildren().add(new Label("Box 2"));
+        VBox root = new VBox(20, draggableRectangle, box1, box2);
+
+        Scene scene = new Scene(root, 400, 400);
         stage.setScene(scene);
         stage.show();
     }
 
-    private Box createBox(double x, double y) {
-        Box box = new Box(300, 50, 50);
-        box.setMaterial(new PhongMaterial(Color.DODGERBLUE));
-        box.getTransforms().add(new Translate(x, y, 0));
-        return box;
-    }
-
-    private void moveBox(Box box, double deltaX, double deltaY) {
-        Translate translate = (Translate) box.getTransforms().get(0);
-        translate.setX(translate.getX() + deltaX);
-        translate.setY(translate.getY() + deltaY);
-
-    }
 
     public static void main(String[] args) {
         launch(args);

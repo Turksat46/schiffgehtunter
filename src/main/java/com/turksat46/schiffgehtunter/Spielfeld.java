@@ -2,6 +2,7 @@ package com.turksat46.schiffgehtunter;
 import com.turksat46.schiffgehtunter.other.Feld;
 import com.turksat46.schiffgehtunter.other.Ship;
 import javafx.scene.input.MouseButton;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
@@ -79,6 +80,33 @@ public class Spielfeld {
                 Feld cell = new Feld(zellengroesse, zellengroesse, row, col);
                 felder[row][col] = cell;
                 cell.setFill(Color.LIGHTBLUE);
+
+
+                // Setze ein DragEntered-Ereignis auf das Zielrechteck
+                cell.setOnDragEntered(event -> {
+                    cell.setFill(Color.LIGHTGREEN); // Ändere die Farbe auf Grün
+                    System.out.println("Drag entered!");
+                    event.consume();
+                });
+                // Setze ein DragExited-Ereignis, um die Farbe zurückzusetzen
+                cell.setOnDragExited(event -> {
+                    cell.setFill(Color.LIGHTGRAY); // Farbe zurücksetzen
+                    System.out.println("Drag exited!");
+                    event.consume();
+                });
+                // Setze ein DragOver-Ereignis, um das Dragging zu unterstützen
+                cell.setOnDragOver(event -> {
+                    if (event.getGestureSource() != cell) {
+                        event.acceptTransferModes(TransferMode.COPY);
+                    }
+                    event.consume();
+                });
+                // Setze ein DragDropped-Ereignis, um den Drop zu behandeln
+                cell.setOnDragDropped(event -> {
+                    System.out.println("Item dropped!");
+                    event.setDropCompleted(true);
+                    event.consume();
+                });
 
                 cell.setStroke(Color.BLACK);
 

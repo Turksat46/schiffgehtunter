@@ -31,14 +31,14 @@
 
 
          <HBox fx:id="container">
-            <GridPane fx:id="spielerstackpane">
+            <Pane fx:id="spielerstackpane">
 
-            </GridPane>
+            </Pane>
 
 
-            <GridPane fx:id="gegnerstackpane">
+            <Pane fx:id="gegnerstackpane">
 
-            </GridPane>
+            </Pane>
          </HBox>
       </VBox>
 
