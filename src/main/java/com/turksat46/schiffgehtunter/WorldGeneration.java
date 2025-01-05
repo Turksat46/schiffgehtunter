@@ -33,23 +33,28 @@ public class WorldGeneration extends Application {
         Rectangle draggableRect = new Rectangle(64, 64, Color.BLUE);
         makeDraggable(draggableRect);
 
-        // Create two target rectangles
+        // Create target rectangles
         Rectangle targetRect1 = createTargetRectangle();
         Rectangle targetRect2 = createTargetRectangle();
 
         root.setCenter(targetRect1);
         root.setRight(targetRect2);
-
         root.setLeft(draggableRect);
 
         Scene scene = new Scene(root, 400, 150);
         stage.setScene(scene);
         stage.show();
 
-        // Continuously check for intersections
+        // Continuously check for intersections and update visual feedback
         draggableRect.boundsInParentProperty().addListener((obs, oldBounds, newBounds) -> {
-            checkIntersection(draggableRect, targetRect1);
-            checkIntersection(draggableRect, targetRect2);
+            updateTargetVisual(draggableRect, targetRect1);
+            updateTargetVisual(draggableRect, targetRect2);
+        });
+
+        // Snap to the target on release
+        draggableRect.setOnMouseReleased(event -> {
+            checkAndSnap(draggableRect, targetRect1);
+            checkAndSnap(draggableRect, targetRect2);
         });
     }
 
@@ -69,15 +74,24 @@ public class WorldGeneration extends Application {
         return new Rectangle(100, 100, Color.LIGHTGRAY);
     }
 
-    private void checkIntersection(Rectangle draggable, Rectangle target) {
+    private void updateTargetVisual(Rectangle draggable, Rectangle target) {
         if (draggable.getBoundsInParent().intersects(target.getBoundsInParent())) {
-            target.setFill(Color.GREEN); // Change to green on intersection
+            target.setFill(Color.GREEN); // Change color to green on intersection
         } else {
             target.setFill(Color.LIGHTGRAY); // Reset to gray when not intersecting
         }
     }
 
+    private void checkAndSnap(Rectangle draggable, Rectangle target) {
+        if (draggable.getBoundsInParent().intersects(target.getBoundsInParent())) {
+            // Snap the draggable rectangle to the center of the target
+            double targetCenterX = target.getLayoutX() + target.getWidth() / 2;
+            double targetCenterY = target.getLayoutY() + target.getHeight() / 2;
 
+            draggable.setTranslateX(targetCenterX - draggable.getWidth() / 2);
+            draggable.setTranslateY(targetCenterY - draggable.getHeight() / 2);
+        }
+    }
     public static void main(String[] args) {
         launch(args);
     }
