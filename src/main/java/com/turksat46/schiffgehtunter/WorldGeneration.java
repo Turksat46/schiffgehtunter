@@ -36,8 +36,8 @@ public class WorldGeneration extends Application {
         // Create a 5x5 grid ofs rectangles
         GridPane gridPane = createGridPane();
 
-        root.setCenter(gridPane);
-        root.setLeft(draggableRect);
+        root.setLeft(gridPane);
+        root.setRight(draggableRect);
 
         Scene scene = new Scene(root, 400, 400);
         stage.setScene(scene);
