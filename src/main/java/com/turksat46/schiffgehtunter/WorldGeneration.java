@@ -20,41 +20,37 @@ import javafx.stage.Stage;
 
 public class WorldGeneration extends Application {
 
-
     private double initialX;
     private double initialY;
-
+    private static final int GRID_SIZE = 5; // 5x5 grid
+    private static final int CELL_SIZE = 50; // Size of each grid cell
 
     @Override
     public void start(Stage stage) {
         BorderPane root = new BorderPane();
 
         // Create a draggable rectangle
-        Rectangle draggableRect = new Rectangle(64, 64, Color.BLUE);
+        Rectangle draggableRect = new Rectangle(30, 30, Color.BLUE);
         makeDraggable(draggableRect);
 
-        // Create target rectangles
-        Rectangle targetRect1 = createTargetRectangle();
-        Rectangle targetRect2 = createTargetRectangle();
+        // Create a 5x5 grid ofs rectangles
+        GridPane gridPane = createGridPane();
 
-        root.setCenter(targetRect1);
-        root.setRight(targetRect2);
+        root.setCenter(gridPane);
         root.setLeft(draggableRect);
 
-        Scene scene = new Scene(root, 400, 150);
+        Scene scene = new Scene(root, 400, 400);
         stage.setScene(scene);
         stage.show();
 
         // Continuously check for intersections and update visual feedback
         draggableRect.boundsInParentProperty().addListener((obs, oldBounds, newBounds) -> {
-            updateTargetVisual(draggableRect, targetRect1);
-            updateTargetVisual(draggableRect, targetRect2);
+            updateGridVisual(draggableRect, gridPane);
         });
 
-        // Snap to the target on release
+        // Snap to the grid cell on release
         draggableRect.setOnMouseReleased(event -> {
-            checkAndSnap(draggableRect, targetRect1);
-            checkAndSnap(draggableRect, targetRect2);
+            snapToGrid(draggableRect, gridPane);
         });
     }
 
@@ -70,26 +66,43 @@ public class WorldGeneration extends Application {
         });
     }
 
-    private Rectangle createTargetRectangle() {
-        return new Rectangle(100, 100, Color.LIGHTGRAY);
+    private GridPane createGridPane() {
+        GridPane gridPane = new GridPane();
+        for (int row = 0; row < GRID_SIZE; row++) {
+            for (int col = 0; col < GRID_SIZE; col++) {
+                Rectangle cell = new Rectangle(CELL_SIZE, CELL_SIZE, Color.LIGHTGRAY);
+                cell.setStroke(Color.BLACK);
+                gridPane.add(cell, col, row);
+            }
+        }
+        return gridPane;
     }
 
-    private void updateTargetVisual(Rectangle draggable, Rectangle target) {
-        if (draggable.getBoundsInParent().intersects(target.getBoundsInParent())) {
-            target.setFill(Color.GREEN); // Change color to green on intersection
-        } else {
-            target.setFill(Color.LIGHTGRAY); // Reset to gray when not intersecting
+    private void updateGridVisual(Rectangle draggable, GridPane gridPane) {
+        for (var node : gridPane.getChildren()) {
+            if (node instanceof Rectangle cell) {
+                if (draggable.getBoundsInParent().intersects(cell.getBoundsInParent())) {
+                    cell.setFill(Color.GREEN); // Change color to green on intersection
+                } else {
+                    cell.setFill(Color.LIGHTGRAY); // Reset to gray when not intersecting
+                }
+            }
         }
     }
 
-    private void checkAndSnap(Rectangle draggable, Rectangle target) {
-        if (draggable.getBoundsInParent().intersects(target.getBoundsInParent())) {
-            // Snap the draggable rectangle to the center of the target
-            double targetCenterX = target.getLayoutX() + target.getWidth() / 2;
-            double targetCenterY = target.getLayoutY() + target.getHeight() / 2;
+    private void snapToGrid(Rectangle draggable, GridPane gridPane) {
+        for (var node : gridPane.getChildren()) {
+            if (node instanceof Rectangle cell) {
+                if (draggable.getBoundsInParent().intersects(cell.getBoundsInParent())) {
+                    // Snap the draggable rectangle to the center of the cell
+                    double cellCenterX = cell.getBoundsInParent().getMinX() + cell.getWidth() / 2;
+                    double cellCenterY = cell.getBoundsInParent().getMinY() + cell.getHeight() / 2;
 
-            draggable.setTranslateX(targetCenterX - draggable.getWidth() / 2);
-            draggable.setTranslateY(targetCenterY - draggable.getHeight() / 2);
+                    draggable.setTranslateX(cellCenterX - draggable.getWidth() / 2);
+                    draggable.setTranslateY(cellCenterY - draggable.getHeight() / 2);
+                    return; // Snap to the first intersecting cell and exit
+                }
+            }
         }
     }
     public static void main(String[] args) {
