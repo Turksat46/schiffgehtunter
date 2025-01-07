@@ -3,6 +3,7 @@ package com.turksat46.schiffgehtunter;
 import javafx.application.Application;
 import javafx.event.Event;
 import javafx.event.EventHandler;
+import javafx.geometry.Bounds;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -30,14 +31,14 @@ public class WorldGeneration extends Application {
         BorderPane root = new BorderPane();
 
         // Create a draggable rectangle
-        Rectangle draggableRect = new Rectangle(30, 30, Color.BLUE);
+        Rectangle draggableRect = new Rectangle(40, 40, Color.BLUE);
         makeDraggable(draggableRect);
 
-        // Create a 5x5 grid ofs rectangles
+        // Create a 5x5 grid of rectangles
         GridPane gridPane = createGridPane();
 
-        root.setLeft(gridPane);
-        root.setRight(draggableRect);
+        root.setCenter(gridPane);
+        root.setLeft(draggableRect);
 
         Scene scene = new Scene(root, 400, 400);
         stage.setScene(scene);
@@ -79,14 +80,38 @@ public class WorldGeneration extends Application {
     }
 
     private void updateGridVisual(Rectangle draggable, GridPane gridPane) {
+        Rectangle closestCell = null;
+        double minDistance = Double.MAX_VALUE;
+
         for (var node : gridPane.getChildren()) {
             if (node instanceof Rectangle cell) {
                 if (draggable.getBoundsInParent().intersects(cell.getBoundsInParent())) {
-                    cell.setFill(Color.GREEN); // Change color to green on intersection
-                } else {
-                    cell.setFill(Color.LIGHTGRAY); // Reset to gray when not intersecting
+                    // Calculate the distance from the draggable rectangle to the cell
+                    Bounds cellBounds = cell.localToScene(cell.getBoundsInLocal());
+                    double centerX = cellBounds.getMinX() + cell.getWidth() / 2;
+                    double centerY = cellBounds.getMinY() + cell.getHeight() / 2;
+
+                    double distance = Math.hypot(centerX - draggable.getBoundsInParent().getCenterX(),
+                            centerY - draggable.getBoundsInParent().getCenterY());
+
+                    if (distance < minDistance) {
+                        minDistance = distance;
+                        closestCell = cell;
+                    }
                 }
             }
+        }
+
+        // Reset all cells to gray
+        for (var node : gridPane.getChildren()) {
+            if (node instanceof Rectangle cell) {
+                cell.setFill(Color.LIGHTGRAY);
+            }
+        }
+
+        // Highlight the closest intersecting cell, if any
+        if (closestCell != null) {
+            closestCell.setFill(Color.GREEN);
         }
     }
 
@@ -94,17 +119,20 @@ public class WorldGeneration extends Application {
         for (var node : gridPane.getChildren()) {
             if (node instanceof Rectangle cell) {
                 if (draggable.getBoundsInParent().intersects(cell.getBoundsInParent())) {
-                    // Snap the draggable rectangle to the center of the cell
-                    double cellCenterX = cell.getBoundsInParent().getMinX() + cell.getWidth() / 2;
-                    double cellCenterY = cell.getBoundsInParent().getMinY() + cell.getHeight() / 2;
+                    // Snap the draggable rectangle to the center of the closest intersecting cell
+                    Bounds cellBounds = cell.localToScene(cell.getBoundsInLocal());
+
+                    double cellCenterX = cellBounds.getMinX() + cell.getWidth() / 2;
+                    double cellCenterY = cellBounds.getMinY() + cell.getHeight() / 2;
 
                     draggable.setTranslateX(cellCenterX - draggable.getWidth() / 2);
                     draggable.setTranslateY(cellCenterY - draggable.getHeight() / 2);
-                    return; // Snap to the first intersecting cell and exit
+                    return;
                 }
             }
         }
     }
+
     public static void main(String[] args) {
         launch(args);
     }
