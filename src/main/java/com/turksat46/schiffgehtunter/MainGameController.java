@@ -1,40 +1,69 @@
 package com.turksat46.schiffgehtunter;
+import javafx.animation.AnimationTimer;
+import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
+import javafx.scene.SnapshotParameters;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.*;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.net.URL;
+import java.util.*;
 
-public class MainGameController {
+public class MainGameController implements Initializable {
+
+    private static int WIDTH = 2500;
+    private static int HEIGHT = 600;
+    private static final int TILE_SIZE = 30;
+    private static final int WORLD_WIDTH_TILES = 37;
+    private static final int WORLD_HEIGHT_TILES = 25;
+    private static final double SHADOW_OFFSET_X = 2;
+    private static final double SHADOW_OFFSET_Y = 2;
+
+    private Tile[][] world;
+    private double playerX;
+    private double playerY;
+    private Image sandTexture;
+    private Image waterTexture;
+
+    private Canvas backgroundCanvas;
+
+
+    public enum Tile {
+        WATER, SAND
+    }
+
     @FXML
     public Pane spielerstackpane, gegnerstackpane;
 
+    @FXML public AnchorPane anchorPane;
 
     @FXML public HBox container;
     @FXML public Pane images;
 
     @FXML public HBox label1;
    public static int currentState, currentMode, currentDifficulty, groesse;
-    GridPane feld;
-    Scene scene;
+    static GridPane feld;
+    static Scene scene;
     private static AI bot;
 
-    boolean rotated;
+    static boolean rotated;
 
-    Spielfeld spielerspielfeld;
-    Spielfeld gegnerspielfeld;
+    static Spielfeld spielerspielfeld;
+    static Spielfeld gegnerspielfeld;
 
 
     //Drei States: place = Schiffe platzieren, offense = Angriff, defense = Verteidigung bzw. auf Angriff vom Gegner warten
@@ -42,6 +71,134 @@ public class MainGameController {
     //Spielmodus P = Spieler, C=Computer
     public String[] mode = {"PvsC", "PvsP", "CvsC"};
 
+
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        createBackground();
+    }
+
+    private void createBackground() {
+        backgroundCanvas = new Canvas(WIDTH, HEIGHT);
+        GraphicsContext gc = backgroundCanvas.getGraphicsContext2D();
+
+        // Lade die Texturen
+        try {
+            sandTexture = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/turksat46/schiffgehtunter/images/sand_texture.png")));
+            waterTexture = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/turksat46/schiffgehtunter/images/water_animated.gif")));
+        } catch (NullPointerException e) {
+            System.err.println("Fehler beim Laden der Texturen. Stelle sicher, dass die Dateien im Ressourcenordner liegen.");
+            throw e;
+        }
+
+        generateWorld();
+        playerX = WIDTH / 2.0;
+        playerY = HEIGHT / 2.0;
+
+
+        new AnimationTimer() {
+            @Override
+            public void handle(long now) {
+                draw(gc);
+            }
+        }.start();
+    }
+
+    private void generateWorld() {
+        world = new Tile[WORLD_WIDTH_TILES][WORLD_HEIGHT_TILES];
+        // Standardmäßig alles mit Wasser füllen
+        for (int x = 0; x < WORLD_WIDTH_TILES; x++) {
+            for (int y = 0; y < WORLD_HEIGHT_TILES; y++) {
+                world[x][y] = Tile.WATER;
+            }
+        }
+
+        int islandStartY = WORLD_HEIGHT_TILES - 5;
+        Random random = new Random();
+
+        // Insel in der Mitte erstellen
+        int middleXStart = WORLD_WIDTH_TILES / 2 - 2; // Starte etwas links von der Mitte
+        int middleXEnd = WORLD_WIDTH_TILES / 2 + 2;   // Ende etwas rechts von der Mitte
+
+        for (int x = middleXStart; x <= middleXEnd; x++) {
+            for (int y = 2; y < WORLD_HEIGHT_TILES - 2; y++) { // Insel geht von unten nach oben, etwas Platz lassen
+                // Füge etwas Zufall hinzu, um die Inselform interessanter zu gestalten
+                // Innere Teile der Insel immer Sand
+                if (x > middleXStart && x < middleXEnd) {
+                    world[x][y] = Tile.SAND;
+                } else {
+                    // Zufällige Entscheidung für die Seiten
+                    if (random.nextDouble() > 0.4) { // Hier kannst du die Wahrscheinlichkeit anpassen
+                        world[x][y] = Tile.SAND;
+                    }
+                }
+            }
+        }
+
+
+        for (int x = 0; x < WORLD_WIDTH_TILES; x++) {
+            for (int y = islandStartY; y < WORLD_HEIGHT_TILES; y++) {
+                if (y == islandStartY && random.nextDouble() < 0.3) { // Wahrscheinlichkeit für Wasser am oberen Rand der Insel
+                    continue;
+                }
+                world[x][y] = Tile.SAND;
+            }
+        }
+    }
+
+    private javafx.scene.paint.Color getShadowColor(javafx.scene.paint.Color baseColor) {
+        return baseColor.darker();
+    }
+
+    private void draw(GraphicsContext gc) {
+        //gc.clearRect(0, 0, WIDTH, HEIGHT);
+
+        double cameraOffsetX = playerX - WIDTH / 2.0;
+        double cameraOffsetY = playerY - HEIGHT / 2.0 +150;
+
+        // Zeichne die Schatten der Sandblöcke
+        for (int x = 0; x < WORLD_WIDTH_TILES; x++) {
+            for (int y = 0; y < WORLD_HEIGHT_TILES; y++) {
+                double tileX = x * TILE_SIZE - cameraOffsetX;
+                double tileY = y * TILE_SIZE - cameraOffsetY;
+
+                if (tileX + TILE_SIZE > 0 && tileX < WIDTH && tileY + TILE_SIZE > 0 && tileY < HEIGHT) {
+                    if (world[x][y] ==  Tile.SAND) {
+                        gc.setFill(getShadowColor(javafx.scene.paint.Color.YELLOW));
+                        gc.fillRect(tileX + SHADOW_OFFSET_X, tileY + SHADOW_OFFSET_Y, TILE_SIZE, TILE_SIZE);
+                    }
+                }
+            }
+        }
+
+        // Zeichne die Welt mit Texturen
+        for (int x = 0; x < WORLD_WIDTH_TILES; x++) {
+            for (int y = 0; y < WORLD_HEIGHT_TILES; y++) {
+                double tileX = x * TILE_SIZE - cameraOffsetX;
+                double tileY = y * TILE_SIZE - cameraOffsetY;
+
+                if (tileX + TILE_SIZE > 0 && tileX < WIDTH && tileY + TILE_SIZE > 0 && tileY < HEIGHT) {
+                    if (world[x][y] ==  Tile.WATER) {
+                        gc.drawImage(waterTexture, tileX, tileY, TILE_SIZE, TILE_SIZE);
+                    } else if (world[x][y] ==  Tile.SAND) {
+                        gc.drawImage(sandTexture, tileX, tileY, TILE_SIZE, TILE_SIZE);
+                    }
+                }
+            }
+        }
+
+        SnapshotParameters params = new SnapshotParameters();
+        WritableImage image = backgroundCanvas.snapshot(params, null);
+
+        BackgroundImage backgroundImage = new BackgroundImage(
+                image,
+                BackgroundRepeat.NO_REPEAT,
+                BackgroundRepeat.NO_REPEAT,
+                BackgroundPosition.DEFAULT,
+                BackgroundSize.DEFAULT
+        );
+        Background background = new Background(backgroundImage);
+        anchorPane.setBackground(background);
+    }
 
     public void setupSpiel(int groesse, Stage stage, int currentDifficulty, int currentMode, Scene scene) throws FileNotFoundException {
         spielerspielfeld = new Spielfeld(groesse,  false);
@@ -58,6 +215,14 @@ public class MainGameController {
         this.currentMode = currentMode;
         this.groesse = groesse;
         this.scene = scene;
+        /*scene.widthProperty().addListener((observable, oldValue, newValue) -> {
+            WIDTH = newValue.intValue();
+        });
+
+        scene.heightProperty().addListener((observable, oldValue, newValue) -> {
+            HEIGHT = newValue.intValue();
+        });
+        */
         currentState = 0;
         this.currentDifficulty = currentDifficulty;
         System.out.println("Mode selected and set to: " + mode[currentMode]);

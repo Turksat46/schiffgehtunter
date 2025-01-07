@@ -10,13 +10,13 @@
          <HBox fx:id="label1" spacing="100">
             <children>
                <Region prefWidth="50" />
-               <Label text="Spielerfeld">
+               <Label style="-fx-background-color: #00000044;" text="Spielerfeld" textFill="WHITE">
                   <font>
                      <Font size="18.0" />
                   </font>
                </Label>
                <Region prefWidth="425" />
-               <Label text="Gegnerfeld">
+               <Label style="-fx-background-color: #00000044;" text="Gegnerfeld" textFill="WHITE">
                   <font>
                      <Font size="18.0" />
                   </font>

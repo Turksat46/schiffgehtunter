@@ -58,6 +58,8 @@ public class HelloController implements Initializable {
         createBackground();
     }
 
+
+
     private void createBackground() {
         backgroundCanvas = new Canvas(WIDTH, HEIGHT);
         GraphicsContext gc = backgroundCanvas.getGraphicsContext2D();
