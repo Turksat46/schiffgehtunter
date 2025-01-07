@@ -25,23 +25,32 @@ import java.util.*;
 
 public class MainGameController implements Initializable {
 
+    //Gesamtgröße des Hintergrund
     private static int WIDTH = 2500;
     private static int HEIGHT = 600;
+    //Größe eines Blocks
     private static final int TILE_SIZE = 30;
+    //Menge der Blöcke in die jeweiligen Richtungen
     private static final int WORLD_WIDTH_TILES = 37;
     private static final int WORLD_HEIGHT_TILES = 25;
+    //Experimental: Schatten
     private static final double SHADOW_OFFSET_X = 2;
     private static final double SHADOW_OFFSET_Y = 2;
 
+    //Hintergrundmap
     private Tile[][] world;
+    //Player ignorieren, das wird für die Kamera gebraucht
+    //TODO: Playerwerte allgemein entfernen
     private double playerX;
     private double playerY;
+    //Jeweiligen Texturen
     private Image sandTexture;
     private Image waterTexture;
 
+    //Hintergrundcanvas, worauf gezeichnet wird
     private Canvas backgroundCanvas;
 
-
+    //Typen von Blöcken
     public enum Tile {
         WATER, SAND
     }
@@ -74,9 +83,11 @@ public class MainGameController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        //Wenn Klasse initialisiert wird, Hintergrund erstellen
         createBackground();
     }
 
+    //Hintergrundwerte berechnen und Welt erzeugen
     private void createBackground() {
         backgroundCanvas = new Canvas(WIDTH, HEIGHT);
         GraphicsContext gc = backgroundCanvas.getGraphicsContext2D();
@@ -103,6 +114,7 @@ public class MainGameController implements Initializable {
         }.start();
     }
 
+    //Blöcke setzen und zeichnen
     private void generateWorld() {
         world = new Tile[WORLD_WIDTH_TILES][WORLD_HEIGHT_TILES];
         // Standardmäßig alles mit Wasser füllen
@@ -133,8 +145,7 @@ public class MainGameController implements Initializable {
                 }
             }
         }
-
-
+        //Kanten randomisieren
         for (int x = 0; x < WORLD_WIDTH_TILES; x++) {
             for (int y = islandStartY; y < WORLD_HEIGHT_TILES; y++) {
                 if (y == islandStartY && random.nextDouble() < 0.3) { // Wahrscheinlichkeit für Wasser am oberen Rand der Insel
@@ -145,10 +156,12 @@ public class MainGameController implements Initializable {
         }
     }
 
+    //Experimental: Schatten
     private javafx.scene.paint.Color getShadowColor(javafx.scene.paint.Color baseColor) {
         return baseColor.darker();
     }
 
+    //Eigentliche Zeichnungsfunktion
     private void draw(GraphicsContext gc) {
         //gc.clearRect(0, 0, WIDTH, HEIGHT);
 
@@ -186,6 +199,7 @@ public class MainGameController implements Initializable {
             }
         }
 
+        //Snapshot von der erstellten Welt erstellen und diese in Hintergrund speichern und anzeigen
         SnapshotParameters params = new SnapshotParameters();
         WritableImage image = backgroundCanvas.snapshot(params, null);
 

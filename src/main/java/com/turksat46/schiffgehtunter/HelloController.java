@@ -27,7 +27,9 @@ import java.util.ResourceBundle;
 
 public class HelloController implements Initializable {
 
-
+    //
+    // Kommentare zu Hintergrundzeichnung bei @MainGameController.java anschauen
+    //
     @FXML
     private VBox rootBox;
     @FXML
