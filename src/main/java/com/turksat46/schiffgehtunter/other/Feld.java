@@ -41,8 +41,4 @@ public class Feld extends Rectangle {
 
     public int getPosY() {return posY+1;}
 
-
-
-
-
 }

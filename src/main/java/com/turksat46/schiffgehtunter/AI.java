@@ -19,6 +19,8 @@ public class AI {
     static List<Position> entdeckteSchiffe = new ArrayList<>();
 
     static MainGameController mainGameController;
+    private boolean huntmode = true;
+    private boolean targetmode = false;
 
     public AI(int difficulty, int groesse, MainGameController mainGameController){
         this.difficulty = difficulty;
@@ -152,10 +154,30 @@ public class AI {
     }
 
     private void midMove() {
+        if(huntmode){
+            while(true){
+                int nextposx = RandomGenerator.getDefault().nextInt(0, groesse);
+                int nextposy = RandomGenerator.getDefault().nextInt(0, groesse);
+                Position pos = new Position(nextposx, nextposy);
+                System.out.println(pos);
+                if(!felder.contains(pos)){
+                    System.out.println(pos + "ist neu, wird hinzugefügt");
+                    felder.add(pos);
+                    mainGameController.receiveShoot(nextposx, nextposy);
+                    break;
+                }else{
+                    System.out.println(pos + "wird ignoriert");
+                }
+            }
+        }
 
+        if(targetmode){
+            
+        }
     }
 
     private void godlikeMove() {
+
     }
 
     private void easyMove(){
