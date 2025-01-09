@@ -28,14 +28,14 @@
 
 
          <HBox fx:id="container">
-            <Pane fx:id="spielerstackpane">
+            <BorderPane fx:id="spielerstackpane">
 
-            </Pane>
+            </BorderPane>
 
 
-            <Pane fx:id="gegnerstackpane">
+            <BorderPane fx:id="gegnerstackpane">
 
-            </Pane>
+            </BorderPane>
          </HBox>
       </VBox>
 
