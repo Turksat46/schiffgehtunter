@@ -17,6 +17,7 @@ import javafx.scene.shape.Rectangle;
 import java.io.Console;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class newSpielfeld {
 
@@ -55,12 +56,18 @@ public class newSpielfeld {
         int shipCount = (int) (totalCells * 0.3); // 30 % der Zellen für Schiffe
 
 
-        // Greedy-Algorithmus zum Auffüllen der Zellen
-        //des hier bei feldgroesse von 10+
-        for (int size : schiffsGroessen) {
-            while (shipCount >= size) {
-                shipLengths.add(size); // Schiff hinzufügen
-                shipCount -= size; // Zellen zählen
+        Random random = new Random();
+
+        int remainingCells = shipCount;
+
+        while (remainingCells > 0) {
+            // Zufällig eine Schiffsgröße auswählen
+            int size = schiffsGroessen[random.nextInt(schiffsGroessen.length)];
+
+            // Prüfen, ob das Schiff noch platziert werden kann
+            if (size <= remainingCells) {
+                shipLengths.add(size); // Schiff zur Liste hinzufügen
+                remainingCells -= size; // Verbleibende Zellen reduzieren
             }
         }
 
