@@ -1,7 +1,9 @@
 package com.turksat46.schiffgehtunter;
 
 import javafx.geometry.Bounds;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
+import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
@@ -34,8 +36,10 @@ public class newSpielfeld {
         }else {
             CELL_SIZE=20;
         }
-        
+
+
         gridPane = createGridPane();
+        gridPane.setPadding(new Insets(0, 0, 70, 0)); // 20 is the bottom padding
 
         root.setCenter(gridPane);
         if(!istGegnerFeld){
@@ -43,6 +47,7 @@ public class newSpielfeld {
             Rectangle draggableRect = new Rectangle(40, 40, Color.BLUE);
             makeDraggable(draggableRect);
             root.setBottom(draggableRect);
+
 
             // Continuously check for intersections and update visual feedback
             draggableRect.boundsInParentProperty().addListener((obs, oldBounds, newBounds) -> {
@@ -72,7 +77,7 @@ public class newSpielfeld {
         GridPane gridPane = new GridPane();
         for (int row = 0; row < GRID_SIZE; row++) {
             for (int col = 0; col < GRID_SIZE; col++) {
-                Rectangle cell = new Rectangle(CELL_SIZE, CELL_SIZE, Color.LIGHTGRAY);
+                Rectangle cell = new Rectangle(CELL_SIZE, CELL_SIZE, Color.TRANSPARENT);
                 cell.setStroke(Color.BLACK);
                 gridPane.add(cell, col, row);
             }
@@ -102,10 +107,10 @@ public class newSpielfeld {
                 }
             }
         }
-        // Reset all cells to gray
+        // Reset all cells to transparent
         for (var node : gridPane.getChildren()) {
             if (node instanceof Rectangle cell) {
-                cell.setFill(Color.LIGHTGRAY);
+                cell.setFill(Color.TRANSPARENT);
             }
         }
 
