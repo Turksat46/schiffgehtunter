@@ -1,11 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<AnchorPane xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.turksat46.schiffgehtunter.MainGameController">
+<AnchorPane fx:id="anchorPane" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.turksat46.schiffgehtunter.MainGameController">
    <children>
-      <GridPane fx:id="spielerstackpane">
+      <VBox fx:id="outercontainer">
+         <HBox fx:id="label1" spacing="100">
+            <children>
+               <Region prefWidth="50" />
+               <Label style="-fx-background-color: #00000044;" text="Spielerfeld" textFill="WHITE">
+                  <font>
+                     <Font size="18.0" />
+                  </font>
+               </Label>
+               <Region prefWidth="425" />
+               <Label style="-fx-background-color: #00000044;" text="Gegnerfeld" textFill="WHITE">
+                  <font>
+                     <Font size="18.0" />
+                  </font>
 
-      </GridPane>
+
+               </Label>
+            </children>
+         </HBox>
+
+
+         <HBox fx:id="container">
+            <Pane fx:id="spielerstackpane">
+
+            </Pane>
+
+
+            <Pane fx:id="gegnerstackpane">
+
+            </Pane>
+         </HBox>
+      </VBox>
+
+      <Pane fx:id="images">
+      </Pane>
+
    </children>
 </AnchorPane>

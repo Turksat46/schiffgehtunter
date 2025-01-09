@@ -5,10 +5,12 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import java.io.IOException;
@@ -83,21 +85,15 @@ public class CreateGameController {
 
     public void startGame() throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("main-game-view.fxml"));
-        FXMLLoader gegnerfxmlLoader = new FXMLLoader(getClass().getResource("gegner-game-view.fxml"));
-
+        Scene scene  = new Scene(fxmlLoader.load());
         Stage stage = new Stage();
-        stage.setTitle("Spielerfeld");
-        stage.setScene(new Scene(fxmlLoader.load()));
-
-        Stage gegnerstage = new Stage();
-        gegnerstage.setTitle("Gegnerfeld");
-        gegnerstage.setScene(new Scene(gegnerfxmlLoader.load()));
+        stage.setTitle("Spielfeld");
+        stage.setScene(scene);
 
         mainGameController = fxmlLoader.getController();
-        mainGameController.setupSpiel((int)groesseslider.getValue(), stage, cb.getSelectionModel().getSelectedIndex() ,cb2.getSelectionModel().getSelectedIndex() );
+        mainGameController.setupSpiel((int)groesseslider.getValue(), stage, cb.getSelectionModel().getSelectedIndex() ,cb2.getSelectionModel().getSelectedIndex(), scene);
+        stage.show();
 
-        mainGameController = gegnerfxmlLoader.getController();
-        mainGameController.setupGegnerFeld((int)groesseslider.getValue(), gegnerstage);
         Stage thisstage = (Stage) cb.getScene().getWindow();
         thisstage.close();
     }
