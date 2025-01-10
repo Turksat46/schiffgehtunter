@@ -26,12 +26,12 @@ public class BackgroundGenerator {
 
     //Gesamtgröße des Hintergrund
     private static int WIDTH = 2500;
-    private static int HEIGHT = 600;
+    private static int HEIGHT = 800;
     //Größe eines Blocks
     private static final int TILE_SIZE = 30;
     //Menge der Blöcke in die jeweiligen Richtungen
     private static final int WORLD_WIDTH_TILES = 37;
-    private static final int WORLD_HEIGHT_TILES = 25;
+    private static final int WORLD_HEIGHT_TILES = 30;
     //Experimental: Schatten
     private static final double SHADOW_OFFSET_X = 2;
     private static final double SHADOW_OFFSET_Y = 2;
@@ -103,7 +103,7 @@ public class BackgroundGenerator {
             }
         }
 
-        int islandStartY = WORLD_HEIGHT_TILES - 5;
+        int islandStartY = WORLD_HEIGHT_TILES - 10;
         Random random = new Random();
 
         // Insel in der Mitte erstellen

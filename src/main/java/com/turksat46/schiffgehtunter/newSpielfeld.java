@@ -60,7 +60,7 @@ public class newSpielfeld {
 
         int remainingCells = shipCount;
 
-        while (remainingCells > 0) {
+        while (remainingCells > 1) {
             // Zufällig eine Schiffsgröße auswählen
             int size = schiffsGroessen[random.nextInt(schiffsGroessen.length)];
 
@@ -92,8 +92,6 @@ public class newSpielfeld {
             }
             root.setBottom(draggableContainer);
 
-            rotateShip();
-
             // Request focus so the scene can receive key events
             root.requestFocus();
 
@@ -110,16 +108,6 @@ public class newSpielfeld {
                 });
             }
         }
-    }
-
-    private EventHandler<KeyEvent> rotateShip(){
-        return event -> {
-            if(event.getCode() == KeyCode.R){
-                System.out.println("Dragging " + currentlyDraggedGroup);
-                rotateDraggableGroup(currentlyDraggedGroup);
-                event.consume(); // Prevent other nodes from handling the event
-            }
-        };
     }
 
     private Group createDraggableGroup(int length) {
@@ -160,32 +148,6 @@ public class newSpielfeld {
         });
     }
 
-    private void duplicateDraggableGroup(Group original) {
-        Group duplicate = new Group();
-        for (var node : original.getChildren()) {
-            if (node instanceof Rectangle originalRect) {
-                Rectangle newRect = new Rectangle(originalRect.getWidth(), originalRect.getHeight(), originalRect.getFill());
-                newRect.setTranslateX(originalRect.getTranslateX());
-                newRect.setTranslateY(originalRect.getTranslateY());
-                duplicate.getChildren().add(newRect);
-            }
-        }
-        makeDraggable(duplicate);
-        makeDuplicatable(duplicate);
-        draggables.add(duplicate);
-        HBox draggableContainer = (HBox) root.getBottom();
-        draggableContainer.getChildren().add(duplicate);
-
-        // Add listeners for the new draggable group
-        duplicate.getChildren().get(0).boundsInParentProperty().addListener((obs, oldBounds, newBounds) -> {
-            updateGridVisual(duplicate, gridPane);
-        });
-
-        duplicate.setOnMouseReleased(event -> {
-            snapToGrid(duplicate, gridPane);
-            currentlyDraggedGroup = null;
-        });
-    }
 
     private void rotateDraggableGroup(Group group) {
         Bounds bounds = group.getLayoutBounds();
