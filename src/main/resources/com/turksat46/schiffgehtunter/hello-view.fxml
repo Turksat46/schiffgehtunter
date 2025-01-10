@@ -2,21 +2,19 @@
 
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
 
 <VBox fx:id="rootBox" alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.turksat46.schiffgehtunter.HelloController">
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
     </padding>
-
-    <Label style="-fx-background-color: #00000044;" text="Schiffe versenken" textFill="WHITE">
-        <font>
-            <Font name="Roboto Light" size="26.0" />
-        </font>
-    </Label>
-
-    <Label fx:id="welcomeText" />
+   <ImageView fitHeight="200.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" scaleX="1.3" scaleY="1.5">
+      <image>
+         <Image url="@images/titellogo.png" />
+      </image>
+   </ImageView>
+   <Label />
     <Button onAction="#onHelloButtonClick" text="Neues Spiel starten/laden" />
     <Button mnemonicParsing="false" onAction="#onMultiplayerClick" prefHeight="26.0" prefWidth="120.0" text="Spiel finden" />
     <Button mnemonicParsing="false" onAction="#onSettingsButtonClick" prefHeight="26.0" prefWidth="118.0" text="Einstellungen" />
