@@ -14,7 +14,7 @@
          <Image url="@images/titellogo.png" />
       </image>
    </ImageView>
-   <Label />
+   <Label fx:id="welcomeText" />
     <Button onAction="#onHelloButtonClick" text="Neues Spiel starten/laden" />
     <Button mnemonicParsing="false" onAction="#onMultiplayerClick" prefHeight="26.0" prefWidth="120.0" text="Spiel finden" />
     <Button mnemonicParsing="false" onAction="#onSettingsButtonClick" prefHeight="26.0" prefWidth="118.0" text="Einstellungen" />
