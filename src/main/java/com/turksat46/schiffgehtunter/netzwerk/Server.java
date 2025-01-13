@@ -1,19 +1,40 @@
 package com.turksat46.schiffgehtunter.netzwerk;
 
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
+import javafx.stage.Stage;
+
 import java.io.*;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
 
-class Server {
+public class Server implements Runnable {
 
-    private ServerSocket server;
-    private Socket s;
-    private BufferedReader in;
-    private Writer out;
-    private BufferedReader usr;
-    private final int port = 50000;
+    private static ServerSocket server;
+    private static Socket s;
+    private static BufferedReader in;
+    private static Writer out;
+    private static BufferedReader usr;
+    private static final int port = 50000;
 
-    public void startServer() throws IOException {
+    @Override
+    public void run() {
+        try {
+            startServer();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void startServer() throws IOException {
         server = new ServerSocket(port);
         System.out.println("Waiting for client connection ...");
         s = server.accept();
@@ -22,14 +43,14 @@ class Server {
         // Ein- und Ausgabestrom des Sockets ermitteln
         // und als BufferedReader bzw. Writer verpacken
         // (damit man zeilen- bzw. zeichenweise statt byteweise arbeiten kann).
-         in = new BufferedReader(new InputStreamReader(s.getInputStream()));
-         out = new OutputStreamWriter(s.getOutputStream());
+        in = new BufferedReader(new InputStreamReader(s.getInputStream()));
+        out = new OutputStreamWriter(s.getOutputStream());
 
         // Standardeingabestrom ebenfalls als BufferedReader verpacken.
-         usr = new BufferedReader(new InputStreamReader(System.in));
+        usr = new BufferedReader(new InputStreamReader(System.in));
 
 
-       handleGame();
+        handleGame();
 
         // EOF ins Socket "schreiben".
         s.shutdownOutput();
@@ -37,7 +58,7 @@ class Server {
     }
 
 
-    private void handleGame() throws IOException {
+    private static void handleGame() throws IOException {
         //richtige size und ships senden
         sendMessage("size 10");
         receiveMessage();
@@ -69,20 +90,16 @@ class Server {
     }
 
 
-
-    private void sendMessage(String message) throws IOException {
+    private static void sendMessage(String message) throws IOException {
         out.write(message + "\n");
         out.flush();
         System.out.println("Server sent: " + message);
     }
 
-    private String receiveMessage() throws IOException {
+    private static String receiveMessage() throws IOException {
         String message = in.readLine();
         System.out.println("Server received: " + message);
         return message;
     }
 
-    private String getIp (){
-        return null;
-    }
 }

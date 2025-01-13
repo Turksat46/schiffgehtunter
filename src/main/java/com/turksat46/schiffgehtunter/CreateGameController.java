@@ -1,17 +1,16 @@
 package com.turksat46.schiffgehtunter;
 import com.turksat46.schiffgehtunter.filemanagement.SaveFileManager;
+import com.turksat46.schiffgehtunter.netzwerk.Server;
 import com.turksat46.schiffgehtunter.other.Difficulty;
 import com.turksat46.schiffgehtunter.other.Music;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import java.io.IOException;
@@ -88,19 +87,34 @@ public class CreateGameController {
     }
 
     public void startGame() throws IOException {
-        soundPlayer.playSound();
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("main-game-view.fxml"));
-        Scene scene  = new Scene(fxmlLoader.load());
-        Stage stage = new Stage();
-        stage.setTitle("Spielfeld");
-        stage.setScene(scene);
+        if (cb2.getSelectionModel().getSelectedIndex() == 0) {
+            soundPlayer.playSound();
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("main-game-view.fxml"));
+            Scene scene = new Scene(fxmlLoader.load());
+            Stage stage = new Stage();
+            stage.setTitle("Spielfeld");
+            stage.setScene(scene);
 
-        mainGameController = fxmlLoader.getController();
-        mainGameController.setupSpiel((int)groesseslider.getValue(), stage, cb.getSelectionModel().getSelectedIndex() ,cb2.getSelectionModel().getSelectedIndex(), scene);
-        stage.show();
+            mainGameController = fxmlLoader.getController();
+            mainGameController.setupSpiel((int) groesseslider.getValue(), stage, cb.getSelectionModel().getSelectedIndex(), cb2.getSelectionModel().getSelectedIndex(), scene);
+            stage.show();
 
-        Stage thisstage = (Stage) cb.getScene().getWindow();
-        thisstage.close();
+            Stage thisstage = (Stage) cb.getScene().getWindow();
+            thisstage.close();
+        }
+        else if (cb2.getSelectionModel().getSelectedIndex() >= 1) {
+            soundPlayer.playSound();
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("establishConnection.fxml"));
+            Scene scene = new Scene(fxmlLoader.load());
+            Stage stage = new Stage();
+            stage.setTitle("Verbindung Aufbauen");
+            stage.setScene(scene);
+            stage.show();
+
+
+            Stage thisstage = (Stage) cb.getScene().getWindow();
+            thisstage.close();
+        }
     }
 
     public void onBackPressed() throws IOException {
