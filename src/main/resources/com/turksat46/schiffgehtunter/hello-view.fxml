@@ -9,7 +9,7 @@
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
     </padding>
-   <ImageView fitHeight="200.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" scaleX="1.3" scaleY="1.5">
+   <ImageView fitHeight="200.0" fitWidth="200.0" onMouseClicked="#onEasterEggClick" pickOnBounds="true" preserveRatio="true" scaleX="1.3" scaleY="1.5">
       <image>
          <Image url="@images/titellogo.png" />
       </image>

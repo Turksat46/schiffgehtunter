@@ -12,6 +12,7 @@ module com.turksat46.schiffgehtunter {
     requires com.almasb.fxgl.all;
     requires jdk.compiler;
     requires java.desktop;
+    requires javafx.media;
 
 
     opens com.turksat46.schiffgehtunter to javafx.fxml;

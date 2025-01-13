@@ -16,7 +16,9 @@ import javafx.scene.shape.Rectangle;
 
 import java.io.Console;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 public class newSpielfeld {
@@ -33,6 +35,9 @@ public class newSpielfeld {
     private static int CELL_SIZE = 50;
     private List<Group> draggables = new ArrayList<>();
     private Group currentlyDraggedGroup = null;
+
+    public Map<Group, List<Integer[]>> shipCellMap = new HashMap<>();
+
 
     List<Integer> shipLengths = new ArrayList<>();
 
@@ -243,6 +248,33 @@ public class newSpielfeld {
 
             draggableGroup.setTranslateX(draggableGroup.getTranslateX() + translateX);
             draggableGroup.setTranslateY(draggableGroup.getTranslateY() + translateY);
+
+            // Ermittle und speichere die belegten Zellen
+            List<Integer[]> shipCells = getShipCells(draggableGroup, gridPane);
+            shipCellMap.put(draggableGroup, shipCells);
+
         }
+    }
+
+    private List<Integer[]> getShipCells(Group draggableGroup, GridPane gridPane) {
+        List<Integer[]> shipCells = new ArrayList<>();
+
+        for (var draggableNode : draggableGroup.getChildren()) {
+            if (draggableNode instanceof Rectangle draggableRect) {
+                Bounds draggableBounds = draggableRect.localToScene(draggableRect.getBoundsInLocal());
+                for (var gridNode : gridPane.getChildren()) {
+                    if (gridNode instanceof Rectangle cell) {
+                        Bounds cellBounds = cell.localToScene(cell.getBoundsInLocal());
+                        if (draggableBounds.intersects(cellBounds)) {
+                            int col = GridPane.getColumnIndex(cell);
+                            int row = GridPane.getRowIndex(cell);
+                            shipCells.add(new Integer[]{col, row});
+                            System.out.println("Schiffplatzierung:" + col + " "+row);
+                        }
+                    }
+                }
+            }
+        }
+        return shipCells;
     }
 }

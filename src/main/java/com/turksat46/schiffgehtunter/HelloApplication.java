@@ -1,5 +1,6 @@
 package com.turksat46.schiffgehtunter;
 
+import com.turksat46.schiffgehtunter.other.Music;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -11,6 +12,8 @@ import java.io.IOException;
 public class HelloApplication extends Application {
     private Stage stage = null;
 
+    Music music = new Music();
+
     @Override
     public void start(Stage stage) throws IOException {
         this.stage = stage;
@@ -19,6 +22,7 @@ public class HelloApplication extends Application {
         stage.setTitle("Hauptmenü");
         stage.setScene(scene);
         stage.show();
+        music.play();
     }
 
     public void setScene(String pfadFXML) throws IOException {

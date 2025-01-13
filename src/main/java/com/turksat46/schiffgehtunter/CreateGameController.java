@@ -1,6 +1,7 @@
 package com.turksat46.schiffgehtunter;
 import com.turksat46.schiffgehtunter.filemanagement.SaveFileManager;
 import com.turksat46.schiffgehtunter.other.Difficulty;
+import com.turksat46.schiffgehtunter.other.Music;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -17,6 +18,8 @@ import java.io.IOException;
 
 
 public class CreateGameController {
+
+    Music soundPlayer = new Music();
 
     // cb = Schwierigkeit
     // cb2 = Spielstrategie
@@ -80,10 +83,12 @@ public class CreateGameController {
     }
 
     public void onPlayPressed() throws IOException {
+        soundPlayer.playSound();
         startGame();
     }
 
     public void startGame() throws IOException {
+        soundPlayer.playSound();
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("main-game-view.fxml"));
         Scene scene  = new Scene(fxmlLoader.load());
         Stage stage = new Stage();
@@ -99,7 +104,8 @@ public class CreateGameController {
     }
 
     public void onBackPressed() throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("Hello-view.fxml"));
+        soundPlayer.playSound();
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("hello-view.fxml"));
         Stage stage = new Stage();
         stage.setTitle("Hauptmenü");
         stage.setScene(new Scene(fxmlLoader.load()));
@@ -109,6 +115,7 @@ public class CreateGameController {
     }
 
     public void openLoadFileDialog() {
+        soundPlayer.playSound();
         ladenhinweislabel.setText("Bitte eine Save-Datei im Dialog öffnen...");
         saveFileManager.openFileChooser();
 

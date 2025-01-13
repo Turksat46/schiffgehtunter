@@ -51,7 +51,7 @@ public class MainGameController implements Initializable {
     static boolean rotated;
 
     static newSpielfeld spielerspielfeld;
-    static newSpielfeld gegnerspielfeld;
+    static Spielfeld gegnerspielfeld;
 
     BackgroundGenerator backgroundManager;
 
@@ -77,17 +77,17 @@ public class MainGameController implements Initializable {
 
     public void setupSpiel(int groesse, Stage stage, int currentDifficulty, int currentMode, Scene scene) throws FileNotFoundException {
         //spielerspielfeld = new Spielfeld(groesse,  false);
-        //gegnerspielfeld = new Spielfeld(groesse,  true);
+        gegnerspielfeld = new Spielfeld(groesse,  true);
 
         spielerspielfeld = new newSpielfeld(groesse, false, spielerstackpane);
         //gegnerspielfeld = new newSpielfeld(groesse, true, gegnerstackpane);
 
         //spielerstackpane.getChildren().add(spielerspielfeld.gridPane);
-        //gegnerstackpane.getChildren().add(gegnerspielfeld.gridPane);
+        gegnerstackpane.getChildren().add(gegnerspielfeld.gridPane);
 
         // StackPane-Margen setzen
         HBox.setMargin(spielerstackpane, new Insets(10, 10, 100, 10)); // Abstand für spielerstackpane
-        //HBox.setMargin(gegnerstackpane, new Insets(10, 10, 100, 300)); // Abstand für gegnerstackpane
+        HBox.setMargin(gegnerstackpane, new Insets(10, 10, 100, 300)); // Abstand für gegnerstackpane
 
 
         this.currentMode = currentMode;

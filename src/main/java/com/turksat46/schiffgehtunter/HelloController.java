@@ -1,5 +1,6 @@
 package com.turksat46.schiffgehtunter;
 
+import com.turksat46.schiffgehtunter.other.Music;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.fxml.FXML;
@@ -26,6 +27,8 @@ import java.util.Random;
 import java.util.ResourceBundle;
 
 public class HelloController implements Initializable {
+
+    Music soundsPlayer = new Music();
 
     //
     // Kommentare zur Hintergrundzeichnung bei @MainGameController.java anschauen
@@ -178,7 +181,7 @@ public class HelloController implements Initializable {
 
     @FXML
     protected void onHelloButtonClick() throws IOException {
-
+        soundsPlayer.playSound();
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("createGame.fxml"));
         Stage stage = new Stage();
         stage.setTitle("Neues Spiel erstellen");
@@ -189,6 +192,7 @@ public class HelloController implements Initializable {
 
     @FXML
     protected void onMultiplayerClick() throws IOException {
+        soundsPlayer.playSound();
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("connect.fxml"));
         Stage stage = new Stage();
         stage.setTitle("Spiel finden");
@@ -204,6 +208,7 @@ public class HelloController implements Initializable {
 
     @FXML
     protected void onSettingsButtonClick() throws IOException {
+        soundsPlayer.playSound();
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("settings.fxml"));
         Stage stage = new Stage();
         stage.setTitle("Einstellungen");
@@ -213,6 +218,12 @@ public class HelloController implements Initializable {
 
     @FXML
     protected void onExitButtonClick() {
+        soundsPlayer.playSound();
         System.exit(0);
+    }
+
+    @FXML
+    protected void onEasterEggClick(){
+        soundsPlayer.playEasterEgg();
     }
 }
