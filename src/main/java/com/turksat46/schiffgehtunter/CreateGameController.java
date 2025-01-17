@@ -1,6 +1,7 @@
 package com.turksat46.schiffgehtunter;
 import com.turksat46.schiffgehtunter.filemanagement.SaveFileManager;
 import com.turksat46.schiffgehtunter.netzwerk.Server;
+import com.turksat46.schiffgehtunter.netzwerk.establishConnection;
 import com.turksat46.schiffgehtunter.other.Difficulty;
 import com.turksat46.schiffgehtunter.other.Music;
 import javafx.beans.value.ChangeListener;
@@ -110,6 +111,9 @@ public class CreateGameController {
             stage.setTitle("Verbindung Aufbauen");
             stage.setScene(scene);
             stage.show();
+
+            establishConnection controller = fxmlLoader.getController();
+            controller.initialize(stage);
 
 
             Stage thisstage = (Stage) cb.getScene().getWindow();
