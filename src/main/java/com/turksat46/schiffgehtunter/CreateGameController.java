@@ -4,6 +4,7 @@ import com.turksat46.schiffgehtunter.netzwerk.Server;
 import com.turksat46.schiffgehtunter.netzwerk.establishConnection;
 import com.turksat46.schiffgehtunter.other.Difficulty;
 import com.turksat46.schiffgehtunter.other.Music;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -74,10 +75,10 @@ public class CreateGameController {
         saveFileManager = new SaveFileManager();
     }
 
-    public void onStrategieChanged(){
-        if(cb2.getSelectionModel().getSelectedIndex() == 0){
+    public void onStrategieChanged() {
+        if (cb2.getSelectionModel().getSelectedIndex() == 0) {
             kiDifficultyUI.setVisible(true);
-        }else{
+        } else {
             kiDifficultyUI.setVisible(false);
         }
     }
@@ -89,36 +90,79 @@ public class CreateGameController {
 
     public void startGame() throws IOException {
         if (cb2.getSelectionModel().getSelectedIndex() == 0) {
-            soundPlayer.playSound();
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("main-game-view.fxml"));
-            Scene scene = new Scene(fxmlLoader.load());
-            Stage stage = new Stage();
-            stage.setTitle("Spielfeld");
-            stage.setScene(scene);
-
-            mainGameController = fxmlLoader.getController();
-            mainGameController.setupSpiel((int) groesseslider.getValue(), stage, cb.getSelectionModel().getSelectedIndex(), cb2.getSelectionModel().getSelectedIndex(), scene);
-            stage.show();
-
-            Stage thisstage = (Stage) cb.getScene().getWindow();
-            thisstage.close();
+            startSinglePlayerGame();
+        } else {
+            // Start multiplayer setup
+            openConnectionSetup();
         }
-        else if (cb2.getSelectionModel().getSelectedIndex() >= 1) {
-            soundPlayer.playSound();
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("establishConnection.fxml"));
-            Scene scene = new Scene(fxmlLoader.load());
-            Stage stage = new Stage();
-            stage.setTitle("Verbindung Aufbauen");
-            stage.setScene(scene);
-            stage.show();
+    }
 
-            establishConnection controller = fxmlLoader.getController();
-            controller.initialize(stage);
+    private void startSinglePlayerGame() throws IOException {
+        soundPlayer.playSound();
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("main-game-view.fxml"));
+        Scene scene = new Scene(fxmlLoader.load());
+        Stage stage = new Stage();
+        stage.setTitle("Spielfeld");
+        stage.setScene(scene);
 
+        mainGameController = fxmlLoader.getController();
+        mainGameController.setupSpiel((int) groesseslider.getValue(), stage, cb.getSelectionModel().getSelectedIndex(), cb2.getSelectionModel().getSelectedIndex(), scene);
+        stage.show();
 
-            Stage thisstage = (Stage) cb.getScene().getWindow();
-            thisstage.close();
-        }
+        Stage thisstage = (Stage) cb.getScene().getWindow();
+        thisstage.close();
+    }
+
+    private void openConnectionSetup() throws IOException {
+        soundPlayer.playSound();
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("establishConnection.fxml"));
+        Scene scene = new Scene(fxmlLoader.load());
+        Stage stage = new Stage();
+        stage.setTitle("Verbindung Aufbauen");
+        stage.setScene(scene);
+        stage.show();
+
+        establishConnection controller = fxmlLoader.getController();
+        controller.initialize(stage);
+        Stage thisStage = (Stage) cb.getScene().getWindow();
+        thisStage.close();
+        waitForConnectionAndStartGame(stage);
+    }
+
+    private void waitForConnectionAndStartGame(Stage stage) throws IOException {
+        new Thread(() -> {
+            while (!Server.connectionEstablished) {
+                try {
+                    Thread.sleep(100); // Check periodically
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            // Once connection is established, start multiplayer game
+            Platform.runLater(() -> {
+                try {
+                    startMultiplayerGame(stage, (int) groesseslider.getValue());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+        }).start();
+    }
+
+    //Überarbeiten sodass auch schiffe übergeben werden können
+    public void startMultiplayerGame(Stage connectionStage, int groesse) throws IOException {
+        soundPlayer.playSound();
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("main-game-view.fxml"));
+        Scene scene = new Scene(fxmlLoader.load());
+        Stage stage = new Stage();
+        stage.setTitle("Spielfeld");
+        stage.setScene(scene);
+
+        mainGameController = fxmlLoader.getController();
+        mainGameController.setupSpiel(groesse, stage, cb.getSelectionModel().getSelectedIndex(), cb2.getSelectionModel().getSelectedIndex(), scene);
+        stage.show();
+
+        connectionStage.close();
     }
 
     public void onBackPressed() throws IOException {

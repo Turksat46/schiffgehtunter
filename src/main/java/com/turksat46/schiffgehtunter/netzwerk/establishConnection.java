@@ -26,7 +26,7 @@ public class establishConnection{
     @FXML
     Button cancel = new Button();
     public Label ipAnzeige;
-    Thread serverThread = new Thread(new Server());
+    public Thread serverThread = new Thread(new Server());
 
 
 
@@ -101,7 +101,7 @@ public class establishConnection{
     }
 
     private void onCancelPressed() throws IOException {
-        serverThread.stop();
+        serverThread.interrupt();
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/turksat46/schiffgehtunter/createGame.fxml"));
         Stage stage = new Stage();
         stage.setTitle("Neues Spiel erstellen");

@@ -1,5 +1,6 @@
 package com.turksat46.schiffgehtunter.netzwerk;
 
+import com.turksat46.schiffgehtunter.CreateGameController;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -8,6 +9,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.Slider;
 import javafx.stage.Stage;
 
 import java.io.*;
@@ -24,6 +26,7 @@ public class Server implements Runnable {
     private static Writer out;
     private static BufferedReader usr;
     private static final int port = 50000;
+    public static boolean connectionEstablished; // Callback-Funktion
 
     @Override
     public void run() {
@@ -39,6 +42,7 @@ public class Server implements Runnable {
         System.out.println("Waiting for client connection ...");
         s = server.accept();
         System.out.println("Connection established.");
+        connectionEstablished = true; // Verbindung hergestellt
 
         // Ein- und Ausgabestrom des Sockets ermitteln
         // und als BufferedReader bzw. Writer verpacken
