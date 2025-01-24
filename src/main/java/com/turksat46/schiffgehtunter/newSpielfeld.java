@@ -14,12 +14,10 @@ import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
+import com.turksat46.schiffgehtunter.other.Cell;
+
 import java.io.Console;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 public class newSpielfeld {
 
@@ -36,7 +34,7 @@ public class newSpielfeld {
     private List<Group> draggables = new ArrayList<>();
     private Group currentlyDraggedGroup = null;
 
-    public Map<Group, List<Integer[]>> shipCellMap = new HashMap<>();
+    public Map<Group, List<Cell>> shipCellMap = new HashMap<>();
 
 
     List<Integer> shipLengths = new ArrayList<>();
@@ -250,14 +248,14 @@ public class newSpielfeld {
             draggableGroup.setTranslateY(draggableGroup.getTranslateY() + translateY);
 
             // Ermittle und speichere die belegten Zellen
-            List<Integer[]> shipCells = getShipCells(draggableGroup, gridPane);
+            List<Cell> shipCells = getShipCells(draggableGroup, gridPane);
             shipCellMap.put(draggableGroup, shipCells);
 
         }
     }
 
-    private List<Integer[]> getShipCells(Group draggableGroup, GridPane gridPane) {
-        List<Integer[]> shipCells = new ArrayList<>();
+    private List<Cell> getShipCells(Group draggableGroup, GridPane gridPane) {
+        Set<Cell> shipCells = new HashSet<>();
 
         for (var draggableNode : draggableGroup.getChildren()) {
             if (draggableNode instanceof Rectangle draggableRect) {
@@ -268,13 +266,20 @@ public class newSpielfeld {
                         if (draggableBounds.intersects(cellBounds)) {
                             int col = GridPane.getColumnIndex(cell);
                             int row = GridPane.getRowIndex(cell);
-                            shipCells.add(new Integer[]{col, row});
-                            System.out.println("Schiffplatzierung:" + col + " "+row);
+                            shipCells.add(new Cell(col, row));
                         }
                     }
                 }
             }
         }
-        return shipCells;
+
+        //Logging
+        List<Cell> shipCellsList = new ArrayList<>(shipCells);
+        System.out.print("Schiffplatzierung: ");
+        for (Cell cell : shipCellsList){
+            System.out.print(cell.toString() + " ");
+        }
+        System.out.println("");
+        return new ArrayList<>(shipCells);
     }
 }
