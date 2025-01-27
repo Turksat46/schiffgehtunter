@@ -1,22 +1,18 @@
 package com.turksat46.schiffgehtunter;
 
-import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.scene.Group;
-import javafx.scene.Scene;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-
 import com.turksat46.schiffgehtunter.other.Cell;
 
-import java.io.Console;
 import java.util.*;
 
 public class newSpielfeld {
@@ -34,8 +30,7 @@ public class newSpielfeld {
     private List<Group> draggables = new ArrayList<>();
     private Group currentlyDraggedGroup = null;
 
-    public Map<Group, List<Cell>> shipCellMap = new HashMap<>();
-
+    public Map<Group, Set<Cell>> shipCellMap = new HashMap<>();
 
     List<Integer> shipLengths = new ArrayList<>();
 
@@ -116,9 +111,15 @@ public class newSpielfeld {
     private Group createDraggableGroup(int length) {
         Group group = new Group();
         for (int i = 0; i < length; i++) {
-            Rectangle rect = new Rectangle(CELL_SIZE, CELL_SIZE, Color.BLUE);
-            rect.setTranslateX(i * CELL_SIZE);
-            group.getChildren().add(rect);
+            Image image = new Image(getClass().getResourceAsStream("/com/turksat46/schiffgehtunter/images/ship.png"));
+            ImageView imageView = new ImageView(image);
+            imageView.setFitHeight(CELL_SIZE);
+            imageView.setFitWidth(CELL_SIZE);
+            imageView.setRotate(90.0);
+            imageView.setFitWidth(CELL_SIZE);
+            imageView.setFitHeight(CELL_SIZE);
+            imageView.setTranslateX(i * CELL_SIZE);
+            group.getChildren().add(imageView);
         }
         return group;
     }
@@ -150,7 +151,6 @@ public class newSpielfeld {
             }
         });
     }
-
 
     private void rotateDraggableGroup(Group group) {
         Bounds bounds = group.getLayoutBounds();
@@ -207,10 +207,10 @@ public class newSpielfeld {
             return;
         }
 
-        Rectangle firstRect = (Rectangle) draggableGroup.getChildren().get(0);
+        ImageView firstRect = (ImageView) draggableGroup.getChildren().get(0);
         Bounds firstRectBounds = firstRect.localToScene(firstRect.getBoundsInLocal());
-        double firstRectCenterX = firstRectBounds.getMinX() + firstRect.getWidth() / 2;
-        double firstRectCenterY = firstRectBounds.getMinY() + firstRect.getHeight() / 2;
+        double firstRectCenterX = firstRectBounds.getMinX() + firstRect.getFitWidth() / 2;
+        double firstRectCenterY = firstRectBounds.getMinY() + firstRect.getFitHeight() / 2;
 
         Rectangle closestCell = null;
         double minDistance = Double.MAX_VALUE;
@@ -234,8 +234,8 @@ public class newSpielfeld {
             double cellCenterX = cellBounds.getMinX() + closestCell.getWidth() / 2;
             double cellCenterY = cellBounds.getMinY() + closestCell.getHeight() / 2;
 
-            double targetX = cellCenterX - firstRect.getWidth() / 2;
-            double targetY = cellCenterY - firstRect.getHeight() / 2;
+            double targetX = cellCenterX - firstRect.getFitWidth() / 2;
+            double targetY = cellCenterY - firstRect.getFitHeight() / 2;
 
             Bounds groupBounds = draggableGroup.getBoundsInParent();
             double currentCenterX = groupBounds.getMinX() + groupBounds.getWidth() / 2;
@@ -247,14 +247,22 @@ public class newSpielfeld {
             draggableGroup.setTranslateX(draggableGroup.getTranslateX() + translateX);
             draggableGroup.setTranslateY(draggableGroup.getTranslateY() + translateY);
 
-            // Ermittle und speichere die belegten Zellen
-            List<Cell> shipCells = getShipCells(draggableGroup, gridPane);
-            shipCellMap.put(draggableGroup, shipCells);
 
+            // Ermittle und speichere die belegten Zellen NACH dem Snappen
+            Set<Cell> shipCells = getShipCells(draggableGroup, gridPane);
+
+            shipCellMap.compute(draggableGroup, (key, existingCells) -> {
+                if(existingCells == null) {
+                    return new HashSet<>(shipCells); // Wenn noch keine Zellen für dieses Schiff vorhanden sind
+                } else {
+                    existingCells.addAll(shipCells); // Wenn bereits Zellen vorhanden sind, füge die neuen hinzu
+                    return existingCells;
+                }
+            });
         }
     }
 
-    private List<Cell> getShipCells(Group draggableGroup, GridPane gridPane) {
+    private Set<Cell> getShipCells(Group draggableGroup, GridPane gridPane) {
         Set<Cell> shipCells = new HashSet<>();
 
         for (var draggableNode : draggableGroup.getChildren()) {
@@ -266,20 +274,21 @@ public class newSpielfeld {
                         if (draggableBounds.intersects(cellBounds)) {
                             int col = GridPane.getColumnIndex(cell);
                             int row = GridPane.getRowIndex(cell);
+                            System.out.println("Position: " + col + ", " + row);
                             shipCells.add(new Cell(col, row));
                         }
                     }
                 }
             }
         }
-
         //Logging
-        List<Cell> shipCellsList = new ArrayList<>(shipCells);
         System.out.print("Schiffplatzierung: ");
-        for (Cell cell : shipCellsList){
-            System.out.print(cell.toString() + " ");
+        for (Cell cell : shipCells){
+            System.out.print(cell.toString() + ", ");
         }
         System.out.println("");
-        return new ArrayList<>(shipCells);
+
+
+        return shipCells;
     }
 }

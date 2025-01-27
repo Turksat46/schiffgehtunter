@@ -26,6 +26,6 @@ public class Cell {
 
     @Override
     public String toString() {
-        return col + ", " + row;
+        return col + ":" + row;
     }
 }

@@ -28,10 +28,6 @@ public class establishConnection{
     public Label ipAnzeige;
     public Thread serverThread = new Thread(new Server());
 
-
-
-
-
     @FXML
     public void initialize(Stage primaryStage) throws IOException {
         String ipAddress = getLocalIPAddress();
