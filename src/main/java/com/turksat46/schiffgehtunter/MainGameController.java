@@ -1,7 +1,9 @@
 package com.turksat46.schiffgehtunter;
 import com.turksat46.schiffgehtunter.backgroundgeneration.BackgroundGenerator;
 import javafx.animation.AnimationTimer;
+import javafx.animation.FadeTransition;
 import javafx.animation.PathTransition;
+import javafx.animation.ScaleTransition;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.event.EventHandler;
@@ -21,10 +23,13 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.QuadCurveTo;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -69,6 +74,7 @@ public class MainGameController implements Initializable {
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("main-game-view.fxml"));
         Parent root = loader.getRoot();
+
 
         MainGameController controller = loader.getController();
         //anchorPane beschmücken
@@ -401,13 +407,123 @@ public class MainGameController implements Initializable {
     }
 
     public void handleWinForPlayer(){
-        //TODO: @Elion mach was draus
-        System.out.println("Spieler hat gewonnen!");
+        Stage victoryStage = new Stage();
+        Image image;
+        Font customFont;
+        try {
+            image = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/turksat46/schiffgehtunter/images/water_animated.gif")));
+             customFont = Font.loadFont(getClass().getResource("/com/turksat46/schiffgehtunter/MinecraftRegular-Bmg3.otf").toExternalForm(), 40);
+
+        } catch (NullPointerException e) {
+            System.err.println("Fehler beim Laden der Texturen. Stelle sicher, dass die Dateien im Ressourcenordner liegen.");
+            throw e;
+        }
+
+        StackPane root = new StackPane();
+
+        // Background image
+        Rectangle background = new Rectangle(600, 400);
+
+        //Setting the image view 1
+        //mageView imageView1 = new ImageView(image);
+
+
+        background.setFill(new ImagePattern(image));
+        // Simulated Minecraft "blocks"
+
+        // Victory message
+        Text victoryText = new Text("VICTORY FOR PLAYER !");
+        victoryText.setFill(javafx.scene.paint.Color.WHITE);
+        victoryText.setFont(customFont);
+
+        // Adding animations
+        FadeTransition fadeIn = new FadeTransition(Duration.seconds(1.5), victoryText);
+        fadeIn.setFromValue(0);
+        fadeIn.setToValue(1);
+        fadeIn.setCycleCount(3);
+        fadeIn.setAutoReverse(true);
+
+        ScaleTransition scale = new ScaleTransition(Duration.seconds(1.5), victoryText);
+        scale.setFromX(1);
+        scale.setFromY(1);
+        scale.setToX(1.2);
+        scale.setToY(1.2);
+        scale.setCycleCount(3);
+        scale.setAutoReverse(true);
+
+        // Start animations
+        fadeIn.play();
+        scale.play();
+
+        // Add elements to root
+        root.getChildren().addAll(background, victoryText);
+
+        // Show stage
+        Scene scene = new Scene(root, 600, 400);
+        victoryStage.setTitle("Victory!");
+        victoryStage.setScene(scene);
+        victoryStage.show();
+        victoryStage.toFront();
     }
 
     public void handleWinForOpponent(){
-        //TODO: @Elion mach was draus
-        System.out.println("Gegner hat gewonnen!");
+        Stage victoryStage = new Stage();
+        Image image;
+        Font customFont;
+        try {
+            image = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/turksat46/schiffgehtunter/images/water_animated.gif")));
+            customFont = Font.loadFont(getClass().getResource("/com/turksat46/schiffgehtunter/MinecraftRegular-Bmg3.otf").toExternalForm(), 40);
+
+        } catch (NullPointerException e) {
+            System.err.println("Fehler beim Laden der Texturen. Stelle sicher, dass die Dateien im Ressourcenordner liegen.");
+            throw e;
+        }
+
+        StackPane root = new StackPane();
+
+        // Background image
+        Rectangle background = new Rectangle(600, 400);
+
+        //Setting the image view 1
+        //mageView imageView1 = new ImageView(image);
+
+
+        background.setFill(new ImagePattern(image));
+        // Simulated Minecraft "blocks"
+
+        // Victory message
+        Text victoryText = new Text("VICTORY FOR OPPONENT !");
+        victoryText.setFill(javafx.scene.paint.Color.WHITE);
+        victoryText.setFont(customFont);
+
+        // Adding animations
+        FadeTransition fadeIn = new FadeTransition(Duration.seconds(1.5), victoryText);
+        fadeIn.setFromValue(0);
+        fadeIn.setToValue(1);
+        fadeIn.setCycleCount(3);
+        fadeIn.setAutoReverse(true);
+
+        ScaleTransition scale = new ScaleTransition(Duration.seconds(1.5), victoryText);
+        scale.setFromX(1);
+        scale.setFromY(1);
+        scale.setToX(1.2);
+        scale.setToY(1.2);
+        scale.setCycleCount(3);
+        scale.setAutoReverse(true);
+
+        // Start animations
+        fadeIn.play();
+        scale.play();
+
+        // Add elements to root
+        root.getChildren().addAll(background, victoryText);
+
+        // Show stage
+        Scene scene = new Scene(root, 600, 400);
+        victoryStage.setTitle("Victory!");
+        victoryStage.setScene(scene);
+        victoryStage.show();
+        victoryStage.toFront();
     }
 
     private void  shootShip(Spielfeld spielfeld, int posx, int posy){
