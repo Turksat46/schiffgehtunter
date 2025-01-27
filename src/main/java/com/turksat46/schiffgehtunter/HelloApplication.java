@@ -12,7 +12,9 @@ import java.io.IOException;
 public class HelloApplication extends Application {
     private Stage stage = null;
 
-    Music music = new Music();
+    Music music = Music.getInstance();
+
+    SettingsController settingsController;
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -23,6 +25,10 @@ public class HelloApplication extends Application {
         stage.setScene(scene);
         stage.show();
         music.play();
+        FXMLLoader fxmlLoader2 = new FXMLLoader(HelloApplication.class.getResource("settings.fxml"));
+        fxmlLoader2.load();
+        settingsController = fxmlLoader2.getController();
+        settingsController.setSettings();
     }
 
     public void setScene(String pfadFXML) throws IOException {

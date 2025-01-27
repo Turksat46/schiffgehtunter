@@ -20,7 +20,7 @@ import java.io.IOException;
 
 public class CreateGameController {
 
-    Music soundPlayer = new Music();
+    Music soundPlayer = Music.getInstance();
 
     // cb = Schwierigkeit
     // cb2 = Spielstrategie

@@ -28,7 +28,7 @@ import java.util.ResourceBundle;
 
 public class HelloController implements Initializable {
 
-    Music soundsPlayer = new Music();
+    Music soundsPlayer = Music.getInstance();
 
     //
     // Kommentare zur Hintergrundzeichnung bei @MainGameController.java anschauen
