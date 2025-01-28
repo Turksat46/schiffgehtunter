@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane fx:id="anchorPane" minHeight="500.0" minWidth="1110.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.turksat46.schiffgehtunter.MultipayerMainGameController">
+   <children>
+      <VBox fx:id="outercontainer">
+         <HBox fx:id="label1" spacing="100">
+            <children>
+               <Region prefWidth="50" />
+               <Label style="-fx-background-color: #00000044;" text="Spielerfeld" textFill="WHITE">
+                  <font>
+                     <Font size="18.0" />
+                  </font>
+               </Label>
+               <Region prefWidth="425" />
+               <Label style="-fx-background-color: #00000044;" text="Gegnerfeld" textFill="WHITE">
+                  <font>
+                     <Font size="18.0" />
+                  </font>
+
+
+               </Label>
+            </children>
+         </HBox>
+
+
+         <HBox fx:id="container">
+            <BorderPane fx:id="spielerstackpane">
+
+            </BorderPane>
+
+
+            <BorderPane fx:id="gegnerstackpane">
+
+            </BorderPane>
+         </HBox>
+      </VBox>
+
+      <Pane fx:id="images">
+      </Pane>
+      <Button fx:id="startButton" layoutX="27.0" layoutY="376.0" mnemonicParsing="false" onAction="#startGame" prefHeight="47.0" prefWidth="104.0" text="START" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+
+   </children>
+</AnchorPane>

@@ -1,6 +1,8 @@
 package com.turksat46.schiffgehtunter.netzwerk;
 
 import com.turksat46.schiffgehtunter.CreateGameController;
+import com.turksat46.schiffgehtunter.CreateGameController.*;
+import com.turksat46.schiffgehtunter.MultipayerMainGameController;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -17,6 +19,9 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.List;
+
+import static com.turksat46.schiffgehtunter.MultipayerMainGameController.shootShipMultiplayer;
 
 public class Server implements Runnable {
 
@@ -27,6 +32,8 @@ public class Server implements Runnable {
     private static BufferedReader usr;
     private static final int port = 50000;
     public static boolean connectionEstablished; // Callback-Funktion
+    private static int groesse;
+    private static List<Integer> ships;
 
     @Override
     public void run() {
@@ -61,15 +68,32 @@ public class Server implements Runnable {
         System.out.println("Connection closed.");
     }
 
+    public static void setGroesse(int x) {
+        if (x == 0) {
+            groesse = 5;
+        }
+        else {
+            groesse = x;
+        }
+    }
+
+    public static void setShips(List<Integer> ships) {
+        Server.ships = ships;
+    }
 
     private static void handleGame() throws IOException {
-        //richtige size und ships senden
-        sendMessage("size 10");
+
+
+        sendMessage("size "+ groesse);
+        receiveMessage();
+
+        //Richtige schiffe übergeben
+        sendMessage("ships 3 2 2");
         receiveMessage();
 
 
-        sendMessage("ships 5 4 4 3 3 3 2 2");
-        receiveMessage();
+        //warten bis schiffe gesetzt sind
+
 
         sendMessage("ready");
         if (receiveMessage().equals("ready")) {
@@ -84,17 +108,18 @@ public class Server implements Runnable {
                 if (parts[0].equals("shot")) {
                     int row = Integer.parseInt(parts[1]);
                     int col = Integer.parseInt(parts[2]);
-                    //Treffer?
+                    reciveShoot(row, col); // antwort Senden
 
-                    sendMessage("answer 1");
+
                     //wenn Treffer dann weiter ansonsten pass und schießen
+
                 }
             }
         }
     }
 
 
-    private static void sendMessage(String message) throws IOException {
+    public static void sendMessage(String message) throws IOException {
         out.write(message + "\n");
         out.flush();
         System.out.println("Server sent: " + message);
@@ -104,6 +129,27 @@ public class Server implements Runnable {
         String message = in.readLine();
         System.out.println("Server received: " + message);
         return message;
+    }
+
+    private static void reciveShoot(int row, int col) throws IOException {
+
+        //shootShipMultiplayer() liefert ob an dieser stelle ein schiff ist es zerstört wurde oder wasser
+        if (shootShipMultiplayer(row,col)==0){
+            sendMessage("answer 0");
+        }
+        if (shootShipMultiplayer(row,col)==1){
+            sendMessage("answer 1");
+        }
+        if (shootShipMultiplayer(row,col)==2){
+            sendMessage("answer 2");
+        }
+    }
+
+    private static boolean shoot() throws IOException {
+
+        //feld auf das gecklickt wurde übergeben
+
+        return true;
     }
 
 }

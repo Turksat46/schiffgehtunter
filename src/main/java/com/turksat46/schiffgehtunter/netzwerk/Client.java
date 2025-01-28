@@ -1,5 +1,10 @@
 package com.turksat46.schiffgehtunter.netzwerk;
 
+import com.turksat46.schiffgehtunter.CreateGameController;
+import com.turksat46.schiffgehtunter.MainGameController;
+import com.turksat46.schiffgehtunter.MultipayerMainGameController;
+import com.turksat46.schiffgehtunter.other.Music;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -14,8 +19,10 @@ import javafx.stage.Stage;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
-public class Client {
+public class Client implements Runnable{
     @FXML
     AnchorPane pane;
     @FXML
@@ -28,12 +35,18 @@ public class Client {
     @FXML
     Button backButton = new Button();
 
+    static MultipayerMainGameController gameController;
+
+
     final int port = 50000;
     Socket server;
     Socket s;
     private Writer out;
     private BufferedReader in;
     private BufferedReader usr;
+
+    private static Thread clientThread = new Thread(new Client());
+
 
     public void onBackPressed() throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/turksat46/schiffgehtunter/hello-view.fxml"));
@@ -46,19 +59,17 @@ public class Client {
         thisstage.close();
     }
 
+    @Override
+    public void run() {
+        try {
+            startConnection();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-    public void initialize() {
-        connectButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                try {
-                    startConnection();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+    public void initialize() throws IOException {
 
-            }
-        });
 
         backButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -70,6 +81,14 @@ public class Client {
                 }
             }
         });
+        connectButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                clientThread.setDaemon(true);
+                clientThread.start();
+
+            }
+        });
     }
 
 
@@ -77,6 +96,8 @@ public class Client {
         progressBar.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
         s = new Socket(ipInput.getText(), port);
         System.out.println("Connection established.");
+
+        progressBar.setProgress(1.0);
 
         // Ein- und Ausgabestrom des Sockets ermitteln
         // und als BufferedReader bzw. Writer verpacken
@@ -87,37 +108,95 @@ public class Client {
         // Standardeingabestrom ebenfalls als BufferedReader verpacken.
         usr = new BufferedReader(new InputStreamReader(System.in));
 
-        handleGame();
+        initializeGame();
 
     }
+
+    private void initializeGame() throws IOException {
+        int groesse = 0;
+            List<Integer> ships = new ArrayList<>();
+            while (true) {
+                String message = receiveMessage();
+                if (message == null) break;
+
+                String[] parts = message.split(" ");
+                switch (parts[0]) {
+                    case "size":
+                        System.out.println("Received size: " + message);
+                        groesse = Integer.parseInt(parts[1]);
+                        sendMessage("done");
+                        break;
+                    case "ships":
+                        System.out.println("Received ships: " + message);
+                        for (int i = 1; i < parts.length; i++) {
+                            ships.add(Integer.parseInt(parts[i]));
+                        }
+                        sendMessage("done");
+                        break;
+                    case "ready":
+
+
+                        //Sollte nur sein wenn size und ships empfangen wurde
+
+
+                        System.out.println("Server is ready.");
+                        if(groesse!=0 && ships.size()!=0) {
+
+                            int finalGroesse = groesse;
+                            Platform.runLater(() -> {
+
+                                try {
+
+                                    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/turksat46/schiffgehtunter/multiplayer-main-game-view.fxml"));
+                                    Scene scene = new Scene(fxmlLoader.load());
+                                    Stage stage = new Stage();
+                                    stage.setTitle("Spielfeld");
+                                    stage.setScene(scene);
+
+                                    MultipayerMainGameController gameController = fxmlLoader.getController();
+                                    gameController.setupSpiel(finalGroesse, stage, 0, 1, scene, ships);
+
+                                    sendMessage("ready");
+                                    stage.show();
+
+
+                                    //Problem mit schließen der alten Stage!!
+
+
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            });
+                        }
+                        break;
+                }
+            }
+    }
+
     private void handleGame () throws IOException {
         while (true) {
-            String message = receiveMessage(); // Nachricht vom Server
+            String message = receiveMessage();
             if (message == null) break;
 
             String[] parts = message.split(" ");
             switch (parts[0]) {
-                case "size":
-                    System.out.println("Received size: " + message);
-                    sendMessage("done");
-                    break;
-                case "ships":
-                    System.out.println("Received ships: " + message);
-                    sendMessage("done");
-                    break;
-                case "ready":
-                    //Sollte nur sein wenn size und ships empfangen wurde
-                    System.out.println("Server is ready.");
-                    sendMessage("ready");
-                    break;
+
+
                 // Überarbeiten
+
+
                 case "shot":
                     int row = Integer.parseInt(parts[1]);
                     int col = Integer.parseInt(parts[2]);
                     System.out.println("Opponent shot at: (" + row + ", " + col + ")");
+
+
                     //handle schuss
+
+
                     handleMultiplayerShoot(row, col);
                     sendMessage("answer 0"); // wasser/schiff
+
                     //wenn Treffer dann weiter ansonsten pass und schießen
             }
         }

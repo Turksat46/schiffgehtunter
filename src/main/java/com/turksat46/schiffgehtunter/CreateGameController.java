@@ -42,6 +42,7 @@ public class CreateGameController {
     HBox kiDifficultyUI = new HBox();
 
     MainGameController mainGameController;
+    MultipayerMainGameController multipayerMainGameController;
     SaveFileManager saveFileManager;
 
     ObservableList<Difficulty> difficulties = FXCollections.observableArrayList();
@@ -122,6 +123,8 @@ public class CreateGameController {
         stage.setScene(scene);
         stage.show();
 
+        Server.setGroesse((int) groesseslider.getValue());
+
         establishConnection controller = fxmlLoader.getController();
         controller.initialize(stage);
         Stage thisStage = (Stage) cb.getScene().getWindow();
@@ -152,14 +155,14 @@ public class CreateGameController {
     //Überarbeiten sodass auch schiffe übergeben werden können
     public void startMultiplayerGame(Stage connectionStage, int groesse) throws IOException {
         soundPlayer.playSound();
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("main-game-view.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("multiplayer-main-game-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
         Stage stage = new Stage();
         stage.setTitle("Spielfeld");
         stage.setScene(scene);
 
-        mainGameController = fxmlLoader.getController();
-        mainGameController.setupSpiel(groesse, stage, cb.getSelectionModel().getSelectedIndex(), cb2.getSelectionModel().getSelectedIndex(), scene);
+        multipayerMainGameController = fxmlLoader.getController();
+        multipayerMainGameController.setupSpiel(groesse, stage, cb.getSelectionModel().getSelectedIndex(), cb2.getSelectionModel().getSelectedIndex(), scene);
         stage.show();
 
         connectionStage.close();
