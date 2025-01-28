@@ -11,144 +11,105 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.Node;
 import com.turksat46.schiffgehtunter.other.Cell;
 
 import java.util.*;
 
 public class newSpielfeld {
 
-    public static GridPane gridPane;
-
-    private double initialX;
-    private double initialY;
-    private double dragOffsetX;
-    private double dragOffsetY;
-    private static boolean gegnerFeld;
+    private static GridPane gridPane;
     private static int GRID_SIZE;
     private static BorderPane root;
     private static int CELL_SIZE = 50;
-    private List<Group> draggables = new ArrayList<>();
-    private Group currentlyDraggedGroup = null;
+    private final Map<Group, Set<Cell>> shipCellMap = new HashMap<>();
+    private final List<Group> draggables = new ArrayList<>();
+    private static int shipCount;
+    private static int remainingCells;
 
-    public Map<Group, Set<Cell>> shipCellMap = new HashMap<>();
-
-    List<Integer> shipLengths = new ArrayList<>();
-
-    public newSpielfeld(int groesse, boolean istGegnerFeld, BorderPane root) {
-        newSpielfeld.GRID_SIZE = groesse;
-        newSpielfeld.gegnerFeld = istGegnerFeld;
+    public newSpielfeld(int size, boolean isEnemyField, BorderPane root) {
+        newSpielfeld.GRID_SIZE = size;
         newSpielfeld.root = root;
 
-        if (groesse <= 5) {
-            CELL_SIZE = 75;
-        } else if (groesse <= 10) {
-            CELL_SIZE = 50;
-        } else if (groesse <= 20) {
-            CELL_SIZE = 30;
-        } else {
-            CELL_SIZE = 20;
-        }
-
-        int[] schiffsGroessen = {5, 4, 3, 2}; // Größen der Schiffe
-        int totalCells = groesse * groesse; // Gesamtanzahl der Zellen im Spielfeld
-        int shipCount = (int) (totalCells * 0.3); // 30 % der Zellen für Schiffe
-
-
-        Random random = new Random();
-
-        int remainingCells = shipCount;
-
-        while (remainingCells > 1) {
-            // Zufällig eine Schiffsgröße auswählen
-            int size = schiffsGroessen[random.nextInt(schiffsGroessen.length)];
-
-            // Prüfen, ob das Schiff noch platziert werden kann
-            if (size <= remainingCells) {
-                shipLengths.add(size); // Schiff zur Liste hinzufügen
-                remainingCells -= size; // Verbleibende Zellen reduzieren
-            }
-        }
-
-        // Ausgabe der Ergebnisse
-        System.out.println("Schiffe in Zellen: " + shipLengths);
-        System.out.println("Verbleibende Zellen: " + shipCount);
+        CELL_SIZE = size <= 5 ? 75 : size <= 10 ? 50 : size <= 20 ? 30 : 20;
 
         gridPane = createGridPane();
-        gridPane.setPadding(new Insets(0, 0, 70, 0));
         root.setCenter(gridPane);
 
-        if (!istGegnerFeld) {
+        if (!isEnemyField) {
             HBox draggableContainer = new HBox(10);
             draggableContainer.setPadding(new Insets(10));
 
-            for (int length : shipLengths) {
-                Group draggableGroup = createDraggableGroup(length);
-                makeDraggable(draggableGroup);
-                makeDuplicatable(draggableGroup);
-                draggables.add(draggableGroup);
-                draggableContainer.getChildren().add(draggableGroup);
+            int[] shipSizes = {5, 4, 3, 2};
+            Random random = new Random();
+            shipCount = (int)((size*size)*0.3);
+            remainingCells = shipCount;
+            while (remainingCells > 1) {
+                // Zufällig eine Schiffsgröße auswählen
+                int shipSize = shipSizes[random.nextInt(shipSizes.length)];
+                // Prüfen, ob das Schiff noch platziert werden kann
+                if (shipSize <= remainingCells) {
+                    Group shipGroup = createDraggableShip(shipSize);
+                    makeDraggable(shipGroup);
+                    draggables.add(shipGroup);
+                    draggableContainer.getChildren().add(shipGroup);
+                    remainingCells -= shipSize;
+
+                }
             }
             root.setBottom(draggableContainer);
-
-            // Request focus so the scene can receive key events
-            root.requestFocus();
-
-            // Continuously check for intersections and update visual feedback
-            for (Group draggableGroup : draggables) {
-                draggableGroup.getChildren().get(0).boundsInParentProperty().addListener((obs, oldBounds, newBounds) -> { // Listen to the first rectangle's bounds
-                    updateGridVisual(draggableGroup, gridPane);
-                });
-
-                // Snap to the grid cell on release
-                draggableGroup.setOnMouseReleased(event -> {
-                    snapToGrid(draggableGroup, gridPane);
-                    currentlyDraggedGroup = null; // Reset dragged item
-                });
-            }
         }
     }
 
-    private Group createDraggableGroup(int length) {
-        Group group = new Group();
+    private GridPane createGridPane() {
+        GridPane grid = new GridPane();
+        for (int row = 0; row < GRID_SIZE; row++) {
+            for (int col = 0; col < GRID_SIZE; col++) {
+                Rectangle cell = new Rectangle(CELL_SIZE, CELL_SIZE, Color.TRANSPARENT);
+                cell.setStroke(Color.BLACK);
+                grid.add(cell, col, row);
+            }
+        }
+        return grid;
+    }
+
+    private Group createDraggableShip(int length) {
+        Group ship = new Group();
         for (int i = 0; i < length; i++) {
-            Image image = new Image(getClass().getResourceAsStream("/com/turksat46/schiffgehtunter/images/ship.png"));
-            ImageView imageView = new ImageView(image);
-            imageView.setFitHeight(CELL_SIZE);
-            imageView.setFitWidth(CELL_SIZE);
-            imageView.setRotate(90.0);
-            imageView.setFitWidth(CELL_SIZE);
-            imageView.setFitHeight(CELL_SIZE);
-            imageView.setTranslateX(i * CELL_SIZE);
-            group.getChildren().add(imageView);
+            ImageView part = new ImageView(new Image(getClass().getResourceAsStream("/com/turksat46/schiffgehtunter/images/ship.png")));
+            part.setFitHeight(CELL_SIZE);
+            part.setFitWidth(CELL_SIZE);
+            part.setRotate(90);
+            part.setTranslateX(i * CELL_SIZE);
+            ship.getChildren().add(part);
         }
-        return group;
+        return ship;
     }
 
-    private void makeDraggable(Group group) {
-        group.setOnMousePressed(event -> {
+    private void makeDraggable(Group ship) {
+        ship.setOnMousePressed(event -> {
             if (event.getButton() == MouseButton.PRIMARY) {
-                initialX = event.getSceneX();
-                initialY = event.getSceneY();
-                dragOffsetX = group.getTranslateX();
-                dragOffsetY = group.getTranslateY();
-                currentlyDraggedGroup = group;
+                ship.setUserData(new double[]{event.getSceneX(), event.getSceneY(), ship.getTranslateX(), ship.getTranslateY()});
+            }
+            if(event.getButton() == MouseButton.SECONDARY) {
+                rotateDraggableGroup(ship);
             }
         });
 
-        group.setOnMouseDragged(event -> {
+        ship.setOnMouseDragged(event -> {
             if (event.getButton() == MouseButton.PRIMARY) {
-                group.setTranslateX(dragOffsetX + event.getSceneX() - initialX);
-                group.setTranslateY(dragOffsetY + event.getSceneY() - initialY);
+                double[] data = (double[]) ship.getUserData();
+                ship.setTranslateX(data[2] + event.getSceneX() - data[0]);
+                ship.setTranslateY(data[3] + event.getSceneY() - data[1]);
+            }
+            if(event.getButton() == MouseButton.SECONDARY) {
+                rotateDraggableGroup(ship);
             }
         });
-    }
 
-    private void makeDuplicatable(Group group) {
-        group.setOnMouseClicked(event -> {
-            if (event.getButton() == MouseButton.SECONDARY) {
-                //duplicateDraggableGroup(group);
-                rotateDraggableGroup(group);
-            }
+        ship.setOnMouseReleased(event -> {
+            snapToGrid(ship);
+            updateShipCellMap();
         });
     }
 
@@ -159,69 +120,25 @@ public class newSpielfeld {
         group.setRotate(group.getRotate() + 90);
     }
 
-    private GridPane createGridPane() {
-        GridPane gridPane = new GridPane();
-        for (int row = 0; row < GRID_SIZE; row++) {
-            for (int col = 0; col < GRID_SIZE; col++) {
-                Rectangle cell = new Rectangle(CELL_SIZE, CELL_SIZE, Color.TRANSPARENT);
-                cell.setStroke(Color.BLACK);
-                gridPane.add(cell, col, row);
-            }
-        }
-        return gridPane;
-    }
 
-    private void updateGridVisual(Group draggableGroup, GridPane gridPane) {
-        // Reset all cells to transparent
-        for (var node : gridPane.getChildren()) {
-            if (node instanceof Rectangle cell) {
-                cell.setFill(Color.TRANSPARENT);
-            }
-        }
+    private void snapToGrid(Group ship) {
+        if (ship.getChildren().isEmpty()) return;
 
-        List<Rectangle> intersectingCells = getIntersectingGridCells(draggableGroup, gridPane);
-        intersectingCells.forEach(cell -> cell.setFill(Color.GREEN));
-    }
+        ImageView firstPart = (ImageView) ship.getChildren().get(0);
+        Bounds bounds = firstPart.localToScene(firstPart.getBoundsInLocal());
+        double centerX = bounds.getMinX() + bounds.getWidth() / 2;
+        double centerY = bounds.getMinY() + bounds.getHeight() / 2;
 
-    private List<Rectangle> getIntersectingGridCells(Group draggableGroup, GridPane gridPane) {
-        List<Rectangle> intersectingCells = new ArrayList<>();
-
-        for (var draggableNode : draggableGroup.getChildren()) {
-            if (draggableNode instanceof Rectangle draggableRect) {
-                Bounds draggableBounds = draggableRect.localToScene(draggableRect.getBoundsInLocal());
-                for (var gridNode : gridPane.getChildren()) {
-                    if (gridNode instanceof Rectangle cell) {
-                        Bounds cellBounds = cell.localToScene(cell.getBoundsInLocal());
-                        if (draggableBounds.intersects(cellBounds)) {
-                            intersectingCells.add(cell);
-                        }
-                    }
-                }
-            }
-        }
-        return intersectingCells;
-    }
-
-    private void snapToGrid(Group draggableGroup, GridPane gridPane) {
-        if (draggableGroup.getChildren().isEmpty()) {
-            return;
-        }
-
-        ImageView firstRect = (ImageView) draggableGroup.getChildren().get(0);
-        Bounds firstRectBounds = firstRect.localToScene(firstRect.getBoundsInLocal());
-        double firstRectCenterX = firstRectBounds.getMinX() + firstRect.getFitWidth() / 2;
-        double firstRectCenterY = firstRectBounds.getMinY() + firstRect.getFitHeight() / 2;
-
-        Rectangle closestCell = null;
+        Node closestCell = null;
         double minDistance = Double.MAX_VALUE;
 
-        for (var node : gridPane.getChildren()) {
+        for (Node node : gridPane.getChildren()) {
             if (node instanceof Rectangle cell) {
                 Bounds cellBounds = cell.localToScene(cell.getBoundsInLocal());
-                double cellCenterX = cellBounds.getMinX() + cell.getWidth() / 2;
-                double cellCenterY = cellBounds.getMinY() + cell.getHeight() / 2;
+                double cellCenterX = cellBounds.getMinX() + cellBounds.getWidth() / 2;
+                double cellCenterY = cellBounds.getMinY() + cellBounds.getHeight() / 2;
 
-                double distance = Math.hypot(firstRectCenterX - cellCenterX, firstRectCenterY - cellCenterY);
+                double distance = Math.hypot(centerX - cellCenterX, centerY - cellCenterY);
                 if (distance < minDistance) {
                     minDistance = distance;
                     closestCell = cell;
@@ -231,64 +148,53 @@ public class newSpielfeld {
 
         if (closestCell != null) {
             Bounds cellBounds = closestCell.localToScene(closestCell.getBoundsInLocal());
-            double cellCenterX = cellBounds.getMinX() + closestCell.getWidth() / 2;
-            double cellCenterY = cellBounds.getMinY() + closestCell.getHeight() / 2;
+            double targetX = cellBounds.getMinX() + closestCell.getBoundsInLocal().getWidth() / 2 - bounds.getWidth() / 2;
+            double targetY = cellBounds.getMinY() + closestCell.getBoundsInLocal().getHeight() / 2 - bounds.getHeight() / 2;
 
-            double targetX = cellCenterX - firstRect.getFitWidth() / 2;
-            double targetY = cellCenterY - firstRect.getFitHeight() / 2;
-
-            Bounds groupBounds = draggableGroup.getBoundsInParent();
-            double currentCenterX = groupBounds.getMinX() + groupBounds.getWidth() / 2;
-            double currentCenterY = groupBounds.getMinY() + groupBounds.getHeight() / 2;
-
-            double translateX = targetX - (firstRectBounds.getMinX());
-            double translateY = targetY - (firstRectBounds.getMinY());
-
-            draggableGroup.setTranslateX(draggableGroup.getTranslateX() + translateX);
-            draggableGroup.setTranslateY(draggableGroup.getTranslateY() + translateY);
-
-
-            // Ermittle und speichere die belegten Zellen NACH dem Snappen
-            Set<Cell> shipCells = getShipCells(draggableGroup, gridPane);
-
-            shipCellMap.compute(draggableGroup, (key, existingCells) -> {
-                if(existingCells == null) {
-                    return new HashSet<>(shipCells); // Wenn noch keine Zellen für dieses Schiff vorhanden sind
-                } else {
-                    existingCells.addAll(shipCells); // Wenn bereits Zellen vorhanden sind, füge die neuen hinzu
-                    return existingCells;
-                }
-            });
+            ship.setTranslateX(ship.getTranslateX() + targetX - bounds.getMinX());
+            ship.setTranslateY(ship.getTranslateY() + targetY - bounds.getMinY());
         }
+
     }
 
-    private Set<Cell> getShipCells(Group draggableGroup, GridPane gridPane) {
-        Set<Cell> shipCells = new HashSet<>();
+    private void updateShipCellMap() {
+        shipCellMap.clear();
 
-        for (var draggableNode : draggableGroup.getChildren()) {
-            if (draggableNode instanceof Rectangle draggableRect) {
-                Bounds draggableBounds = draggableRect.localToScene(draggableRect.getBoundsInLocal());
-                for (var gridNode : gridPane.getChildren()) {
-                    if (gridNode instanceof Rectangle cell) {
-                        Bounds cellBounds = cell.localToScene(cell.getBoundsInLocal());
-                        if (draggableBounds.intersects(cellBounds)) {
-                            int col = GridPane.getColumnIndex(cell);
-                            int row = GridPane.getRowIndex(cell);
-                            System.out.println("Position: " + col + ", " + row);
-                            shipCells.add(new Cell(col, row));
+        for (Group ship : draggables) {
+            Set<Cell> occupiedCells = new HashSet<>();
+
+            for (Node part : ship.getChildren()) {
+                if (part instanceof ImageView imageView) {
+                    Bounds partBounds = imageView.localToScene(imageView.getBoundsInLocal());
+
+                    for (Node node : gridPane.getChildren()) {
+                        if (node instanceof Rectangle cell) {
+                            Bounds cellBounds = cell.localToScene(cell.getBoundsInLocal());
+                            if (partBounds.intersects(cellBounds)) {
+                                int col = GridPane.getColumnIndex(cell);
+                                int row = GridPane.getRowIndex(cell);
+                                occupiedCells.add(new Cell(col, row));
+                            }
                         }
                     }
                 }
             }
-        }
-        //Logging
-        System.out.print("Schiffplatzierung: ");
-        for (Cell cell : shipCells){
-            System.out.print(cell.toString() + ", ");
-        }
-        System.out.println("");
 
+            shipCellMap.put(ship, occupiedCells);
+        }
 
-        return shipCells;
+        shipCellMap.forEach((group, cells) -> {
+            System.out.println("Ship at cells: " + cells);
+        });
+    }
+
+    public void selectFeld(int x, int y, Color color){
+        for (javafx.scene.Node node : gridPane.getChildren()) {
+            if (GridPane.getColumnIndex(node) == x && GridPane.getRowIndex(node) == y) {
+                if (node instanceof Rectangle) {
+                    ((Rectangle) node).setFill(color);
+                }
+            }
+        }
     }
 }

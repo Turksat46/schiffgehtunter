@@ -125,6 +125,10 @@ public class WorldGeneration extends Application {
                     double cellCenterX = cellBounds.getMinX() + cell.getWidth() / 2;
                     double cellCenterY = cellBounds.getMinY() + cell.getHeight() / 2;
 
+                    int x = GridPane.getColumnIndex(cell);
+                    int y = GridPane.getRowIndex(cell);
+                    System.out.println("x: " + x + ", y: " + y);
+
                     draggable.setTranslateX(cellCenterX - draggable.getWidth() / 2);
                     draggable.setTranslateY(cellCenterY - draggable.getHeight() / 2);
                     return;

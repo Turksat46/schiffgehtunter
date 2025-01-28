@@ -78,7 +78,7 @@ public class Spielfeld {
                 // Rechteck und Text erstellen und position der zelle
                 Feld cell = new Feld(zellengroesse, zellengroesse, row, col);
                 felder[row][col] = cell;
-                cell.setFill(Color.LIGHTBLUE);
+                cell.setFill(Color.TRANSPARENT);
 
                 cell.setStroke(Color.BLACK);
 

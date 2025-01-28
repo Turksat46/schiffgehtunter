@@ -1,5 +1,8 @@
 package com.turksat46.schiffgehtunter.filemanagement;
 
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -20,6 +23,17 @@ public class SettingsFileManager {
             properties.load(fileInputStream);
         } catch (IOException e) {
             System.out.println("Fehler beim Laden der Einstellungen: " + e.getMessage());
+            createSettingsFile();
+        }
+    }
+
+    private static void createSettingsFile() {
+        try{
+            properties.setProperty("musicEnabled", "false");
+            properties.setProperty("volume", "1.0");
+            properties.store(new FileOutputStream(SETTINGS_FILE), "Einstellungen");
+        }catch(IOException e){
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Fehler beim Erstellen von Einstellungen: " + e.getMessage(), ButtonType.CLOSE);
         }
     }
 

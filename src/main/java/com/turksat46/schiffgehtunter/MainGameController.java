@@ -17,6 +17,7 @@ import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
@@ -48,6 +49,9 @@ public class MainGameController implements Initializable {
     @FXML public Pane images;
 
     @FXML public HBox label1;
+
+    @FXML public Button startButton;
+
    public static int currentState, currentMode, currentDifficulty, groesse;
     static GridPane feld;
     static Scene scene;
@@ -81,6 +85,10 @@ public class MainGameController implements Initializable {
 
     }
 
+    public void startGame(){
+        currentState = 1;
+    }
+
     public void setupSpiel(int groesse, Stage stage, int currentDifficulty, int currentMode, Scene scene) throws FileNotFoundException {
         //spielerspielfeld = new Spielfeld(groesse,  false);
         gegnerspielfeld = new Spielfeld(groesse,  true);
@@ -88,12 +96,12 @@ public class MainGameController implements Initializable {
         spielerspielfeld = new newSpielfeld(groesse, false, spielerstackpane);
         //gegnerspielfeld = new newSpielfeld(groesse, true, gegnerstackpane);
 
-        //spielerstackpane.getChildren().add(spielerspielfeld.gridPane);
+        //spielerstackpane.getChildren().add(newSpielfeld.gridPane);
         gegnerstackpane.getChildren().add(gegnerspielfeld.gridPane);
 
         // StackPane-Margen setzen
-        HBox.setMargin(spielerstackpane, new Insets(10, 10, 100, 10)); // Abstand für spielerstackpane
-        HBox.setMargin(gegnerstackpane, new Insets(10, 10, 100, 150)); // Abstand für gegnerstackpane
+        //HBox.setMargin(spielerstackpane, new Insets(10, 10, 100, 10)); // Abstand für spielerstackpane
+        //HBox.setMargin(gegnerstackpane, new Insets(10, 10, 100, 150)); // Abstand für gegnerstackpane
 
 
         this.currentMode = currentMode;
@@ -526,7 +534,7 @@ public class MainGameController implements Initializable {
         victoryStage.toFront();
     }
 
-    private void  shootShip(Spielfeld spielfeld, int posx, int posy){
+    private void shootShip(Spielfeld spielfeld, int posx, int posy){
         System.out.println("schiffe erschießen");
         if(spielfeld.istGegnerFeld){
             if(spielfeld.felder[posx][posy].wurdeGetroffen == false){
@@ -534,7 +542,7 @@ public class MainGameController implements Initializable {
                 System.out.println("Feld ist gegnerfeld");
                 spielfeld.felder[posx][posy].wurdeGetroffen = true;
                 spielfeld.selectFeld(posx,posy);
-                bot.receiveMove(posx, posy);
+                bot.receiveMove(posx, posy, spielfeld);
                 //animateSnowball(posx, posy);
             }else{
                 //Feld wurde bereits getroffen
@@ -544,7 +552,7 @@ public class MainGameController implements Initializable {
     }
 
     public void receiveShoot(int posx, int posy){
-        //spielerspielfeld.selectFeld(posx, posy, Color.DARKRED);
+        spielerspielfeld.selectFeld(posx, posy, Color.DARKRED);
         //bot.receiveHit(posx, posy, spielerspielfeld.felder[posx][posy].istSchiff);
         currentState = 1;
     }

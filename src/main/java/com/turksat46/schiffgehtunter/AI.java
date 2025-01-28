@@ -1,8 +1,8 @@
 package com.turksat46.schiffgehtunter;
 
 import com.turksat46.schiffgehtunter.other.Position;
+import javafx.scene.paint.Color;
 
-import java.io.Console;
 import java.util.*;
 import java.util.random.RandomGenerator;
 
@@ -104,11 +104,12 @@ public class AI {
 
     }
 
-    public void receiveMove(int posx, int posy){
+    public void receiveMove(int posx, int posy, Spielfeld spielfeld){
         //Angriff wurde initiiert, Gegenangriff starten
         if(feld[posx][posy] == 1){
             System.out.println(posx + " " + posy + " wurde getroffen!");
             feld[posx][posy] = 0;
+            spielfeld.selectFeld(posx,posy, Color.GREEN);
             Map<Integer, List<Position>> shipsCopy = new HashMap<>(ships);
 
             for (Map.Entry<Integer, List<Position>> entry : shipsCopy.entrySet()) {

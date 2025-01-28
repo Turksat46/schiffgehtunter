@@ -15,7 +15,7 @@ public class Ship {
 
 
 
-    public Ship(String name, int groesse ){
+    public Ship(String name, int groesse){
         this.name = name;
         this.groesse = groesse;
         location = new  ArrayList<>();
