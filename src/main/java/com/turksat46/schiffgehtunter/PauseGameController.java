@@ -1,5 +1,6 @@
 package com.turksat46.schiffgehtunter;
 
+import com.turksat46.schiffgehtunter.filemanagement.SaveFileManager;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
@@ -16,6 +17,11 @@ public class PauseGameController {
         //TODO: Wenn sich iwas geändert hat, reverten
         Stage stage = (Stage) continuebutton.getScene().getWindow();
         stage.close();
+    }
+
+    public void saveGame(){
+        MainGameController mainGameController = new MainGameController();
+        mainGameController.saveFile();
     }
 
     public void closeGame(){

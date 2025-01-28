@@ -13,6 +13,7 @@ module com.turksat46.schiffgehtunter {
     requires jdk.compiler;
     requires java.desktop;
     requires javafx.media;
+    requires com.google.gson;
 
 
     opens com.turksat46.schiffgehtunter to javafx.fxml;

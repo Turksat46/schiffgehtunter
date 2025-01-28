@@ -15,10 +15,10 @@ public class Spielfeld {
 
     public GridPane gridPane;
     int zellengroesse, groesse;
-    int[][] feld;
-    Feld[][] felder;
+    public int[][] feld;
+    public Feld[][] felder;
     MainGameController mainGameController;
-    ArrayList<Integer> schiffe= new ArrayList<>();
+    public ArrayList<Integer> schiffe= new ArrayList<>();
     boolean istGegnerFeld;
 
     public Spielfeld (int groesse, boolean istGegnerFeld){

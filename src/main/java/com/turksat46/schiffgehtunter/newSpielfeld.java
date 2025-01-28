@@ -18,11 +18,15 @@ import java.util.*;
 
 public class newSpielfeld {
 
+    //
+    //  FÜRS SPEICHERN WICHTIGE VARIABLEN
+    //
+
     private static GridPane gridPane;
     private static int GRID_SIZE;
     private static BorderPane root;
     private static int CELL_SIZE = 50;
-    final Map<Group, Set<Cell>> shipCellMap = new HashMap<>();
+    public final Map<Group, Set<Cell>> shipCellMap = new HashMap<>();
     private final List<Group> draggables = new ArrayList<>();
     private static int shipCount;
     private static int remainingCells;

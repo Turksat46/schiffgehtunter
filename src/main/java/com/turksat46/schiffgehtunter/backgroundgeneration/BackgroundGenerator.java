@@ -17,6 +17,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.QuadCurveTo;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.util.Objects;
@@ -24,7 +25,7 @@ import java.util.Random;
 
 public class BackgroundGenerator {
 
-    //Gesamtgröße des Hintergrund
+    //Gesamtgröße des Hintergrunds
     private static int WIDTH = 2500;
     private static int HEIGHT = 800;
     //Größe eines Blocks

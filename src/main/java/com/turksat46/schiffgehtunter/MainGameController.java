@@ -1,33 +1,23 @@
 package com.turksat46.schiffgehtunter;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.turksat46.schiffgehtunter.backgroundgeneration.BackgroundGenerator;
-import javafx.animation.AnimationTimer;
+import com.turksat46.schiffgehtunter.filemanagement.SaveData;
+import com.turksat46.schiffgehtunter.filemanagement.SaveFileManager;
 import javafx.animation.FadeTransition;
-import javafx.animation.PathTransition;
 import javafx.animation.ScaleTransition;
-import javafx.application.Application;
-import javafx.beans.value.ChangeListener;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.geometry.Bounds;
-import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.SnapshotParameters;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.image.WritableImage;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
-import javafx.scene.shape.MoveTo;
-import javafx.scene.shape.Path;
-import javafx.scene.shape.QuadCurveTo;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -39,6 +29,9 @@ import java.net.URL;
 import java.util.*;
 
 public class MainGameController implements Initializable {
+
+    private SaveFileManager saveFileManager;
+
 
     @FXML
     public BorderPane spielerstackpane, gegnerstackpane;
@@ -69,6 +62,9 @@ public class MainGameController implements Initializable {
     //Spielmodus P = Spieler, C=Computer
     public String[] mode = {"PvsC", "PvsP", "CvsC"};
 
+    public MainGameController(){
+        saveFileManager = new SaveFileManager();
+    }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -126,117 +122,11 @@ public class MainGameController implements Initializable {
         //generateSchiffe();
 
         setPausierenEventHandler(stage);
-    }
 
-    private EventHandler<KeyEvent> createrRotateShiffe(Pane pane) {
-        return event -> {
-            if (event.getCode() == KeyCode.R) {
-                //System.out.println("Rotate ship");
-
-                // Rechtecke aus der aktuellen Pane extrahieren
-                List<Rectangle> rectangles = new ArrayList<>();
-                for (var node : pane.getChildren()) {
-                    if (node instanceof Rectangle) {
-                        rectangles.add((Rectangle) node);
-                    }
-                }
-
-                Pane newPane;
-
-                if (pane instanceof HBox) {
-                    // Erstellen einer VBox, wenn die aktuelle Pane eine HBox ist
-                    VBox vbox = new VBox();
-                    vbox.setSpacing(5);
-                    vbox.getChildren().addAll(rectangles);
-                    newPane = vbox;
-                } else if (pane instanceof VBox) {
-                    // Erstellen einer HBox, wenn die aktuelle Pane eine VBox ist
-                    HBox hbox = new HBox();
-                    hbox.setSpacing(10);
-                    hbox.getChildren().addAll(rectangles);
-                    newPane = hbox;
-                } else {
-                    return;
-                }
-
-                // Position der ursprünglichen Pane übernehmen
-                newPane.setTranslateX(pane.getTranslateX());
-                newPane.setTranslateY(pane.getTranslateY());
-
-                // Eltern-Container der aktuellen Pane finden und die Pane ersetzen
-                if (pane.getParent() instanceof Pane) {
-                    Pane parent = (Pane) pane.getParent();
-                    parent.getChildren().remove(pane);
-                    parent.getChildren().add(newPane);
-
-                    // Drag and drop Logik zur neuen Pane hinzufügen
-                    //addDragAndDrop(newPane);
-                }
-            }
-        };
-    }
-
-   /* private void generateSchiffe(){
-
-        int currentOffset = 0;
-        int offset = 100;
-        HBox hbox = null;
-        // hier richtige:
-        for (int size : spielerspielfeld.schiffe) {
-
-            // Neue HBox für jedes Schiff erstellen
-            hbox = new HBox();
-            hbox.setSpacing(10);
-            hbox.setTranslateY(currentOffset); // Y-Position für Versatz
-
-            for (int i = 0; i < size; i++) {
-                Rectangle rectangle = new Rectangle();
-                rectangle.setWidth(spielerspielfeld.zellengroesse-10);
-                rectangle.setHeight(spielerspielfeld.zellengroesse-10);
-                rectangle.setFill(Color.RED);
-                rectangle.setStroke(Color.BLACK);
-
-                hbox.getChildren().add(rectangle);
-            }
-            // Drag-and-Drop hinzufügen
-            addDragAndDrop(hbox);
-
-
-            spielerstackpane.getChildren().add(hbox);
-
-            currentOffset += offset;
-        }
-    }
-    */
-    /*private void addDragAndDrop(Pane pane) {
-        final double[] initialMouseX = {0};
-        final double[] initialMouseY = {0};
-
-        EventHandler<KeyEvent> rotateShipFilter = createrRotateShiffe(pane);
-
-        pane.setOnMousePressed(event -> {
-
-            initialMouseX[0] = event.getSceneX() - pane.getTranslateX();
-            initialMouseY[0] = event.getSceneY() - pane.getTranslateY();
-
-
-            scene.addEventFilter(KeyEvent.KEY_PRESSED, rotateShipFilter);
-        });
-
-        pane.setOnMouseDragged(event -> {
-            // Pane an neue Position verschieben
-            pane.setTranslateX(event.getSceneX() - initialMouseX[0]);
-            pane.setTranslateY(event.getSceneY() - initialMouseY[0]);
-        });
-
-        pane.setOnMouseReleased(event -> {
-            // Aktion, wenn die Maus losgelassen wird
-            scene.removeEventFilter(KeyEvent.KEY_PRESSED, rotateShipFilter);
-        });
+        saveFileManager = new SaveFileManager();
 
     }
 
-     */
 
     public void setPausierenEventHandler(Stage stage){
         stage.getScene().setOnKeyPressed(new EventHandler<KeyEvent>() {
@@ -347,38 +237,6 @@ public class MainGameController implements Initializable {
         return length;
     }
 
-    //Gibt sortierte Positionen benachbarter gesetzter Felder zurück.
-    private List<int[]> getPairPositionen(Spielfeld spielfeld, int posx, int posy) {
-        List<int[]> positionen = new ArrayList<>();
-
-        int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
-
-        for (int[] dir : directions) {
-            int x = posx + dir[0];
-            int y = posy + dir[1];
-            while (x >= 0 && x < spielfeld.groesse && y >= 0 && y < spielfeld.groesse) {
-                if (spielfeld.felder[x][y].gesetzt) {
-                    positionen.add(new int[]{x, y});
-                } else {
-                    break;
-                }
-                x += dir[0];
-                y += dir[1];
-            }
-        }
-        positionen.add(new int[]{posx, posy});
-
-        positionen.sort((p1, p2) -> {
-            if (p1[0] != p2[0]) {
-                return Integer.compare(p1[0], p2[0]);
-            } else {
-                return Integer.compare(p1[1], p2[1]);
-            }
-        });
-
-        return positionen;
-    }
-
     // schau hier mal ob des nur ein vorkommen löscht aus array list ist noc unsiche
     // und gucken ob des effizient ist, wird ja immer geschlieift wenn man clicked
     private void placeShip(Spielfeld spielfeld, int posx, int posy){
@@ -432,12 +290,7 @@ public class MainGameController implements Initializable {
         // Background image
         Rectangle background = new Rectangle(600, 400);
 
-        //Setting the image view 1
-        //mageView imageView1 = new ImageView(image);
-
-
         background.setFill(new ImagePattern(image));
-        // Simulated Minecraft "blocks"
 
         // Victory message
         Text victoryText = new Text("VICTORY FOR PLAYER !");
@@ -559,6 +412,18 @@ public class MainGameController implements Initializable {
 
     private void  watchShip(Spielfeld spielfeld, int posx, int posy){
         System.out.println("schiffe beobachten ");
+    }
+
+    //
+    //  SaveFileProcedure
+    //
+
+    public void saveFile(){
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        Gson gson = gsonBuilder.create();
+        SaveData saveData = new SaveData(this, spielerspielfeld, gegnerspielfeld, bot);
+        String data = gson.toJson(saveData.sampleData());
+        saveFileManager.openSaveFileChooserAndSave(data);
     }
 
 }
