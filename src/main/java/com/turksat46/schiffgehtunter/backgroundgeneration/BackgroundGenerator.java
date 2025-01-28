@@ -2,6 +2,7 @@ package com.turksat46.schiffgehtunter.backgroundgeneration;
 
 import javafx.animation.AnimationTimer;
 import javafx.animation.PathTransition;
+import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Bounds;
@@ -67,6 +68,7 @@ public class BackgroundGenerator {
             System.err.println("Schneeball-Ressource konnte nicht geladen werden!");
             throw e;
         }
+
     }
 
     public void createBackground() {

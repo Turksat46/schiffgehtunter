@@ -1,5 +1,6 @@
 package com.turksat46.schiffgehtunter;
 
+import javafx.animation.ScaleTransition;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.scene.Group;
@@ -13,6 +14,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.Node;
 import com.turksat46.schiffgehtunter.other.Cell;
+import javafx.util.Duration;
 
 import java.util.*;
 
@@ -30,6 +32,7 @@ public class newSpielfeld {
     private final List<Group> draggables = new ArrayList<>();
     private static int shipCount;
     private static int remainingCells;
+    public static boolean isEditable = true;
 
     public newSpielfeld(int size, boolean isEnemyField, BorderPane root) {
         newSpielfeld.GRID_SIZE = size;
@@ -58,7 +61,6 @@ public class newSpielfeld {
                     draggables.add(shipGroup);
                     draggableContainer.getChildren().add(shipGroup);
                     remainingCells -= shipSize;
-
                 }
             }
             root.setBottom(draggableContainer);
@@ -85,7 +87,6 @@ public class newSpielfeld {
                 draggables.add(shipGroup);
                 draggableContainer.getChildren().add(shipGroup);
             }
-
             root.setBottom(draggableContainer);
         }
     }
@@ -116,30 +117,36 @@ public class newSpielfeld {
     }
 
     private void makeDraggable(Group ship) {
-        ship.setOnMousePressed(event -> {
-            if (event.getButton() == MouseButton.PRIMARY) {
-                ship.setUserData(new double[]{event.getSceneX(), event.getSceneY(), ship.getTranslateX(), ship.getTranslateY()});
-            }
-            if(event.getButton() == MouseButton.SECONDARY) {
-                rotateDraggableGroup(ship);
-            }
-        });
+        if(isEditable){
+            ship.setOnMousePressed(event -> {
+                if (event.getButton() == MouseButton.PRIMARY) {
+                    ship.setUserData(new double[]{event.getSceneX(), event.getSceneY(), ship.getTranslateX(), ship.getTranslateY()});
+                }
+                if(event.getButton() == MouseButton.SECONDARY) {
+                    rotateDraggableGroup(ship);
+                }
+            });
 
-        ship.setOnMouseDragged(event -> {
-            if (event.getButton() == MouseButton.PRIMARY) {
-                double[] data = (double[]) ship.getUserData();
-                ship.setTranslateX(data[2] + event.getSceneX() - data[0]);
-                ship.setTranslateY(data[3] + event.getSceneY() - data[1]);
-            }
-            if(event.getButton() == MouseButton.SECONDARY) {
-                rotateDraggableGroup(ship);
-            }
-        });
+            ship.setOnMouseDragged(event -> {
+                if (event.getButton() == MouseButton.PRIMARY) {
+                    double[] data = (double[]) ship.getUserData();
+                    ship.setTranslateX(data[2] + event.getSceneX() - data[0]);
+                    ship.setTranslateY(data[3] + event.getSceneY() - data[1]);
+                }
+                if(event.getButton() == MouseButton.SECONDARY) {
+                    rotateDraggableGroup(ship);
+                }
+            });
 
-        ship.setOnMouseReleased(event -> {
-            snapToGrid(ship);
-            updateShipCellMap();
-        });
+            ship.setOnMouseReleased(event -> {
+                snapToGrid(ship);
+                updateShipCellMap();
+            });
+        }
+    }
+
+    public void changeEditableState(boolean ye){
+        isEditable = ye;
     }
 
     private void rotateDraggableGroup(Group group) {
@@ -222,6 +229,19 @@ public class newSpielfeld {
             if (GridPane.getColumnIndex(node) == x && GridPane.getRowIndex(node) == y) {
                 if (node instanceof Rectangle) {
                     ((Rectangle) node).setFill(color);
+                }
+                //Wenn es ein Schiff ist
+                if(node instanceof ImageView) {
+                    ScaleTransition scaleTransition = new ScaleTransition(Duration.seconds(2), node);
+                    scaleTransition.setFromX(1.0);
+                    scaleTransition.setFromY(1.0);
+                    scaleTransition.setToX(0.0);
+                    scaleTransition.setToY(0.0);
+                    scaleTransition.setCycleCount(1);
+                    scaleTransition.setAutoReverse(false);
+
+                    // Start the animation
+                    scaleTransition.play();
                 }
             }
         }

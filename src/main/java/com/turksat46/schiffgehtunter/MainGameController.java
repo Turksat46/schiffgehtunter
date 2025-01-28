@@ -4,6 +4,7 @@ import com.google.gson.GsonBuilder;
 import com.turksat46.schiffgehtunter.backgroundgeneration.BackgroundGenerator;
 import com.turksat46.schiffgehtunter.filemanagement.SaveData;
 import com.turksat46.schiffgehtunter.filemanagement.SaveFileManager;
+import com.turksat46.schiffgehtunter.other.Music;
 import javafx.animation.FadeTransition;
 import javafx.animation.ScaleTransition;
 import javafx.event.EventHandler;
@@ -50,6 +51,8 @@ public class MainGameController implements Initializable {
     static Scene scene;
     private static AI bot;
 
+    Music soundPlayer;
+
     static boolean rotated;
 
     static newSpielfeld spielerspielfeld;
@@ -77,12 +80,14 @@ public class MainGameController implements Initializable {
 
 
         MainGameController controller = loader.getController();
-        //anchorPane beschmücken
+
+
 
     }
 
     public void startGame(){
         currentState = 1;
+        spielerspielfeld.changeEditableState(false);
     }
 
     public void setupSpiel(int groesse, Stage stage, int currentDifficulty, int currentMode, Scene scene) throws FileNotFoundException {
@@ -315,7 +320,8 @@ public class MainGameController implements Initializable {
         // Start animations
         fadeIn.play();
         scale.play();
-
+        soundPlayer = Music.getInstance();
+        soundPlayer.playWin();
         // Add elements to root
         root.getChildren().addAll(background, victoryText);
 
