@@ -46,7 +46,7 @@ public class MainGameController implements Initializable {
 
     @FXML public Button startButton;
 
-   public static int currentState, currentMode, currentDifficulty, groesse;
+    public static int currentState, currentMode, currentDifficulty, groesse;
     static GridPane feld;
     static Scene scene;
     private static AI bot;
@@ -92,7 +92,7 @@ public class MainGameController implements Initializable {
 
     public void setupSpiel(int groesse, Stage stage, int currentDifficulty, int currentMode, Scene scene) throws FileNotFoundException {
         //spielerspielfeld = new Spielfeld(groesse,  false);
-        gegnerspielfeld = new Spielfeld(groesse,  true);
+        gegnerspielfeld = new Spielfeld(groesse,  true, false);
 
         spielerspielfeld = new newSpielfeld(groesse, false, spielerstackpane);
         //gegnerspielfeld = new newSpielfeld(groesse, true, gegnerstackpane);
@@ -103,6 +103,12 @@ public class MainGameController implements Initializable {
         // StackPane-Margen setzen
         //HBox.setMargin(spielerstackpane, new Insets(10, 10, 100, 10)); // Abstand für spielerstackpane
         //HBox.setMargin(gegnerstackpane, new Insets(10, 10, 100, 150)); // Abstand für gegnerstackpane
+
+        setupBase(groesse, stage, currentDifficulty, currentMode, scene);
+
+    }
+
+    public void setupBase (int groesse,Stage stage, int currentDifficulty, int currentMode, Scene scene) throws FileNotFoundException {
 
 
         this.currentMode = currentMode;
@@ -129,7 +135,6 @@ public class MainGameController implements Initializable {
         setPausierenEventHandler(stage);
 
         saveFileManager = new SaveFileManager();
-
     }
 
 
@@ -245,31 +250,31 @@ public class MainGameController implements Initializable {
     // schau hier mal ob des nur ein vorkommen löscht aus array list ist noc unsiche
     // und gucken ob des effizient ist, wird ja immer geschlieift wenn man clicked
     private void placeShip(Spielfeld spielfeld, int posx, int posy){
-            if (!spielfeld.felder[posx][posy].gesetzt) {
-                spielfeld.felder[posx][posy].gesetzt = true;
-                spielfeld.selectFeld(posx, posy);
+        if (!spielfeld.felder[posx][posy].gesetzt) {
+            spielfeld.felder[posx][posy].gesetzt = true;
+            spielfeld.selectFeld(posx, posy);
             // Entferne das passende Schiff aus der Liste
             int nachbarWert = nachbarFeldGewaehlt(spielfeld, posx, posy); // Berechnung nur einmal
 
-               //Suche das Schiff in der Liste und entferne ein Vorkommen
-                for (int i = 0; i < spielfeld.schiffe.size(); i++) {
-                    int schiff = spielfeld.schiffe.get(i);
-                    if (schiff == nachbarWert) {
-                        spielfeld.schiffe.remove(i);
-                        System.out.println("Schiff mit Wert " + nachbarWert + " aus der Liste entfernt.");
-                        // Da die Liste durch das Entfernen eines Elements kleiner wird,
-                        // muss der Index um eins reduziert werden, um das nächste Element korrekt zu überprüfen.
-                        i--;
-                       break;
-                    }
+            //Suche das Schiff in der Liste und entferne ein Vorkommen
+            for (int i = 0; i < spielfeld.schiffe.size(); i++) {
+                int schiff = spielfeld.schiffe.get(i);
+                if (schiff == nachbarWert) {
+                    spielfeld.schiffe.remove(i);
+                    System.out.println("Schiff mit Wert " + nachbarWert + " aus der Liste entfernt.");
+                    // Da die Liste durch das Entfernen eines Elements kleiner wird,
+                    // muss der Index um eins reduziert werden, um das nächste Element korrekt zu überprüfen.
+                    i--;
+                    break;
                 }
-                System.out.println("Hier ist schiffe von spieler die zur Asuwahl stehen : " +spielfeld.schiffe);
+            }
+            System.out.println("Hier ist schiffe von spieler die zur Asuwahl stehen : " +spielfeld.schiffe);
 
-                if (spielfeld.schiffe.isEmpty()) {
-                        System.out.println("State wird auf 1 gesetzt");
-                        currentState++;
-                    }
-                }
+            if (spielfeld.schiffe.isEmpty()) {
+                System.out.println("State wird auf 1 gesetzt");
+                currentState++;
+            }
+        }
 
     }
 
@@ -283,7 +288,7 @@ public class MainGameController implements Initializable {
         Font customFont;
         try {
             image = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/turksat46/schiffgehtunter/images/water_animated.gif")));
-             customFont = Font.loadFont(getClass().getResource("/com/turksat46/schiffgehtunter/MinecraftRegular-Bmg3.otf").toExternalForm(), 40);
+            customFont = Font.loadFont(getClass().getResource("/com/turksat46/schiffgehtunter/MinecraftRegular-Bmg3.otf").toExternalForm(), 40);
 
         } catch (NullPointerException e) {
             System.err.println("Fehler beim Laden der Texturen. Stelle sicher, dass die Dateien im Ressourcenordner liegen.");

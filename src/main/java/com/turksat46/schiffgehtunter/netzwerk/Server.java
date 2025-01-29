@@ -1,25 +1,14 @@
 package com.turksat46.schiffgehtunter.netzwerk;
 
-import com.turksat46.schiffgehtunter.CreateGameController;
-import com.turksat46.schiffgehtunter.CreateGameController.*;
 import com.turksat46.schiffgehtunter.MultipayerMainGameController;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ProgressBar;
-import javafx.scene.control.Slider;
-import javafx.stage.Stage;
 
 import java.io.*;
-import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.UnknownHostException;
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.stream.Collectors;
 
 import static com.turksat46.schiffgehtunter.MultipayerMainGameController.shootShipMultiplayer;
 
@@ -34,6 +23,7 @@ public class Server implements Runnable {
     public static boolean connectionEstablished; // Callback-Funktion
     private static int groesse;
     private static List<Integer> ships;
+    private static CountDownLatch latch = new CountDownLatch(1); // Latch hinzufügen
 
     @Override
     public void run() {
@@ -61,6 +51,14 @@ public class Server implements Runnable {
         usr = new BufferedReader(new InputStreamReader(System.in));
 
 
+        // Warten, bis das Latch freigegeben wird
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+
         handleGame();
 
         // EOF ins Socket "schreiben".
@@ -77,8 +75,19 @@ public class Server implements Runnable {
         }
     }
 
-    public static void setShips(List<Integer> ships) {
-        Server.ships = ships;
+    public static void setShips(List<Integer> ship) {
+        ships = ship;
+    }
+
+    public static void releaseLatch() {
+        latch.countDown(); // Latch freigeben
+    }
+
+    private static String formatShips(List<Integer> ships) {
+        // Konvertiere die Liste von Schiffen in eine durch Leerzeichen getrennte Zeichenkette
+        return ships.stream()
+                .map(String::valueOf)
+                .collect(Collectors.joining(" "));
     }
 
     private static void handleGame() throws IOException {
@@ -87,15 +96,23 @@ public class Server implements Runnable {
         sendMessage("size "+ groesse);
         receiveMessage();
 
-        //Richtige schiffe übergeben
-        sendMessage("ships 3 2 2");
+
+        sendMessage("ships " + formatShips(ships));
         receiveMessage();
 
 
         //warten bis schiffe gesetzt sind
-
+        // Warten bis der Button gedrückt wurde
+        while (!MultipayerMainGameController.isButtonClicked) {
+            try {
+                Thread.sleep(100); // Kurze Pause, um das UI zu ermöglichen
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
 
         sendMessage("ready");
+
         if (receiveMessage().equals("ready")) {
 
 

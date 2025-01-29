@@ -69,8 +69,6 @@ public class Client implements Runnable{
     }
 
     public void initialize() throws IOException {
-
-
         backButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
@@ -81,12 +79,14 @@ public class Client implements Runnable{
                 }
             }
         });
+
         connectButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                clientThread.setDaemon(true);
-                clientThread.start();
-
+                if (!clientThread.isAlive()) { // Überprüfen, ob der Thread schon läuft
+                    clientThread.setDaemon(true);
+                    clientThread.start();
+                }
             }
         });
     }
@@ -114,63 +114,72 @@ public class Client implements Runnable{
 
     private void initializeGame() throws IOException {
         int groesse = 0;
-            List<Integer> ships = new ArrayList<>();
-            while (true) {
-                String message = receiveMessage();
-                if (message == null) break;
+        List<Integer> ships = new ArrayList<>();
+        while (true) {
+            String message = receiveMessage();
+            if (message == null) break;
 
-                String[] parts = message.split(" ");
-                switch (parts[0]) {
-                    case "size":
-                        System.out.println("Received size: " + message);
-                        groesse = Integer.parseInt(parts[1]);
-                        sendMessage("done");
-                        break;
-                    case "ships":
-                        System.out.println("Received ships: " + message);
-                        for (int i = 1; i < parts.length; i++) {
-                            ships.add(Integer.parseInt(parts[i]));
+            String[] parts = message.split(" ");
+            switch (parts[0]) {
+                case "size":
+                    System.out.println("Received size: " + message);
+                    groesse = Integer.parseInt(parts[1]);
+                    sendMessage("done");
+                    break;
+                case "ships":
+                    System.out.println("Received ships: " + message);
+                    for (int i = 1; i < parts.length; i++) {
+                        ships.add(Integer.parseInt(parts[i]));
+                    }
+                    sendMessage("done");
+
+                    if(groesse!=0 && ships.size()!=0) {
+
+                        int finalGroesse = groesse;
+                        Platform.runLater(() -> {
+
+                            try {
+
+                                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/turksat46/schiffgehtunter/multiplayer-main-game-view.fxml"));
+                                Scene scene = new Scene(fxmlLoader.load());
+                                Stage stage = new Stage();
+                                stage.setTitle("Spielfeld");
+                                stage.setScene(scene);
+
+                                MultipayerMainGameController gameController = fxmlLoader.getController();
+                                gameController.setupSpiel(finalGroesse, stage, 0, 1, scene, ships);
+
+                                stage.show();
+
+
+                                //Problem mit schließen der alten Stage!!
+
+
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        });
+                    }
+
+                    break;
+                case "ready":
+
+
+                    //warten bis schiffe gesetzt sind
+                    // Warten bis der Button gedrückt wurde
+                    while (!MultipayerMainGameController.isButtonClicked) {
+                        try {
+                            clientThread.sleep(100); // Kurze Pause, um das UI zu ermöglichen
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
                         }
-                        sendMessage("done");
-                        break;
-                    case "ready":
+                    }
 
+                    sendMessage("ready");
 
-                        //Sollte nur sein wenn size und ships empfangen wurde
-
-
-                        System.out.println("Server is ready.");
-                        if(groesse!=0 && ships.size()!=0) {
-
-                            int finalGroesse = groesse;
-                            Platform.runLater(() -> {
-
-                                try {
-
-                                    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/turksat46/schiffgehtunter/multiplayer-main-game-view.fxml"));
-                                    Scene scene = new Scene(fxmlLoader.load());
-                                    Stage stage = new Stage();
-                                    stage.setTitle("Spielfeld");
-                                    stage.setScene(scene);
-
-                                    MultipayerMainGameController gameController = fxmlLoader.getController();
-                                    gameController.setupSpiel(finalGroesse, stage, 0, 1, scene, ships);
-
-                                    sendMessage("ready");
-                                    stage.show();
-
-
-                                    //Problem mit schließen der alten Stage!!
-
-
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-                            });
-                        }
-                        break;
-                }
+                    break;
             }
+        }
     }
 
     private void handleGame () throws IOException {

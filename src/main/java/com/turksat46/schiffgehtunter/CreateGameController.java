@@ -145,6 +145,7 @@ public class CreateGameController {
             Platform.runLater(() -> {
                 try {
                     startMultiplayerGame(stage, (int) groesseslider.getValue());
+                    Server.releaseLatch();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

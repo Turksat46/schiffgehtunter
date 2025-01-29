@@ -18,42 +18,53 @@ public class Spielfeld {
     public int[][] feld;
     public Feld[][] felder;
     MainGameController mainGameController;
+    MultipayerMainGameController multipayerMainGameController;
     public ArrayList<Integer> schiffe= new ArrayList<>();
     boolean istGegnerFeld;
 
-    public Spielfeld (int groesse, boolean istGegnerFeld){
+    public Spielfeld (int groesse, boolean istGegnerFeld, boolean isMultiplayer){
         this.feld= new int [groesse][groesse];
         this.gridPane = new GridPane();
         this.groesse = groesse;
         felder = new Feld[groesse][groesse];
-        mainGameController = new MainGameController();
+        if (isMultiplayer){
+            multipayerMainGameController = new MultipayerMainGameController();
+        }
+        else{
+            mainGameController = new MainGameController();
+
+        }
         this.istGegnerFeld = istGegnerFeld;
-        initFeld();
+        initFeld(isMultiplayer);
 
     }
 
     // TODO:Ich schaue hier noch ob wir des so lassen
     // soll bei kleinen felder random schiffsgroeße aufgewöhlt werden oder greedy benutzen ???
     // TODO: IDEE ist jz umgedrehter greedy algorihtmus
-    private void initFeld(){
+    private void initFeld(boolean isMultiplayer){
 
         int[] schiffsGroessen = {5, 4, 3, 2}; // Größen der Schiffe
         int totalCells = groesse * groesse; // Gesamtanzahl der Zellen im Spielfeld
         int shipCount = (int) (totalCells * 0.3); // 30 % der Zellen für Schiffe
 
 
-        // Greedy-Algorithmus zum Auffüllen der Zellen
-        //des hier bei feldgroesse von 10+
-        for (int size : schiffsGroessen) {
-            while (shipCount >= size) {
-                schiffe.add(size); // Schiff hinzufügen
-                shipCount -= size; // Zellen zählen
+        if (!isMultiplayer) {
+            // Greedy-Algorithmus zum Auffüllen der Zellen
+            //des hier bei feldgroesse von 10+
+            for (int size : schiffsGroessen) {
+                while (shipCount >= size) {
+                    schiffe.add(size); // Schiff hinzufügen
+                    shipCount -= size; // Zellen zählen
+                }
             }
+
+
+            // Ausgabe der Ergebnisse
+            System.out.println("Schiffe in Zellen: " + schiffe);
+            System.out.println("Verbleibende Zellen: " + shipCount);
         }
 
-        // Ausgabe der Ergebnisse
-        System.out.println("Schiffe in Zellen: " + schiffe);
-        System.out.println("Verbleibende Zellen: " + shipCount);
 
         if(groesse <=5 ){
             zellengroesse=75;
@@ -91,11 +102,19 @@ public class Spielfeld {
 
                 // Klick-Event für jede Zelle
                 cellPane.setOnMouseClicked(event -> {
-                    if (event.getButton()== MouseButton.PRIMARY) {
-                        mainGameController.handlePrimaryClick(this, row, col);
+                    if (!isMultiplayer) {
+                        if (event.getButton() == MouseButton.PRIMARY) {
+                            mainGameController.handlePrimaryClick(this, row, col);
+                        } else if (event.getButton() == MouseButton.SECONDARY) {
+                            mainGameController.handleSecondaryClick(this, row, col);
+                        }
                     }
-                    else if (event.getButton()== MouseButton.SECONDARY) {
-                        mainGameController.handleSecondaryClick(this, row, col);
+                    else {
+                        if (event.getButton() == MouseButton.PRIMARY) {
+                            multipayerMainGameController.handlePrimaryClick(this, row, col);
+                        } else if (event.getButton() == MouseButton.SECONDARY) {
+                            multipayerMainGameController.handleSecondaryClick(this, row, col);
+                        }
                     }
 
                 });
@@ -118,7 +137,7 @@ public class Spielfeld {
 
     public void selectFeld(int posx, int posy, Color color){
         //TODO: Eventuell hier die Farbe ändern, wenn ein Schiff angeklickt wird
-            felder[posx][posy].setFill(color);
+        felder[posx][posy].setFill(color);
     }
 
     public void deselectRowAndColumn(Spielfeld spielfeld, int posx, int posy) {

@@ -1,6 +1,7 @@
 package com.turksat46.schiffgehtunter;
 
 import com.turksat46.schiffgehtunter.backgroundgeneration.BackgroundGenerator;
+import com.turksat46.schiffgehtunter.filemanagement.SaveFileManager;
 import com.turksat46.schiffgehtunter.netzwerk.Server;
 import com.turksat46.schiffgehtunter.netzwerk.establishConnection;
 import com.turksat46.schiffgehtunter.other.Cell;
@@ -41,6 +42,7 @@ public class MultipayerMainGameController extends MainGameController implements 
 
     @FXML public HBox label1;
     @FXML private Button startButton;
+
     public static int currentState, currentMode, currentDifficulty, groesse;
     static GridPane feld;
     static Scene scene;
@@ -53,6 +55,8 @@ public class MultipayerMainGameController extends MainGameController implements 
 
     BackgroundGenerator backgroundManager;
 
+    public static volatile boolean isButtonClicked = false;
+
     //Drei States: place = Schiffe platzieren, offense = Angriff, defense = Verteidigung bzw. auf Angriff vom Gegner warten
     public String[] state = {"place", "offense", "defense"};
     //Spielmodus P = Spieler, C=Computer
@@ -63,22 +67,37 @@ public class MultipayerMainGameController extends MainGameController implements 
         super.initialize(url, resourceBundle);
     }
 
-    @Override
-    public void startGame() {
-        super.startGame();
+
+    public void startGameMultiplayer() {
+        //super.startGame();
+        currentState = 1;
+        isButtonClicked = true;
         System.out.println("MultipayerMainGameController state 1");
     }
 
     @Override
     public void setupSpiel(int groesse, Stage stage, int currentDifficulty, int currentMode, Scene scene) throws FileNotFoundException {
-        super.setupSpiel(groesse, stage, currentDifficulty, currentMode, scene);
+        //spielerspielfeld = new Spielfeld(groesse,  false);
+        gegnerspielfeld = new Spielfeld(groesse,  true, true);
+
+        spielerspielfeld = new newSpielfeld(groesse, false, spielerstackpane);
+        //gegnerspielfeld = new newSpielfeld(groesse, true, gegnerstackpane);
+
+        //spielerstackpane.getChildren().add(newSpielfeld.gridPane);
+        gegnerstackpane.getChildren().add(gegnerspielfeld.gridPane);
+
+        // StackPane-Margen setzen
+        //HBox.setMargin(spielerstackpane, new Insets(10, 10, 100, 10)); // Abstand für spielerstackpane
+        //HBox.setMargin(gegnerstackpane, new Insets(10, 10, 100, 150)); // Abstand für gegnerstackpane
+
+        super.setupBase(groesse, stage,currentDifficulty,currentMode,scene);
     }
 
 
     //Konstruktor mit schiff übergabe
     public void setupSpiel(int groesse, Stage stage, int currentDifficulty, int currentMode, Scene scene, List<Integer> ships) throws FileNotFoundException {
         //spielerspielfeld = new Spielfeld(groesse,  false);
-        gegnerspielfeld = new Spielfeld(groesse,  true);
+        gegnerspielfeld = new Spielfeld(groesse, true,  true);
 
         spielerspielfeld = new newSpielfeld(groesse, false, spielerstackpane, ships);
         //gegnerspielfeld = new newSpielfeld(groesse, true, gegnerstackpane);
@@ -90,28 +109,15 @@ public class MultipayerMainGameController extends MainGameController implements 
         //HBox.setMargin(spielerstackpane, new Insets(10, 10, 100, 10)); // Abstand für spielerstackpane
         //HBox.setMargin(gegnerstackpane, new Insets(10, 10, 100, 150)); // Abstand für gegnerstackpane
 
-
-        this.currentMode = currentMode;
-        this.groesse = groesse;
-        MainGameController.scene = scene;
-        System.out.println(MainGameController.scene);
-        /*scene.widthProperty().addListener((observable, oldValue, newValue) -> {
-            WIDTH = newValue.intValue();
-        });
-
-        scene.heightProperty().addListener((observable, oldValue, newValue) -> {
-            HEIGHT = newValue.intValue();
-        });
-        */
-        currentState = 0;
-        this.currentDifficulty = currentDifficulty;
-        System.out.println("Mode selected and set to: " + mode[currentMode]);
-        System.out.println("State selected and set to: " + state[currentState]);
-        System.out.println("Difficulty selected and set to: " + currentDifficulty);
-
-        setPausierenEventHandler(stage);
+        super.setupBase(groesse, stage,currentDifficulty,currentMode,scene);
     }
 
+    @Override
+    public void setPausierenEventHandler(Stage stage) {
+        super.setPausierenEventHandler(stage);
+    }
+
+    @Override
     public void handlePrimaryClick(Spielfeld spielfeld, int posx, int posy){
         System.out.println(currentState);
         switch (currentState){
@@ -126,8 +132,9 @@ public class MultipayerMainGameController extends MainGameController implements 
 
             //Schiffe erschießen
             case 1:
-                shootEnemyShipMultiplayer(spielfeld, posx, posy);
-                System.out.println("Klick mit State 1 entdeckt");
+                //shootEnemyShipMultiplayer(spielfeld, posx, posy);
+                System.out.println("Multiplayer Klick mit State 1 entdeckt");
+                System.out.println("koordinate " + posx + " " + posy);
 
                 break;
 
@@ -141,16 +148,23 @@ public class MultipayerMainGameController extends MainGameController implements 
         }
     }
 
-
-    public void handleWinForPlayer(){
-        //TODO: @Elion mach was draus
-        System.out.println("Spieler hat gewonnen!");
+    @Override
+    public void handleSecondaryClick(Spielfeld spielfeld, int posx, int posy) {
+        super.handleSecondaryClick(spielfeld, posx, posy);
     }
 
-    public void handleWinForOpponent(int schiffeAnzahl){
-        //TODO: @Elion mach was draus
-        System.out.println("Gegner hat gewonnen!");
+    @Override
+    public void handleWinForPlayer() {
+        super.handleWinForPlayer();
     }
+
+    @Override
+    public void handleWinForOpponent() {
+        super.handleWinForOpponent();
+    }
+
+
+
 
     public static int shootShipMultiplayer(int posx, int posy){
         Cell targetCell = new Cell(posx, posy);

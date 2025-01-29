@@ -1,5 +1,6 @@
 package com.turksat46.schiffgehtunter;
 
+import com.turksat46.schiffgehtunter.netzwerk.Server;
 import javafx.animation.ScaleTransition;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
@@ -43,6 +44,8 @@ public class newSpielfeld {
         gridPane = createGridPane();
         root.setCenter(gridPane);
 
+        List<Integer> shipSizesList = new ArrayList<>();
+
         if (!isEnemyField) {
             HBox draggableContainer = new HBox(10);
             draggableContainer.setPadding(new Insets(10));
@@ -61,10 +64,13 @@ public class newSpielfeld {
                     draggables.add(shipGroup);
                     draggableContainer.getChildren().add(shipGroup);
                     remainingCells -= shipSize;
+
+                    shipSizesList.add(shipSize);
                 }
             }
             root.setBottom(draggableContainer);
         }
+        Server.setShips(shipSizesList);
     }
 
     //Konstruktor ohne schiff Berechnung für Multiplayer
@@ -87,6 +93,7 @@ public class newSpielfeld {
                 draggables.add(shipGroup);
                 draggableContainer.getChildren().add(shipGroup);
             }
+
             root.setBottom(draggableContainer);
         }
     }
