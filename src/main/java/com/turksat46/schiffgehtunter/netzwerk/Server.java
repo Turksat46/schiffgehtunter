@@ -1,6 +1,8 @@
 package com.turksat46.schiffgehtunter.netzwerk;
 
+import com.turksat46.schiffgehtunter.MainGameController;
 import com.turksat46.schiffgehtunter.MultipayerMainGameController;
+import javafx.application.Platform;
 import javafx.scene.paint.Color;
 
 import java.io.*;
@@ -8,6 +10,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Stack;
 import java.util.concurrent.CountDownLatch;
 import java.util.stream.Collectors;
 
@@ -23,7 +26,7 @@ public class Server implements Runnable {
     private static final int port = 50000;
     public static boolean connectionEstablished; // Callback-Funktion
     private static int groesse;
-    private static List<Integer> ships;
+    private static Stack<Integer> ships = new Stack<>();
     private static CountDownLatch latch = new CountDownLatch(1);// Latch hinzufügen
 
 
@@ -82,7 +85,7 @@ public class Server implements Runnable {
     }
 
     public static void setShips(List<Integer> ship) {
-        ships = ship;
+        ships.addAll(ship);
     }
 
     public static void releaseLatch() {
@@ -123,9 +126,12 @@ public class Server implements Runnable {
 
         if (receiveMessage().equals("ready")) {
 
-
+            int answerCounterWin=0;
+            final int numberOfShips = ships.size();
             while (true) {
                 String message = receiveMessage();
+
+
                 if (message == null) break;
                 //abbruch bedingungen prüfen
 
@@ -145,6 +151,16 @@ public class Server implements Runnable {
 
                         String answer = handleShot(row, col);
                         sendMessage("answer " + answer); // 0 wasser/ 1 schiff/ 2 versenkt
+                        if (answer=="2") {
+                            answerCounterWin = answerCounterWin + 1;
+                            if (answerCounterWin==numberOfShips){
+                                MultipayerMainGameController temp2 = new MultipayerMainGameController();
+                                MultipayerMainGameController.currentState=2;
+                                System.out.println("LOOSER");
+                                Platform.runLater(() -> temp2.handleWinForOpponent());
+                                break;
+                            }
+                        }
 
 
                         //wenn Treffer dann weiter ansonsten pass und schießen
@@ -164,6 +180,8 @@ public class Server implements Runnable {
                         else if (parts[1].equals("2")) {
                             MultipayerMainGameController.currentState=1;
                             MultipayerMainGameController.gegnerspielfeld.selectFeld(lastCol,lastRow, Color.GREEN);
+                            ships.pop();
+                            checkWin();
                             break;
                         }
                         break;
@@ -205,16 +223,19 @@ public class Server implements Runnable {
         return null;
     }
 
-    private static boolean shoot() throws IOException {
-
-        //feld auf das gecklickt wurde übergeben
-
-        return true;
-    }
 
     public static void setLastRowCol(int row, int col) {
         lastCol = col;
         lastRow = row;
+    }
+
+    private static void checkWin() throws IOException {
+        if (ships.size()==0){
+            MultipayerMainGameController temp = new MultipayerMainGameController();
+            System.out.println("YOU WON");
+            MultipayerMainGameController.currentState=2;
+            Platform.runLater(() -> temp.handleWinForPlayer());
+        }
     }
 
 }

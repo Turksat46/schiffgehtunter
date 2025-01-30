@@ -166,7 +166,7 @@ public class MultipayerMainGameController extends MainGameController implements 
     }
 
     @Override
-    public void handleWinForOpponent() {
+    public  void handleWinForOpponent() {
         super.handleWinForOpponent();
     }
 
