@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.net.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox fx:id="rootBox" alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.turksat46.schiffgehtunter.HelloController">
+<VBox fx:id="rootBox" alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.turksat46.schiffgehtunter.HelloController">
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
     </padding>
@@ -15,8 +16,11 @@
       </image>
    </ImageView>
    <Label fx:id="welcomeText" />
-    <Button onAction="#onHelloButtonClick" text="Neues Spiel starten/laden" />
-    <Button mnemonicParsing="false" onAction="#onMultiplayerClick" prefHeight="26.0" prefWidth="120.0" text="Spiel finden" />
-    <Button mnemonicParsing="false" onAction="#onSettingsButtonClick" prefHeight="26.0" prefWidth="118.0" text="Einstellungen" />
-    <Button mnemonicParsing="false" onAction="#onExitButtonClick" prefHeight="26.0" prefWidth="123.0" text="Spiel beenden" />
+    <Button minHeight="-Infinity" minWidth="-Infinity" onAction="#onHelloButtonClick" prefHeight="40.0" prefWidth="200.0" text="Neues Spiel starten/laden" />
+    <Button mnemonicParsing="false" onAction="#onMultiplayerClick" prefHeight="40.0" prefWidth="200.0" text="Spiel finden" />
+    <Button mnemonicParsing="false" onAction="#onSettingsButtonClick" prefHeight="40.0" prefWidth="200.0" text="Einstellungen" />
+    <Button mnemonicParsing="false" onAction="#onExitButtonClick" prefHeight="40.0" prefWidth="200.0" text="Spiel beenden" />
+    <stylesheets>
+        <URL value="@helloView_style.css" />
+    </stylesheets>
 </VBox>

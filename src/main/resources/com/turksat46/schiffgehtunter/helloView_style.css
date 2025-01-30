@@ -1,0 +1,16 @@
+.button{
+    -fx-background-image: url("images/button_texture.png");
+    -fx-border-width: 2px;
+    -fx-background-color: #000;
+    -fx-background-size: cover;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+
+}
+.button:hover{
+    -fx-background-image: url("images/buttonHover_texture.png");
+    -fx-border-width: 2px;
+    -fx-background-color: #000;
+}
+
+
