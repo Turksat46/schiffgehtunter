@@ -54,6 +54,7 @@ public class CreateGameController {
         cb.setItems(skillLevels);
         cb2.setItems(gameModes);
 
+
         cb.setValue(skillLevels.get(0));
         cb2.setValue(gameModes.get(0));
 

@@ -185,7 +185,11 @@ public class HelloController implements Initializable {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("createGame.fxml"));
         Stage stage = new Stage();
         stage.setTitle("Neues Spiel erstellen");
-        stage.setScene(new Scene(fxmlLoader.load()));
+        Scene scene = new Scene(fxmlLoader.load());
+        stage.setScene(scene);
+        stage.setResizable(false);
+        stage.setWidth(640);
+        stage.setHeight(580);
         stage.show();
         hideCurrentStage();
     }
