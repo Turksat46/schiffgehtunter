@@ -15,12 +15,15 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.turksat46.schiffgehtunter.MultipayerMainGameController.shootShipMultiplayer;
 
 public class Client implements Runnable{
     @FXML
@@ -41,11 +44,15 @@ public class Client implements Runnable{
     final int port = 50000;
     Socket server;
     Socket s;
-    private Writer out;
+    private static Writer out;
     private BufferedReader in;
     private BufferedReader usr;
 
     private static Thread clientThread = new Thread(new Client());
+
+
+    private static int lastRow;
+    private static int lastCol;
 
 
     public void onBackPressed() throws IOException {
@@ -176,41 +183,60 @@ public class Client implements Runnable{
                     }
 
                     sendMessage("ready");
-
+                    MultipayerMainGameController.currentState=2;
+                    handleGame();
                     break;
             }
         }
     }
 
     private void handleGame () throws IOException {
+
         while (true) {
             String message = receiveMessage();
-            if (message == null) break;
 
             String[] parts = message.split(" ");
             switch (parts[0]) {
-
-
-                // Überarbeiten
-
-
                 case "shot":
                     int row = Integer.parseInt(parts[1]);
                     int col = Integer.parseInt(parts[2]);
                     System.out.println("Opponent shot at: (" + row + ", " + col + ")");
 
 
-                    //handle schuss
 
 
-                    handleMultiplayerShoot(row, col);
-                    sendMessage("answer 0"); // wasser/schiff
+                    String answer = handleshot(row, col);
+                    sendMessage("answer " + answer); // 0 wasser/ 1 schiff/ 2 versenkt
 
                     //wenn Treffer dann weiter ansonsten pass und schießen
+                    break;
+
+                case "answer":
+                    if (parts[1].equals("0")) {
+                        MultipayerMainGameController.currentState=2;
+                        sendMessage("pass");
+                        break;
+                    }
+                    else if (parts[1].equals("1")) {
+                        MultipayerMainGameController.currentState=1;
+                        MultipayerMainGameController.gegnerspielfeld.selectFeld(lastCol,lastRow, Color.GREEN);
+
+                        break;
+                    }
+                    else if (parts[1].equals("2")) {
+                        MultipayerMainGameController.currentState=1;
+                        MultipayerMainGameController.gegnerspielfeld.selectFeld(lastCol,lastRow, Color.GREEN);
+                        break;
+                    }
+                    break;
+
+                case "pass":
+                   MultipayerMainGameController.currentState=1;
+                   break;
             }
         }
     }
-    private void sendMessage(String message) throws IOException {
+    public static void sendMessage(String message) throws IOException {
         out.write(message + "\n");
         out.flush();
         System.out.println("Client sent: " + message);
@@ -222,8 +248,23 @@ public class Client implements Runnable{
         return message;
     }
 
-    public String handleMultiplayerShoot(int row, int col) throws IOException {
+    public String handleshot(int row, int col) throws IOException {
+        //shootShipMultiplayer() liefert ob an dieser stelle ein schiff ist es zerstört wurde oder wasser
+        if (shootShipMultiplayer(row,col)==0){
+            return "0";
+        }
+        if (shootShipMultiplayer(row,col)==1){
+            return "1";
+        }
+        if (shootShipMultiplayer(row,col)==2){
+            return "2";
+        }
         return null;
+    }
+
+    public static void setLastRowCol(int row, int col) {
+        lastCol = col;
+        lastRow = row;
     }
 
 

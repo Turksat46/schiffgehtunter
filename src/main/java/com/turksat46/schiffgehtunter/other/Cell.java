@@ -28,4 +28,12 @@ public class Cell {
     public String toString() {
         return col + ":" + row;
     }
+
+    public int getCol() {
+        return col;
+    }
+
+    public int getRow() {
+        return row;
+    }
 }

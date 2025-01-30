@@ -35,6 +35,9 @@ public class newSpielfeld {
     private static int remainingCells;
     public static boolean isEditable = true;
 
+    private final Set<Cell> hitCells = new HashSet<>();
+
+
     public newSpielfeld(int size, boolean isEnemyField, BorderPane root) {
         newSpielfeld.GRID_SIZE = size;
         newSpielfeld.root = root;
@@ -252,5 +255,28 @@ public class newSpielfeld {
                 }
             }
         }
+    }
+
+    public int isShipAtPosition(int x, int y) {
+        // Iteriere durch alle Schiffsgruppen und ihre belegten Zellen
+        for (Map.Entry<Group, Set<Cell>> entry : shipCellMap.entrySet()) {
+            Set<Cell> occupiedCells = entry.getValue();
+
+            // Überprüfe, ob die Zelle (x, y) in der belegten Zellenmenge enthalten ist
+            for (Cell cell : occupiedCells) {
+                if (cell.getRow() == x && cell.getCol() == y) {
+                    // Füge die Trefferzelle hinzu
+                    hitCells.add(cell);
+
+                    // Überprüfe, ob alle Zellen dieses Schiffs getroffen sind
+                    if (hitCells.containsAll(occupiedCells)) {
+                        return 2; // Das gesamte Schiff wurde versenkt
+                    }
+
+                    return 1; // Treffen, aber nicht alle Zellen des Schiffs sind getroffen
+                }
+            }
+        }
+        return 0; // Kein Treffer
     }
 }

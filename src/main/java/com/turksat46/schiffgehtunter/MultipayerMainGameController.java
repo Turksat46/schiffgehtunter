@@ -2,6 +2,7 @@ package com.turksat46.schiffgehtunter;
 
 import com.turksat46.schiffgehtunter.backgroundgeneration.BackgroundGenerator;
 import com.turksat46.schiffgehtunter.filemanagement.SaveFileManager;
+import com.turksat46.schiffgehtunter.netzwerk.Client;
 import com.turksat46.schiffgehtunter.netzwerk.Server;
 import com.turksat46.schiffgehtunter.netzwerk.establishConnection;
 import com.turksat46.schiffgehtunter.other.Cell;
@@ -51,11 +52,13 @@ public class MultipayerMainGameController extends MainGameController implements 
     static boolean rotated;
 
     static newSpielfeld spielerspielfeld;
-    static Spielfeld gegnerspielfeld;
+    public static Spielfeld gegnerspielfeld;
 
     BackgroundGenerator backgroundManager;
 
     public static volatile boolean isButtonClicked = false;
+    private static boolean isServer;
+
 
     //Drei States: place = Schiffe platzieren, offense = Angriff, defense = Verteidigung bzw. auf Angriff vom Gegner warten
     public String[] state = {"place", "offense", "defense"};
@@ -70,7 +73,7 @@ public class MultipayerMainGameController extends MainGameController implements 
 
     public void startGameMultiplayer() {
         //super.startGame();
-        currentState = 1;
+        //currentState = 1;
         isButtonClicked = true;
         System.out.println("MultipayerMainGameController state 1");
     }
@@ -91,6 +94,8 @@ public class MultipayerMainGameController extends MainGameController implements 
         //HBox.setMargin(gegnerstackpane, new Insets(10, 10, 100, 150)); // Abstand für gegnerstackpane
 
         super.setupBase(groesse, stage,currentDifficulty,currentMode,scene);
+
+        isServer = true;
     }
 
 
@@ -110,6 +115,8 @@ public class MultipayerMainGameController extends MainGameController implements 
         //HBox.setMargin(gegnerstackpane, new Insets(10, 10, 100, 150)); // Abstand für gegnerstackpane
 
         super.setupBase(groesse, stage,currentDifficulty,currentMode,scene);
+
+        isServer = false;
     }
 
     @Override
@@ -135,7 +142,7 @@ public class MultipayerMainGameController extends MainGameController implements 
                 //shootEnemyShipMultiplayer(spielfeld, posx, posy);
                 System.out.println("Multiplayer Klick mit State 1 entdeckt");
                 System.out.println("koordinate " + posx + " " + posy);
-
+                shootEnemyShipMultiplayer(spielfeld, posx, posy);
                 break;
 
             //Schiffe beobachten (Spieler: Klicks ignorieren)
@@ -167,14 +174,14 @@ public class MultipayerMainGameController extends MainGameController implements 
 
 
     public static int shootShipMultiplayer(int posx, int posy){
-        Cell targetCell = new Cell(posx, posy);
-        for (Set<Cell> cells : spielerspielfeld.shipCellMap.values()) {
-            if (cells.equals(targetCell)) {
-                spielerspielfeld.shipCellMap.remove(cells);
-                return 1;
-            }
+        if (spielerspielfeld.isShipAtPosition(posx, posy) == 1){
+            return 1;
         }
-        return 0; // Kein Schiff
+        if (spielerspielfeld.isShipAtPosition(posx, posy) == 2){
+            return 2;
+        }
+        else
+            return 0;
     }
 
     //Shoot Funktionen Überarbeiten
@@ -188,8 +195,15 @@ public class MultipayerMainGameController extends MainGameController implements 
                 spielfeld.selectFeld(posx,posy);
 
                 try {
-                    Server.sendMessage("shot "+ posx + " " + posy);
-                    System.out.println(posx + " " + posy);
+                    if(isServer) {
+                        Server.sendMessage("shot " + posx + " " + posy);
+                        Server.setLastRowCol(posy, posx);
+                    }
+                    else {
+                        Client.sendMessage("shot " + posx + " " + posy);
+                        Client.setLastRowCol(posy, posx);
+                    }
+
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
