@@ -3,11 +3,17 @@ package com.turksat46.schiffgehtunter;
 
 import com.turksat46.schiffgehtunter.filemanagement.SettingsFileManager;
 import com.turksat46.schiffgehtunter.other.Music;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Slider;
 import javafx.scene.media.MediaPlayer;
+import javafx.stage.Stage;
+
+import java.io.IOException;
 
 
 public class SettingsController {
@@ -84,5 +90,14 @@ public class SettingsController {
 
         // Speichere die Einstellungen, falls erforderlich
         fileManager.saveSettings(musicEnabled, volume);
+    }
+
+    public void onBackPressed(ActionEvent actionEvent) throws IOException {
+
+
+        Stage stage = (Stage) toggleMusic.getScene().getWindow();
+        stage.close();
+
+
     }
 }

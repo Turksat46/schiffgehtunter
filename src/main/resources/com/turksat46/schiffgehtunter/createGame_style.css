@@ -64,9 +64,10 @@
 }
 
 .slider .thumb {
-    -fx-background-color: #ff6600; /* Orange thumb */
-    -fx-background-radius: 50%;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 5, 0.3, 0, 1);
+    -fx-background-color: #333333; /* Orange thumb */
+    -fx-background-radius: 25%;
+    -fx-pref-width: 25px;
+    -fx-pref-height: 25px;
 }
 
 .slider .tick-mark {
