@@ -2,7 +2,7 @@
     -fx-background-image: url("images/button_texture.png");
     -fx-border-width: 2px;
     -fx-background-color: #000;
-    -fx-background-size: cover;
+    -fx-background-size: 200px 40px;
     -fx-text-fill: white;
     -fx-font-size: 12px;
 
