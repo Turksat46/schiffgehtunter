@@ -42,10 +42,14 @@
         -fx-border-color: #444444;     /* Dark border */
         -fx-border-width: 1px;         /* Border width */
         -fx-font-family: "Press Start 2P"; /* Custom font */
-        -fx-text-fill: #FFFFFF;        /* White text */
+        -fx-text-fill: #000000;        /* White text */
         -fx-background-insets: 0, 1;   /* Subtle inset effect */
         -fx-background-radius: 5px;    /* Rounded corners */
         -fx-border-radius: 5px;        /* Matching border radius */
+}
+
+.choice-box .menu-item > .label{
+    -fx-text-fill: #000000;
 }
 
 
