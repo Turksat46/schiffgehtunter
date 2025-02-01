@@ -1,0 +1,145 @@
+/* Allgemeiner Hintergrund für die Szene */
+.root {
+    -fx-background-image: url("images/stone_texture.jpg");
+    -fx-background-size: cover;
+}
+
+/* Buttons für die Verbindung */
+.button {
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-font-family: "Press Start 2P";
+    -fx-background-color: #555555; /* Steinartig grau */
+    -fx-border-color: #000000;
+    -fx-border-width: 2px;
+
+    -fx-min-width: 100px;
+    -fx-min-height: 50px;
+}
+
+/* Hover-Effekt für Buttons */
+.button:hover {
+    -fx-background-color: #666666;
+}
+
+/* Abbrechen-Button */
+#cancel {
+    -fx-background-color: #ff5555; /* Rote Farbe für "Abbrechen" */
+    -fx-text-fill: white;
+    -fx-border-color: #cc0000;
+    -fx-border-width: 2px;
+}
+
+#cancel:hover {
+    -fx-background-color: #ff6666;
+}
+
+/* Labels - speziell für Verbindungshinweise */
+.label {
+    -fx-font-family: "Press Start 2P";
+    -fx-text-fill: #ffffff; /* Weißer Texte */
+    -fx-font-size: 14px;
+}
+
+/* Mit Gegner verbinden - spezielles Label (Header-Design) */
+.label:default {
+    -fx-font-family: "Press Start 2P";
+    -fx-text-fill: #ffee88; /* Goldene Farbe für Header */
+    -fx-font-size: 21px;
+    -fx-alignment: center;
+}
+
+/* IP Anzeige als Standard content Element */
+#ipAnzeige {
+    /* Removed invalid pseudo-selector as JavaFX does not support it */
+        /*formatted overall fix Advanced usabilityrecated Feedback booth safing final lclassifierly
+        Entschuldigung für die Unterbrechung! Hier ist die vollständige und sauber formatierte CSS-Datei für `establishconnection.fxml`:
+
+        ```css
+        /* Allgemeiner Hintergrund für die Szene */
+
+        .root {
+            -fx-background-image: url("images/stone_texture.jpg");
+            -fx-background-size: cover;
+        }
+
+        /* Buttons für die Verbindung */
+
+        .button {
+            -fx-text-fill: white;
+            -fx-font-size: 16px;
+            -fx-font-family: "Press Start 2P";
+            -fx-background-color: #555555; /* Steinartig grau */
+            -fx-border-color: #000000;
+            -fx-border-width: 2px;
+
+            -fx-min-width: 100px;
+            -fx-min-height: 50px;
+        }
+
+        /* Hover-Effekt für Buttons */
+
+        .button:hover {
+            -fx-background-color: #666666; /* Helleres Grau beim Hover */
+        }
+
+        /* Abbrechen-Button */
+
+        #cancel {
+            -fx-background-color: #ff5555; /* Rote Farbe für "Abbrechen" */
+            -fx-text-fill: white;
+            -fx-border-color: #cc0000;
+            -fx-border-width: 2px;
+        }
+
+        #cancel:hover {
+            -fx-background-color: #ff6666; /* Helleres Rot beim Hover */
+        }
+
+        /* Labels - speziell für Verbindungshinweise */
+
+        .label {
+            -fx-font-family: "Press Start 2P";
+            -fx-text-fill: #ffffff; /* Weißer Text */
+            -fx-font-size: 14px;
+        }
+
+        /* Header-Label: Spezifisches Styling für den Text "Mit Gegner verbinden" */
+
+        .label:default {
+            -fx-font-family: "Press Start 2P";
+            -fx-text-fill: #ffee88; /* Goldene Farbe für Header */
+            -fx-font-size: 21px;
+            -fx-alignment: center;
+        }
+
+        /* IP-Anzeige Label */
+
+        #ipAnzeige {
+            -fx-font-family: "Press Start 2P";
+            -fx-text-fill: #ffeeff; /* Leicht goldweiß */
+            -fx-font-size: 16px;
+            -fx-border-color: #666666;
+            -fx-border-width: 1px;
+            -fx-padding: 10px;
+            -fx-alignment: center;
+        }
+
+        /* Fortschrittsbalken */
+
+        .progress-bar {
+            -fx-accent: #ffee88; /* Goldene Farbe für den Fortschritt */
+            -fx-background-color: #444444;
+            -fx-border-color: #000000;
+            -fx-border-width: 1px;
+            -fx-padding: 5px;
+        }
+
+        /* Separator für die visuelle Trennung von Bereichen */
+
+        .separator {
+            -fx-border-color: #000000;
+            -fx-border-width: 1px;
+        }
+
+    }

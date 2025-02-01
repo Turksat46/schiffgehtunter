@@ -5,6 +5,8 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
+<?import java.net.URL?>
+
 <AnchorPane minWidth="-Infinity" prefHeight="137.0" prefWidth="350.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.turksat46.schiffgehtunter.netzwerk.establishConnection">
 <children>
     <VBox prefHeight="160.0" prefWidth="350.0">
@@ -42,4 +44,7 @@
         </children>
     </VBox>
 </children>
+    <stylesheets>
+        <URL value="@connection_establishment_styles.css" />
+    </stylesheets>
 </AnchorPane>

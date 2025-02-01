@@ -1,0 +1,59 @@
+/* Set the background to represent a "connecting" atmosphere */
+.root {
+    -fx-background-image: url("images/stone_texture.jpg");
+    -fx-background-size: cover;
+}
+
+/* Buttons for connection actions */
+.button {
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-font-family: "Press Start 2P";
+    -fx-background-color: #555555; /* Stone-like gray */
+    -fx-border-color: #000000;
+    -fx-border-width: 2px;
+
+    -fx-min-width: 120px;
+    -fx-min-height: 50px;
+}
+
+/* Hover effect for buttons */
+.button:hover {
+    -fx-background-color: #666666; /* Slightly brighter gray */
+}
+
+/* Labels - styled for connection instructions */
+.label {
+    -fx-font-family: "Press Start 2P";
+    -fx-text-fill: #ffffff; /* White text */
+    -fx-font-size: 14px;
+}
+
+#header-label {
+    -fx-font-family: "Press Start 2P";
+    -fx-text-fill: #ffee88; /* Golden for headers */
+    -fx-font-size: 28px;
+}
+
+/* Input fields for connection (TextField) */
+.text-field {
+    -fx-background-color: #444444;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-family: "Press Start 2P";
+    -fx-padding: 10px;
+    -fx-border-color: #666666; /* Subtle gray border */
+    -fx-border-width: 2px;
+}
+
+/* Connection progress bar */
+.progress-bar {
+    -fx-accent: #ffee88; /* Golden progress */
+    -fx-background-color: #444444;
+}
+
+/* Separator bar for dividing sections */
+.separator {
+    -fx-border-color: #000000;
+    -fx-border-width: 1px;
+}
