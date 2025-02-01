@@ -30,7 +30,7 @@ public class newSpielfeld {
     private static int GRID_SIZE;
     private static BorderPane root;
     private static int CELL_SIZE = 50;
-    public final Map<Group, Set<Cell>> shipCellMap = new HashMap<>();
+    public Map<Group, Set<Cell>> shipCellMap = new HashMap<>();
     private final List<Group> draggables = new ArrayList<>();
     private static int shipCount;
     private static int remainingCells;
@@ -80,6 +80,35 @@ public class newSpielfeld {
             root.setBottom(draggableContainer);
         }
         Server.setShips(shipSizesList);
+    }
+
+    //Fürs Laden vom Speicherstand
+    public newSpielfeld(int size, boolean isEnemyField, BorderPane root, Map<String, Object> data) {
+        newSpielfeld.GRID_SIZE = size;
+        newSpielfeld.root = root;
+
+        CELL_SIZE = size <= 5 ? 75 : size <= 10 ? 50 : size <= 20 ? 30 : 20;
+
+        gridPane = createGridPane();
+        root.setCenter(gridPane);
+;
+        shipCellMap = (Map<Group, Set<Cell>>) data.get(shipCellMap);
+
+        if (!isEnemyField) {
+            HBox draggableContainer = new HBox(10);
+            draggableContainer.setPadding(new Insets(10));
+
+            root.setBottom(draggableContainer);
+        }
+        //Server.setShips(shipSizesList);
+
+        //Daten laden
+        drawShipsFromData();
+    }
+
+    // Funktion zum Zeichnen von Schiffen aufm Feld
+    private void drawShipsFromData() {
+
     }
 
     //Konstruktor ohne schiff Berechnung für Multiplayer
@@ -291,4 +320,5 @@ public class newSpielfeld {
         }
         return 0; // Kein Treffer
     }
+
 }

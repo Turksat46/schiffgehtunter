@@ -31,7 +31,6 @@ public class SaveData {
     //Spielfeld
     int[][] feld;
     Feld[][] felder;
-    ArrayList<Integer> schiffe = new ArrayList<>();
 
     Map<String, Object> data = new HashMap<>();
 
@@ -41,6 +40,17 @@ public class SaveData {
         this.newSpielfeld = newSpielfeld;
         this.spielfeld = gegnerfeld;
         this.bot = bot;
+
+        this.currentState = MainGameController.currentState;
+        this.currentMode = MainGameController.currentMode;
+        this.currentDifficulty = MainGameController.currentDifficulty;
+        this.groesse = MainGameController.groesse;
+
+        this.shipCellMap = newSpielfeld.getShipCellMap();
+
+        this.feld = gegnerfeld.feld;
+        //this.felder = gegnerfeld.felder;
+
     }
 
     //Diese Funktion wird für das Sammeln nötiger Daten gebraucht
@@ -52,7 +62,6 @@ public class SaveData {
         data.put("shipCellMap", shipCellMap);
         data.put("feld", feld);
         data.put("felder", felder);
-        data.put("schiffe", schiffe);
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         String json = gson.toJson(data);

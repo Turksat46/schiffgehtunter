@@ -114,6 +114,35 @@ public class MainGameController implements Initializable {
 
     }
 
+    // Fürs Laden von einem gespeicherten Spiel
+    public void setupSpiel(Stage stage, Scene scene, Map<String, Object> data) throws FileNotFoundException {
+        //spielerspielfeld = new Spielfeld(groesse,  false);
+        Double groessedouble = (double) data.get("groesse");
+        int groesse = groessedouble.intValue();
+
+        Double currentDifDouble = (double) data.get("currentDifficulty");
+        int currentDifficulty = currentDifDouble.intValue();
+
+        Double currentModeDouble = (double) data.get("currentMode");
+        int currentMode = currentModeDouble.intValue();
+
+        gegnerspielfeld = new Spielfeld(groesse,  true, false, data);
+
+        spielerspielfeld = new newSpielfeld(groesse, false, spielerstackpane, data);
+
+        //gegnerspielfeld = new newSpielfeld(groesse, true, gegnerstackpane);
+
+        //spielerstackpane.getChildren().add(newSpielfeld.gridPane);
+        gegnerstackpane.getChildren().add(gegnerspielfeld.gridPane);
+
+        // StackPane-Margen setzen
+        //HBox.setMargin(spielerstackpane, new Insets(10, 10, 100, 10)); // Abstand für spielerstackpane
+        //HBox.setMargin(gegnerstackpane, new Insets(10, 10, 100, 150)); // Abstand für gegnerstackpane
+
+        setupBase(groesse, stage, currentDifficulty, currentMode, scene);
+
+    }
+
     public void setupBase (int groesse,Stage stage, int currentDifficulty, int currentMode, Scene scene) throws FileNotFoundException {
 
 
@@ -171,7 +200,7 @@ public class MainGameController implements Initializable {
             //Schiffe setzen
             case 0:
                 if(!spielfeld.istGegnerFeld){
-                    placeShip(spielfeld,posx, posy);
+
                 }else{
                     System.out.println("Spielfeld ist gegner");
                 }
@@ -198,7 +227,6 @@ public class MainGameController implements Initializable {
             //Schiffe entfernen
             if(spielfeld.felder[posx][posy].gesetzt){
                 spielfeld.felder[posx][posy].gesetzt = false;
-                spielfeld.deselectRowAndColumn(spielfeld, posx, posy);
                 System.out.println("Feld wurde abgewählt");
             }
         }
@@ -253,36 +281,6 @@ public class MainGameController implements Initializable {
         return length;
     }
 
-    // schau hier mal ob des nur ein vorkommen löscht aus array list ist noc unsiche
-    // und gucken ob des effizient ist, wird ja immer geschlieift wenn man clicked
-    private void placeShip(Spielfeld spielfeld, int posx, int posy){
-        if (!spielfeld.felder[posx][posy].gesetzt) {
-            spielfeld.felder[posx][posy].gesetzt = true;
-            spielfeld.selectFeld(posx, posy);
-            // Entferne das passende Schiff aus der Liste
-            int nachbarWert = nachbarFeldGewaehlt(spielfeld, posx, posy); // Berechnung nur einmal
-
-            //Suche das Schiff in der Liste und entferne ein Vorkommen
-            for (int i = 0; i < spielfeld.schiffe.size(); i++) {
-                int schiff = spielfeld.schiffe.get(i);
-                if (schiff == nachbarWert) {
-                    spielfeld.schiffe.remove(i);
-                    System.out.println("Schiff mit Wert " + nachbarWert + " aus der Liste entfernt.");
-                    // Da die Liste durch das Entfernen eines Elements kleiner wird,
-                    // muss der Index um eins reduziert werden, um das nächste Element korrekt zu überprüfen.
-                    i--;
-                    break;
-                }
-            }
-            System.out.println("Hier ist schiffe von spieler die zur Asuwahl stehen : " +spielfeld.schiffe);
-
-            if (spielfeld.schiffe.isEmpty()) {
-                System.out.println("State wird auf 1 gesetzt");
-                currentState++;
-            }
-        }
-
-    }
 
     public void handleHit(int x, int y){
         //gegnerspielfeld.selectFeld(x,y,Color.GREEN);

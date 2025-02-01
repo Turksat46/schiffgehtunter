@@ -16,6 +16,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import java.io.IOException;
+import java.util.Map;
 
 
 public class CreateGameController {
@@ -154,7 +155,7 @@ public class CreateGameController {
         }).start();
     }
 
-    //Überarbeiten sodass auch schiffe übergeben werden können
+    //Überarbeiten so das auch schiffe übergeben werden können
     public void startMultiplayerGame(Stage connectionStage, int groesse) throws IOException {
         soundPlayer.playSound();
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("multiplayer-main-game-view.fxml"));
@@ -181,10 +182,26 @@ public class CreateGameController {
         thisstage.close();
     }
 
-    public void openLoadFileDialog() {
+    public void openLoadFileDialog() throws IOException {
         soundPlayer.playSound();
         ladenhinweislabel.setText("Bitte eine Save-Datei im Dialog öffnen...");
-        saveFileManager.openFileChooser();
+        Map<String, Object> data = saveFileManager.openFileChooser();
+        if(data != null) {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("main-game-view.fxml"));
+            Scene scene = new Scene(fxmlLoader.load());
+            Stage stage = new Stage();
+            stage.setTitle("Spielfeld");
+            stage.setScene(scene);
+
+            mainGameController = fxmlLoader.getController();
+            mainGameController.setupSpiel(stage, scene, data);
+            stage.show();
+
+            Stage thisstage = (Stage) cb.getScene().getWindow();
+            thisstage.close();
+        }else{
+            ladenhinweislabel.setText("Datei konnte nicht geladen werden!");
+        }
 
     }
 }

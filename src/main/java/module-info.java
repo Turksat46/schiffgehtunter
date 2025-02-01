@@ -18,6 +18,7 @@ module com.turksat46.schiffgehtunter {
 
     opens com.turksat46.schiffgehtunter to javafx.fxml;
     opens com.turksat46.schiffgehtunter.netzwerk to javafx.fxml;
+    opens com.turksat46.schiffgehtunter.other to com.google.gson;
     exports com.turksat46.schiffgehtunter;
     exports com.turksat46.schiffgehtunter.netzwerk;
     exports com.turksat46.schiffgehtunter.other;
