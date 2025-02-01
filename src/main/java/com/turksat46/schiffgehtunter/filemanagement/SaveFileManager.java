@@ -28,12 +28,12 @@ public class SaveFileManager {
             File file = fileChooser.getSelectedFile();
             String filePath = file.getAbsolutePath();
             // Ensure the file has the .txt extension
-            if (!filePath.endsWith(".txt")) {
+            if (!filePath.endsWith(".save")) {
                 file = new File(filePath + ".save");
             }
             try{
                 FileWriter writer = new FileWriter(file.getAbsolutePath());
-                writer.write("Test");
+                writer.write(data);
                 writer.close();
             } catch (IOException e) {
                 throw new RuntimeException(e);

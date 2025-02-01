@@ -11,6 +11,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.Node;
@@ -37,7 +38,12 @@ public class newSpielfeld {
 
     private final Set<Cell> hitCells = new HashSet<>();
 
-
+    /***
+     *
+     * @param size Feldgröße
+     * @param isEnemyField
+     * @param root
+     */
     public newSpielfeld(int size, boolean isEnemyField, BorderPane root) {
         newSpielfeld.GRID_SIZE = size;
         newSpielfeld.root = root;
@@ -103,6 +109,8 @@ public class newSpielfeld {
 
     private GridPane createGridPane() {
         GridPane grid = new GridPane();
+        grid.setMaxHeight(4000);
+        grid.setMaxWidth(4000);
         for (int row = 0; row < GRID_SIZE; row++) {
             for (int col = 0; col < GRID_SIZE; col++) {
                 Rectangle cell = new Rectangle(CELL_SIZE, CELL_SIZE, Color.TRANSPARENT);
@@ -201,6 +209,10 @@ public class newSpielfeld {
             ship.setTranslateY(ship.getTranslateY() + targetY - bounds.getMinY());
         }
 
+    }
+
+    public Map<Group, Set<Cell>> getShipCellMap() {
+        return shipCellMap;
     }
 
     private void updateShipCellMap() {

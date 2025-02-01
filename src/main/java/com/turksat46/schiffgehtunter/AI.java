@@ -126,15 +126,19 @@ public class AI {
                     }
                 }
             }
-            mainGameController.handleHit(posx, posy);
+
 
         }
-
+        mainGameController.handleHit(posx, posy);
         getNextMove();
     }
 
     public void receiveHit(int x, int y, boolean isShip){
         System.out.println("AI.java: Position an: " + x + " " + y + " ist ein Schiff: "+isShip);
+    }
+
+    public void allShipsShot(){
+        mainGameController.handleWinForOpponent();
     }
 
     public void getNextMove(){

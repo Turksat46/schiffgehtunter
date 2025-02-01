@@ -1,5 +1,7 @@
 package com.turksat46.schiffgehtunter.filemanagement;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.turksat46.schiffgehtunter.AI;
 import com.turksat46.schiffgehtunter.MainGameController;
 import com.turksat46.schiffgehtunter.Spielfeld;
@@ -31,6 +33,8 @@ public class SaveData {
     Feld[][] felder;
     ArrayList<Integer> schiffe = new ArrayList<>();
 
+    Map<String, Object> data = new HashMap<>();
+
 
     public SaveData(MainGameController mainGameController, newSpielfeld newSpielfeld, Spielfeld gegnerfeld, AI bot){
         this.mainGameController = mainGameController;
@@ -41,14 +45,20 @@ public class SaveData {
 
     //Diese Funktion wird für das Sammeln nötiger Daten gebraucht
     public String sampleData(){
-        currentState = MainGameController.currentState;
-        currentMode = MainGameController.currentMode;
-        currentDifficulty = MainGameController.currentDifficulty;
-        shipCellMap = newSpielfeld.shipCellMap;
-        feld = spielfeld.feld;
-        felder = spielfeld.felder;
-        schiffe = spielfeld.schiffe;
-        return this.toString();
+        data.put("currentState", currentState);
+        data.put("currentMode", currentMode);
+        data.put("currentDifficulty", currentDifficulty);
+        data.put("groesse", groesse);
+        data.put("shipCellMap", shipCellMap);
+        data.put("feld", feld);
+        data.put("felder", felder);
+        data.put("schiffe", schiffe);
+
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        String json = gson.toJson(data);
+
+        return json;
+
     }
 
 }

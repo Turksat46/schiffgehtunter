@@ -4,6 +4,7 @@ import com.google.gson.GsonBuilder;
 import com.turksat46.schiffgehtunter.backgroundgeneration.BackgroundGenerator;
 import com.turksat46.schiffgehtunter.filemanagement.SaveData;
 import com.turksat46.schiffgehtunter.filemanagement.SaveFileManager;
+import com.turksat46.schiffgehtunter.other.Cell;
 import com.turksat46.schiffgehtunter.other.Music;
 import javafx.animation.FadeTransition;
 import javafx.animation.ScaleTransition;
@@ -11,6 +12,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -65,6 +67,9 @@ public class MainGameController implements Initializable {
     //Spielmodus P = Spieler, C=Computer
     public String[] mode = {"PvsC", "PvsP", "CvsC"};
 
+    public Map<Group, Set<Cell>> shipCellMap;
+    private final Set<Cell> hitCells = new HashSet<>();
+
     public MainGameController(){
         saveFileManager = new SaveFileManager();
     }
@@ -88,6 +93,7 @@ public class MainGameController implements Initializable {
     public void startGame(){
         currentState = 1;
         spielerspielfeld.changeEditableState(false);
+        shipCellMap = spielerspielfeld.getShipCellMap();
     }
 
     public void setupSpiel(int groesse, Stage stage, int currentDifficulty, int currentMode, Scene scene) throws FileNotFoundException {
@@ -416,7 +422,42 @@ public class MainGameController implements Initializable {
     }
 
     public void receiveShoot(int posx, int posy){
+        System.out.println("receiveShot at: " + posx + ", " + posy);
         spielerspielfeld.selectFeld(posx, posy, Color.DARKRED);
+        Iterator<Map.Entry<Group, Set<Cell>>> iterator = shipCellMap.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<Group, Set<Cell>> entry = iterator.next();
+            Group schiffGroup = entry.getKey();
+            Set<Cell> occupiedCells = entry.getValue();
+            System.out.println(shipCellMap.toString());
+            for (Cell cell : occupiedCells) {
+                if (cell.getRow() == posx && cell.getCol() == posy) {
+                    // Füge die Trefferzelle hinzu
+                    hitCells.add(cell);
+                    // Überprüfe, ob alle Zellen dieses Schiffs getroffen sind
+                    if (hitCells.containsAll(occupiedCells)) {
+                        // Das gesamte Schiff wurde versenkt
+                        iterator.remove();
+                        if(shipCellMap.isEmpty()){
+                            bot.allShipsShot();
+                        }
+                        bot.receiveHit(posx, posy, true);
+                    }else{
+                        //Ein Feld von 'nem Schiff wurde getroffen
+                        bot.receiveHit(posx, posy, true);
+                    }
+                    //return 1; // Treffen, aber nicht alle Zellen des Schiffs sind getroffen
+
+                }else{
+                    bot.receiveHit(posx, posy, false);
+                }
+            }
+
+        }
+
+
+
+        //return 0; // Kein Treffer
         //bot.receiveHit(posx, posy, spielerspielfeld.felder[posx][posy].istSchiff);
         currentState = 1;
     }
@@ -433,8 +474,7 @@ public class MainGameController implements Initializable {
         GsonBuilder gsonBuilder = new GsonBuilder();
         Gson gson = gsonBuilder.create();
         SaveData saveData = new SaveData(this, spielerspielfeld, gegnerspielfeld, bot);
-        String data = gson.toJson(saveData.sampleData());
-        saveFileManager.openSaveFileChooserAndSave(data);
+        saveFileManager.openSaveFileChooserAndSave(saveData.sampleData());
     }
 
 }

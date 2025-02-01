@@ -37,7 +37,7 @@
                   <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                </padding>
             </Button>
-            <Button mnemonicParsing="false" prefHeight="26.0" prefWidth="295.0" text="Einstellungen">
+            <Button mnemonicParsing="false" onAction="#openSettings" prefHeight="26.0" prefWidth="295.0" text="Einstellungen">
                <VBox.margin>
                   <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                </VBox.margin>

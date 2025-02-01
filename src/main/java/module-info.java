@@ -20,4 +20,5 @@ module com.turksat46.schiffgehtunter {
     opens com.turksat46.schiffgehtunter.netzwerk to javafx.fxml;
     exports com.turksat46.schiffgehtunter;
     exports com.turksat46.schiffgehtunter.netzwerk;
+    exports com.turksat46.schiffgehtunter.other;
 }
