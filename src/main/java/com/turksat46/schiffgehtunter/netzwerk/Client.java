@@ -19,6 +19,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.io.*;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
@@ -57,6 +58,8 @@ public class Client implements Runnable{
 
     static Stack<Integer> ships = new Stack<>();
 
+    private static volatile String ip;
+
 
 
     public void onBackPressed() throws IOException {
@@ -91,21 +94,31 @@ public class Client implements Runnable{
             }
         });
 
-        connectButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                if (!clientThread.isAlive()) { // Überprüfen, ob der Thread schon läuft
-                    clientThread.setDaemon(true);
-                    clientThread.start();
-                }
+        connectButton.setOnAction(actionEvent -> {
+            ip = ipInput.getText();
+            System.out.println("Trying to connect to server at IP: " + ip + " on Port: " + port);
+            if (clientThread.getState() == Thread.State.NEW) {
+                clientThread.setDaemon(true);
+                clientThread.start();
+            } else if (!clientThread.isAlive()) {
+                // Client-Thread wurde gestoppt oder läuft nicht mehr -> Neuen Thread erstellen
+                clientThread = new Thread(new Client());
+                clientThread.setDaemon(true);
+                clientThread.start();
+
+            } else {
+                System.out.println("Connection thread is already running...");
             }
         });
+
     }
 
 
     public void startConnection() throws IOException {
         progressBar.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
-        s = new Socket(ipInput.getText(), port);
+        System.out.println("ip " +ip);
+        s = new Socket(ip, port);
+
         System.out.println("Connection established.");
 
         progressBar.setProgress(1.0);

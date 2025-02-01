@@ -109,8 +109,7 @@ public class establishConnection{
 
     public static String getLocalIPAddress() {
         try {
-            InetAddress localhost = InetAddress.getLocalHost();
-            return localhost.getHostAddress(); // Rückgabe der IP-Adresse
+            return InetAddress.getLocalHost().getHostAddress(); // Rückgabe der IP-Adresse
         } catch (UnknownHostException e) {
             e.printStackTrace();
             return null; // Falls ein Fehler auftritt
