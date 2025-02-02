@@ -17,6 +17,7 @@ import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
@@ -41,6 +42,8 @@ public class MainGameController implements Initializable {
     public BorderPane spielerstackpane, gegnerstackpane;
 
     @FXML AnchorPane anchorPane;
+    @FXML
+    Label hinweistext;
 
     @FXML public HBox container;
     @FXML public Pane images;
@@ -48,6 +51,8 @@ public class MainGameController implements Initializable {
     @FXML public HBox label1;
 
     @FXML public Button startButton;
+
+    @FXML HBox draggableContainer;
 
     public static int currentState, currentMode, currentDifficulty, groesse;
     static GridPane feld;
@@ -111,21 +116,33 @@ public class MainGameController implements Initializable {
         currentState = 1;
         spielerspielfeld.changeEditableState(false);
         shipCellMap = spielerspielfeld.getShipCellMap();
+        hinweistext.setVisible(false);
+        startButton.setVisible(false);
     }
 
     public void setupSpiel(int groesse, Stage stage, int currentDifficulty, int currentMode, Scene scene) throws FileNotFoundException {
         //spielerspielfeld = new Spielfeld(groesse,  false);
-        gegnerspielfeld = new Spielfeld(groesse,  true, false);
+        gegnerspielfeld = new Spielfeld(groesse,  true, false, gegnerstackpane);
 
-        spielerspielfeld = new newSpielfeld(groesse, false, spielerstackpane);
+        spielerspielfeld = new newSpielfeld(groesse, false, spielerstackpane, draggableContainer);
         //gegnerspielfeld = new newSpielfeld(groesse, true, gegnerstackpane);
 
         //spielerstackpane.getChildren().add(newSpielfeld.gridPane);
-        gegnerstackpane.getChildren().add(gegnerspielfeld.gridPane);
+        //agegnerstackpane.getChildren().add(gegnerspielfeld.gridPane);
+
+        if(groesse <= 7){
+            stage.setMinWidth(1110);
+            stage.setMinHeight(650);
+        }else if(groesse <= 15){
+            stage.setMinWidth(1510);
+            stage.setMinHeight(800);
+        }else if(groesse > 15){
+            stage.setMaximized(true);
+        }
 
         // StackPane-Margen setzen
         HBox.setMargin(spielerstackpane, new Insets(10, 10, 100, 10)); // Abstand für spielerstackpane
-        HBox.setMargin(gegnerstackpane, new Insets(10, 10, 100, 150)); // Abstand für gegnerstackpane
+        HBox.setMargin(gegnerstackpane, new Insets(10, 10, 100, 300)); // Abstand für gegnerstackpane
 
         setupBase(groesse, stage, currentDifficulty, currentMode, scene);
 
@@ -143,14 +160,14 @@ public class MainGameController implements Initializable {
         Double currentModeDouble = (double) data.get("currentMode");
         int currentMode = currentModeDouble.intValue();
 
-        gegnerspielfeld = new Spielfeld(groesse,  true, false, data);
+        gegnerspielfeld = new Spielfeld(groesse,  true, false, gegnerstackpane);
 
         spielerspielfeld = new newSpielfeld(groesse, false, spielerstackpane, data);
 
         //gegnerspielfeld = new newSpielfeld(groesse, true, gegnerstackpane);
 
         //spielerstackpane.getChildren().add(newSpielfeld.gridPane);
-        gegnerstackpane.getChildren().add(gegnerspielfeld.gridPane);
+        //gegnerstackpane.getChildren().add(gegnerspielfeld.gridPane);
 
         // StackPane-Margen setzen
         //HBox.setMargin(spielerstackpane, new Insets(10, 10, 100, 10)); // Abstand für spielerstackpane

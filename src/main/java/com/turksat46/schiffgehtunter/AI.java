@@ -227,7 +227,7 @@ public class AI {
         double[][] probabilities = calculateProbabilities();
         Random random = new Random();
         double probability = random.nextDouble();
-        if(probability < 0.5){
+        if(probability < 0.4){
             Position bestMove = selectBestMove(probabilities);
             validMoves.remove(bestMove);
             mainGameController.receiveShoot(bestMove.x, bestMove.y);

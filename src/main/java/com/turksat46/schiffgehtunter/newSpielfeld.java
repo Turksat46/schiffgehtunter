@@ -2,6 +2,7 @@ package com.turksat46.schiffgehtunter;
 
 import com.turksat46.schiffgehtunter.netzwerk.Server;
 import javafx.animation.ScaleTransition;
+import javafx.fxml.FXML;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.scene.Group;
@@ -25,6 +26,7 @@ public class newSpielfeld {
     //  FÜRS SPEICHERN WICHTIGE VARIABLEN
     //
 
+
     private static GridPane gridPane;
     private static int GRID_SIZE;
     private static BorderPane root;
@@ -44,7 +46,7 @@ public class newSpielfeld {
      * @param isEnemyField
      * @param root
      */
-    public newSpielfeld(int size, boolean isEnemyField, BorderPane root) {
+    public newSpielfeld(int size, boolean isEnemyField, BorderPane root, HBox draggableContainer) {
         newSpielfeld.GRID_SIZE = size;
         newSpielfeld.root = root;
 
@@ -56,11 +58,6 @@ public class newSpielfeld {
         List<Integer> shipSizesList = new ArrayList<>();
 
         if (!isEnemyField) {
-            ScrollPane scrollPane = new ScrollPane();
-            scrollPane.setFitToWidth(true);
-            scrollPane.setPadding(new Insets(10));
-
-            HBox draggableContainer = new HBox(10);
             draggableContainer.setPadding(new Insets(10));
 
             int[] shipSizes = {5, 4, 3, 2};
@@ -81,8 +78,8 @@ public class newSpielfeld {
                     shipSizesList.add(shipSize);
                 }
             }
-            scrollPane.setContent(draggableContainer);
-            root.setBottom(draggableContainer);
+            //scrollPane.setContent(draggableContainer);
+            //root.setBottom(draggableContainer);
         }
         Server.setShips(shipSizesList);
     }

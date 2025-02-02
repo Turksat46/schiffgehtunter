@@ -83,9 +83,9 @@ public class MultipayerMainGameController extends MainGameController implements 
     @Override
     public void setupSpiel(int groesse, Stage stage, int currentDifficulty, int currentMode, Scene scene) throws FileNotFoundException {
         //spielerspielfeld = new Spielfeld(groesse,  false);
-        gegnerspielfeld = new Spielfeld(groesse,  true, true);
+        gegnerspielfeld = new Spielfeld(groesse,  true, true, gegnerstackpane);
 
-        spielerspielfeld = new newSpielfeld(groesse, false, spielerstackpane);
+        spielerspielfeld = new newSpielfeld(groesse, false, spielerstackpane, draggableContainer);
         //gegnerspielfeld = new newSpielfeld(groesse, true, gegnerstackpane);
 
         //spielerstackpane.getChildren().add(newSpielfeld.gridPane);
@@ -111,7 +111,7 @@ public class MultipayerMainGameController extends MainGameController implements 
     //Konstruktor mit schiff übergabe
     public void setupSpiel(int groesse, Stage stage, int currentDifficulty, int currentMode, Scene scene, List<Integer> ships) throws FileNotFoundException {
         //spielerspielfeld = new Spielfeld(groesse,  false);
-        gegnerspielfeld = new Spielfeld(groesse, true,  true);
+        gegnerspielfeld = new Spielfeld(groesse, true,  true, gegnerstackpane);
 
         spielerspielfeld = new newSpielfeld(groesse, false, spielerstackpane, ships);
         //gegnerspielfeld = new newSpielfeld(groesse, true, gegnerstackpane);

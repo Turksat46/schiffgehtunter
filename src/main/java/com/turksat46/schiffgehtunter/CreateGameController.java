@@ -105,6 +105,7 @@ public class CreateGameController {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("main-game-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
         Stage stage = new Stage();
+        //stage.setResizable(false);
         stage.setTitle("Spielfeld");
         stage.setScene(scene);
 

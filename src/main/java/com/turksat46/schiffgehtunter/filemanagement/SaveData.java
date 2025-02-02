@@ -29,7 +29,10 @@ public class SaveData {
     int[][] feld;
     Feld[][] felder;
 
+    //
     Map<String, Object> data = new HashMap<>();
+
+    //AI Daten
 
 
     public SaveData(MainGameController mainGameController, newSpielfeld newSpielfeld, Spielfeld gegnerfeld, AI bot){
@@ -82,7 +85,6 @@ public class SaveData {
             shipsDataList.add(shipData);
         }
         data.put("ships", shipsDataList); // Save the list of ship data instead of shipCellMap directly
-        // --- End of Modified Ship Saving Logic ---
         data.put("feld", feld);
         data.put("felder", felder);
 

@@ -4,6 +4,7 @@ import com.turksat46.schiffgehtunter.other.Music;
 import com.turksat46.schiffgehtunter.other.Ship;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseButton;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
@@ -28,7 +29,7 @@ public class Spielfeld {
     Image sandTexture;
     Image tntTexture;
 
-    public Spielfeld (int groesse, boolean istGegnerFeld, boolean isMultiplayer){
+    public Spielfeld (int groesse, boolean istGegnerFeld, boolean isMultiplayer, BorderPane root){
         this.feld= new int [groesse][groesse];
         this.gridPane = new GridPane();
         this.groesse = groesse;
@@ -42,6 +43,7 @@ public class Spielfeld {
         }
         this.istGegnerFeld = istGegnerFeld;
         initFeld(isMultiplayer);
+        root.setCenter(gridPane);
 
         // Lade die Texturen
         try {
@@ -54,11 +56,12 @@ public class Spielfeld {
 
     }
 
-    public Spielfeld (int groesse, boolean istGegnerFeld, boolean isMultiplayer, Map<String, Object> data){
+    public Spielfeld (int groesse, boolean istGegnerFeld, boolean isMultiplayer, BorderPane root, Map<String, Object> data){
         this.feld= new int [groesse][groesse];
         this.gridPane = new GridPane();
         this.groesse = groesse;
         felder = new Feld[groesse][groesse];
+        root.setCenter(gridPane);
         if (isMultiplayer){
             multipayerMainGameController = new MultipayerMainGameController();
         }
