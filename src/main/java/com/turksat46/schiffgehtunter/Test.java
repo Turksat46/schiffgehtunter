@@ -1,19 +1,14 @@
 package com.turksat46.schiffgehtunter;
+
 import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 public class Test extends Application {
-
-    public static void main(String[] args) {
-        launch(args);
-    }
 
     private Stage gridStage; // Zweite Stage für die GridPanes
     private GridPane grid1;
@@ -79,7 +74,7 @@ public class Test extends Application {
         fillGridPane(grid2, gridSize);
     }
 
-    // Erstellt ein skalierbares GridPane
+    // Erstellt ein skalierbares GridPane mit CellPanes
     private GridPane createGridPane(int gridSize) {
         GridPane gridPane = new GridPane();
         gridPane.setHgap(5);
@@ -88,7 +83,7 @@ public class Test extends Application {
         return gridPane;
     }
 
-    // Füllt das GridPane mit Buttons und setzt die Constraints
+    // Füllt das GridPane mit CellPanes und setzt die Constraints
     private void fillGridPane(GridPane gridPane, int gridSize) {
         for (int i = 0; i < gridSize; i++) {
             ColumnConstraints col = new ColumnConstraints();
@@ -102,13 +97,25 @@ public class Test extends Application {
 
         for (int row = 0; row < gridSize; row++) {
             for (int col = 0; col < gridSize; col++) {
-                Button btn = new Button((row + 1) + "," + (col + 1));
-                btn.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-                GridPane.setHgrow(btn, Priority.ALWAYS);
-                GridPane.setVgrow(btn, Priority.ALWAYS);
-                gridPane.add(btn, col, row);
+                Pane cell = new CellPane();
+                GridPane.setHgrow(cell, Priority.ALWAYS);
+                GridPane.setVgrow(cell, Priority.ALWAYS);
+                gridPane.add(cell, col, row);
             }
         }
     }
 
+    // Klasse für eine einzelne Zelle mit einer sichtbaren Border
+    private static class CellPane extends Pane {
+        public CellPane() {
+            setBorder(new Border(new BorderStroke(
+                    Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(1)
+            )));
+            setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        }
+    }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
 }
