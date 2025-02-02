@@ -25,9 +25,9 @@ public class newSpielfeld {
     //  FÜRS SPEICHERN WICHTIGE VARIABLEN
     //
 
-    public static GridPane gridPane;
+    private static GridPane gridPane;
     private static int GRID_SIZE;
-    public static BorderPane root;
+    private static BorderPane root;
     private static int CELL_SIZE = 50;
     public Map<Group, Set<Cell>> shipCellMap = new HashMap<>();
     public List<Map<String, Object>> shipCellListFromData = new ArrayList<>();
@@ -271,11 +271,11 @@ public class newSpielfeld {
         //grid.setMaxWidth(4000);
 
         for (int row = 0; row < GRID_SIZE; row++) {
-
-
             for (int col = 0; col < GRID_SIZE; col++) {
                 Rectangle cell = new Rectangle(CELL_SIZE, CELL_SIZE, Color.TRANSPARENT);
                 cell.setStroke(Color.BLACK);
+                //GridPane.setHgrow(cell, Priority.ALWAYS);
+                //GridPane.setVgrow(cell, Priority.ALWAYS);
                 grid.add(cell, col, row);
             }
         }
