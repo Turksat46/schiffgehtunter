@@ -1,69 +1,77 @@
-package com.turksat46.schiffgehtunter;
+package com.turksat46.schiffgehtunter.backgroundgeneration;
 
-import com.turksat46.schiffgehtunter.other.Music;
 import javafx.animation.AnimationTimer;
-import javafx.application.Application;
+import javafx.animation.PathTransition;
+import javafx.event.EventType;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.geometry.Point3D;
-import javafx.scene.*;
+import javafx.geometry.Bounds;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Label;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.*;
-import javafx.scene.paint.PhongMaterial;
-import javafx.stage.Stage;
-import javafx.scene.PointLight;
+import javafx.scene.*;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Box;
+import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.Path;
+import javafx.scene.shape.QuadCurveTo;
+import javafx.stage.Stage;
+import javafx.util.Duration;
 
-import java.io.IOException;
-import java.net.URL;
 import java.util.Objects;
 import java.util.Random;
-import java.util.ResourceBundle;
 
-public class HelloController implements Initializable {
+public class BackgroundGenerator {
 
-    Music soundsPlayer = Music.getInstance();
-
-    //
-    // Kommentare zur Hintergrundzeichnung bei @MainGameController.java anschauen
-    //
-    @FXML
-    private VBox rootBox;
-    @FXML
-    private Label welcomeText;
-
-    private Canvas backgroundCanvas;
-
-    private static final int WIDTH = 400;
-    private static final int HEIGHT = 600;
+    //Gesamtgröße des Hintergrunds
+    private static int WIDTH = 2500;
+    private static int HEIGHT = 800;
+    //Größe eines Blocks
     private static final int TILE_SIZE = 30;
-    private static final int WORLD_WIDTH_TILES = 30;
-    private static final int WORLD_HEIGHT_TILES = 20;
+    //Menge der Blöcke in die jeweiligen Richtungen
+    private static final int WORLD_WIDTH_TILES = 37;
+    private static final int WORLD_HEIGHT_TILES = 30;
+    //Experimental: Schatten
     private static final double SHADOW_OFFSET_X = 2;
     private static final double SHADOW_OFFSET_Y = 2;
 
+    //Hintergrundmap
     private Tile[][] world;
+    //Player ignorieren, das wird für die Kamera gebraucht
+    //TODO: Playerwerte allgemein entfernen
     private double playerX;
     private double playerY;
+    //Jeweiligen Texturen
     private Image sandTexture;
     private Image waterTexture;
+    // Pfad zum Schneeball-Bild
+    private Image snowballImage;
 
+    //Hintergrundcanvas, worauf gezeichnet wird
+    private Canvas backgroundCanvas;
+
+    static javafx.scene.layout.Pane rootElement;
+
+    //Typen von Blöcken
     public enum Tile {
         WATER, SAND
     }
 
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
-        createBackground();
+    public BackgroundGenerator(javafx.scene.layout.Pane rootElement) {
+        BackgroundGenerator.rootElement = rootElement;
+        try{
+            snowballImage = new Image(getClass().getResourceAsStream("/com/turksat46/schiffgehtunter/images/snowball.jpeg"));
+        }catch (NullPointerException e){
+            System.err.println("Schneeball-Ressource konnte nicht geladen werden!");
+            throw e;
+        }
+
     }
 
-    private void createBackground() {
+    public void createBackground() {
         backgroundCanvas = new Canvas(WIDTH, HEIGHT);
         GraphicsContext gc = backgroundCanvas.getGraphicsContext2D();
 
@@ -84,7 +92,6 @@ public class HelloController implements Initializable {
         new AnimationTimer() {
             @Override
             public void handle(long now) {
-                // 1. Zeichne alles auf den Canvas
                 draw(gc);
             }
         }.start();
@@ -99,14 +106,31 @@ public class HelloController implements Initializable {
             }
         }
 
-        // Definiere den Bereich für die Insel am unteren Rand
-        int islandStartY = WORLD_HEIGHT_TILES - 5; // Beginnt in den untersten 5 Reihen
+        int islandStartY = WORLD_HEIGHT_TILES - 10;
         Random random = new Random();
 
+        // Insel in der Mitte erstellen
+        int middleXStart = WORLD_WIDTH_TILES / 2 - 2; // Starte etwas links von der Mitte
+        int middleXEnd = WORLD_WIDTH_TILES / 2 + 2;   // Ende etwas rechts von der Mitte
+
+        for (int x = middleXStart; x <= middleXEnd; x++) {
+            for (int y = 2; y < WORLD_HEIGHT_TILES - 2; y++) { // Insel geht von unten nach oben, etwas Platz lassen
+                // Füge etwas Zufall hinzu, um die Inselform interessanter zu gestalten
+                // Innere Teile der Insel immer Sand
+                if (x > middleXStart && x < middleXEnd) {
+                    world[x][y] = Tile.SAND;
+                } else {
+                    // Zufällige Entscheidung für die Seiten
+                    if (random.nextDouble() > 0.4) { // Hier kannst du die Wahrscheinlichkeit anpassen
+                        world[x][y] = Tile.SAND;
+                    }
+                }
+            }
+        }
+        //Kanten randomisieren
         for (int x = 0; x < WORLD_WIDTH_TILES; x++) {
             for (int y = islandStartY; y < WORLD_HEIGHT_TILES; y++) {
-                // Mit etwas Zufall eine unregelmäßige Küstenlinie erzeugen
-                if (y == islandStartY && random.nextDouble() < 0.5) { // Wahrscheinlichkeit für Wasser am oberen Rand der Insel
+                if (y == islandStartY && random.nextDouble() < 0.3) { // Wahrscheinlichkeit für Wasser am oberen Rand der Insel
                     continue;
                 }
                 world[x][y] = Tile.SAND;
@@ -117,6 +141,7 @@ public class HelloController implements Initializable {
     private javafx.scene.paint.Color getShadowColor(javafx.scene.paint.Color baseColor) {
         return baseColor.darker();
     }
+
 
     private void draw(GraphicsContext gc) {
         //gc.clearRect(0, 0, WIDTH, HEIGHT);
@@ -155,11 +180,10 @@ public class HelloController implements Initializable {
             }
         }
 
-        // 2. Erstelle einen Snapshot des Canvas, nachdem alles gezeichnet wurde
+        //Snapshot von der erstellten Welt erstellen und diese in Hintergrund speichern und anzeigen
         SnapshotParameters params = new SnapshotParameters();
         WritableImage image = backgroundCanvas.snapshot(params, null);
 
-        // 3. Erstelle ein BackgroundImage vom Snapshot
         BackgroundImage backgroundImage = new BackgroundImage(
                 image,
                 BackgroundRepeat.NO_REPEAT,
@@ -167,67 +191,10 @@ public class HelloController implements Initializable {
                 BackgroundPosition.DEFAULT,
                 BackgroundSize.DEFAULT
         );
-
-        // 4. Erstelle ein Background Objekt mit dem BackgroundImage
         Background background = new Background(backgroundImage);
-
-        // 5. Setze den Hintergrund des VBox
-        rootBox.setBackground(background);
-
-
+        rootElement.setBackground(background);
     }
 
 
 
-    @FXML
-    protected void onHelloButtonClick() throws IOException {
-        soundsPlayer.playSound();
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("createGame.fxml"));
-        Stage stage = new Stage();
-        stage.setTitle("Neues Spiel erstellen");
-        Scene scene = new Scene(fxmlLoader.load());
-        stage.setScene(scene);
-        stage.setResizable(false);
-        stage.setWidth(640);
-        stage.setHeight(580);
-        stage.show();
-        hideCurrentStage();
-    }
-
-    @FXML
-    protected void onMultiplayerClick() throws IOException {
-        soundsPlayer.playSound();
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("connect.fxml"));
-        Stage stage = new Stage();
-        stage.setTitle("Spiel finden");
-        stage.setScene(new Scene(fxmlLoader.load()));
-        stage.show();
-        hideCurrentStage();
-    }
-
-    public void hideCurrentStage() {
-        Stage stage = (Stage) welcomeText.getScene().getWindow();
-        stage.hide();
-    }
-
-    @FXML
-    protected void onSettingsButtonClick() throws IOException {
-        soundsPlayer.playSound();
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("settings.fxml"));
-        Stage stage = new Stage();
-        stage.setTitle("Einstellungen");
-        stage.setScene(new Scene(fxmlLoader.load()));
-        stage.show();
-    }
-
-    @FXML
-    protected void onExitButtonClick() {
-        soundsPlayer.playSound();
-        System.exit(0);
-    }
-
-    @FXML
-    protected void onEasterEggClick(){
-        soundsPlayer.playEasterEgg();
-    }
 }

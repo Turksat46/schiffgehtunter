@@ -1,0 +1,95 @@
+
+/* Set the background to a pixelated Minecraft-style stone texture */
+.root {
+    -fx-background-image: url("images/stone_texture.jpg");
+    -fx-background-size: cover;
+}
+
+/* Style buttons to be blocky with a stone-like border */
+.button {
+
+
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-font-family: "Press Start 2P";
+    -fx-background-color: #333333;
+
+    -fx-min-width: 100px;
+    -fx-min-height: 40px;
+}
+
+/* When hovered, buttons become slightly lighter */
+.button:hover {
+    -fx-background-color: #282828;
+}
+
+/* Style labels with a pixelated look */
+.label {
+    -fx-font-family: "Press Start 2P";
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+}
+
+#topic{
+    -fx-font-family: "Press Start 2P";
+    -fx-text-fill: white;
+    -fx-font-size: 25px;
+}
+
+/* ChoiceBox styling */
+.choice-box {
+        -fx-background-color: #333333; /* Dark background */
+        -fx-border-color: #444444;     /* Dark border */
+        -fx-border-width: 1px;         /* Border width */
+        -fx-font-family: "Press Start 2P"; /* Custom font */
+        -fx-text-fill: #000000;        /* White text */
+        -fx-background-insets: 0, 1;   /* Subtle inset effect */
+        -fx-background-radius: 5px;    /* Rounded corners */
+        -fx-border-radius: 5px;        /* Matching border radius */
+}
+
+.choice-box .menu-item > .label{
+    -fx-text-fill: #000000;
+}
+
+
+.slider {
+    -fx-padding: 5px;
+    -fx-opacity: 0.9; /* Slight transparency */
+}
+
+.slider .track {
+    -fx-background-color: #aaaaaa; /* Light gray track */
+    -fx-background-radius: 5px;
+}
+
+.slider .thumb {
+    -fx-background-color: #333333; /* Orange thumb */
+    -fx-background-radius: 25%;
+    -fx-pref-width: 25px;
+    -fx-pref-height: 25px;
+}
+
+.slider .tick-mark {
+    -fx-stroke: #444444; /* Dark tick marks */
+}
+
+.slider .tick-label {
+    -fx-text-fill: white; /* White tick labels */
+    -fx-font-size: 12px;
+}
+
+/* TextField styling to match Minecraft text boxes */
+.text-field {
+    -fx-background-color: #333333;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-family: "Press Start 2P";
+    -fx-padding: 10px;
+}
+
+/* Separator bar resembling Minecraft inventory dividers */
+.separator {
+    -fx-border-color: black; /* Set the border color to black */
+    -fx-border-width: 0px;   /* Define a border width */
+}

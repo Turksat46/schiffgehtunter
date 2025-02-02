@@ -1,88 +1,260 @@
 package com.turksat46.schiffgehtunter.netzwerk;
 
+import com.turksat46.schiffgehtunter.MainGameController;
+import com.turksat46.schiffgehtunter.MultipayerMainGameController;
+import com.turksat46.schiffgehtunter.other.Music;
+import javafx.application.Platform;
+import javafx.scene.paint.Color;
+
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Stack;
+import java.util.concurrent.CountDownLatch;
+import java.util.stream.Collectors;
 
-class Server {
+import static com.turksat46.schiffgehtunter.MultipayerMainGameController.dyeCell;
+import static com.turksat46.schiffgehtunter.MultipayerMainGameController.shootShipMultiplayer;
 
-    private ServerSocket server;
-    private Socket s;
-    private BufferedReader in;
-    private Writer out;
-    private BufferedReader usr;
-    private final int port = 50000;
+public class Server implements Runnable {
 
-    public void startServer() throws IOException {
+    private static ServerSocket server;
+    private static Socket s;
+    private static BufferedReader in;
+    private static Writer out;
+    private static BufferedReader usr;
+    private static final int port = 50000;
+    public static boolean connectionEstablished; // Callback-Funktion
+    private static int groesse;
+    private static Stack<Integer> ships = new Stack<>();
+    private static CountDownLatch latch = new CountDownLatch(1);// Latch hinzufügen
+
+
+    private static int lastx;
+    private static int lasty;
+
+
+    @Override
+    public void run() {
+        try {
+            startServer();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void startServer() throws IOException {
         server = new ServerSocket(port);
         System.out.println("Waiting for client connection ...");
         s = server.accept();
         System.out.println("Connection established.");
+        connectionEstablished = true; // Verbindung hergestellt
 
         // Ein- und Ausgabestrom des Sockets ermitteln
         // und als BufferedReader bzw. Writer verpacken
         // (damit man zeilen- bzw. zeichenweise statt byteweise arbeiten kann).
-         in = new BufferedReader(new InputStreamReader(s.getInputStream()));
-         out = new OutputStreamWriter(s.getOutputStream());
+        in = new BufferedReader(new InputStreamReader(s.getInputStream()));
+        out = new OutputStreamWriter(s.getOutputStream());
 
         // Standardeingabestrom ebenfalls als BufferedReader verpacken.
-         usr = new BufferedReader(new InputStreamReader(System.in));
+        usr = new BufferedReader(new InputStreamReader(System.in));
 
 
-       handleGame();
+        // Warten, bis das Latch freigegeben wird
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+
+        handleGame();
 
         // EOF ins Socket "schreiben".
         s.shutdownOutput();
         System.out.println("Connection closed.");
     }
 
+    public static void setGroesse(int x) {
+        if (x == 0) {
+            groesse = 5;
+        }
+        else {
+            groesse = x;
+        }
+    }
 
-    private void handleGame() throws IOException {
-        //richtige size und ships senden
-        sendMessage("size 10");
+    public static void setShips(List<Integer> ship) {
+        ships.addAll(ship);
+    }
+
+    public static void releaseLatch() {
+        latch.countDown(); // Latch freigeben
+    }
+
+    private static String formatShips(List<Integer> ships) {
+        // Sortiere die Schiffe aufsteigend
+        List<Integer> sortedShips = ships.stream()
+                .sorted()
+                .collect(Collectors.toList());
+
+        // Konvertiere die sortierte Liste von Schiffen in eine durch Leerzeichen getrennte Zeichenkette
+        return sortedShips.stream()
+                .map(String::valueOf)
+                .collect(Collectors.joining(" "));
+    }
+
+    private static void handleGame() throws IOException {
+
+
+        sendMessage("size "+ groesse);
         receiveMessage();
 
 
-        sendMessage("ships 5 4 4 3 3 3 2 2");
+        sendMessage("ships " + formatShips(ships));
         receiveMessage();
+
+
+        //warten bis schiffe gesetzt sind
+        // Warten bis der Button gedrückt wurde
+        while (!MultipayerMainGameController.isButtonClicked) {
+            try {
+                Thread.sleep(100); // Kurze Pause, um das UI zu ermöglichen
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
 
         sendMessage("ready");
+
+        MultipayerMainGameController.currentState=1;
+
         if (receiveMessage().equals("ready")) {
 
-
+            int answerCounterWin=0;
+            final int numberOfShips = ships.size();
             while (true) {
+                if (MultipayerMainGameController.isBotPlayer && MultipayerMainGameController.currentState == 1) {
+                    MultipayerMainGameController tmp = new MultipayerMainGameController();
+
+                    try {
+                        tmp.executeAITurn();
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+
                 String message = receiveMessage();
+
+
                 if (message == null) break;
                 //abbruch bedingungen prüfen
 
                 String[] parts = message.split(" ");
-                if (parts[0].equals("shot")) {
-                    int row = Integer.parseInt(parts[1]);
-                    int col = Integer.parseInt(parts[2]);
-                    //Treffer?
+                switch (parts[0]) {
 
-                    sendMessage("answer 1");
-                    //wenn Treffer dann weiter ansonsten pass und schießen
+
+                    // Überarbeiten
+
+
+                    case "shot":
+                        int posx = Integer.parseInt(parts[1]);
+                        int posy = Integer.parseInt(parts[2]);
+                        System.out.println("Opponent shot at: (" + posx + ", " + posy + ")");
+                        dyeCell(posx, posy);
+
+
+                        String answer = handleShot(posx, posy);
+                        sendMessage("answer " + answer); // 0 wasser/ 1 schiff/ 2 versenkt
+                        if (answer=="2") {
+                            answerCounterWin = answerCounterWin + 1;
+                            if (answerCounterWin==numberOfShips){
+                                MultipayerMainGameController temp2 = new MultipayerMainGameController();
+                                MultipayerMainGameController.currentState=2;
+                                System.out.println("LOOSER");
+                                Platform.runLater(() -> temp2.handleWinForOpponent());
+                                break;
+                            }
+                        }
+
+
+                        //wenn Treffer dann weiter ansonsten pass und schießen
+                        break;
+
+                    case "answer":
+                        if (parts[1].equals("0")) {
+                            MultipayerMainGameController.currentState=2;
+                            sendMessage("pass");
+                            break;
+                        }
+                        else if (parts[1].equals("1")) {
+                            MultipayerMainGameController.currentState=1;
+                            MultipayerMainGameController.gegnerspielfeld.selectFeld(lastx,lasty, Color.GREEN);
+                            break;
+                        }
+                        else if (parts[1].equals("2")) {
+                            MultipayerMainGameController.currentState=1;
+                            MultipayerMainGameController.gegnerspielfeld.selectFeld(lastx,lasty, Color.GREEN);
+                            Music sound = Music.getInstance();
+                            sound.playShipDestroyed();
+                            ships.pop();
+                            checkWin();
+                            break;
+                        }
+                        break;
+
+                    case "pass":
+                        MultipayerMainGameController.currentState=1;
+                        break;
                 }
+
             }
         }
     }
 
 
-
-    private void sendMessage(String message) throws IOException {
+    public static void sendMessage(String message) throws IOException {
         out.write(message + "\n");
         out.flush();
         System.out.println("Server sent: " + message);
     }
 
-    private String receiveMessage() throws IOException {
+    private static String receiveMessage() throws IOException {
         String message = in.readLine();
         System.out.println("Server received: " + message);
         return message;
     }
 
-    private String getIp (){
+    private static String handleShot(int posx, int posy) throws IOException {
+
+        //shootShipMultiplayer() liefert ob an dieser stelle ein schiff ist es zerstört wurde oder wasser
+        if (shootShipMultiplayer(posx,posy)==0){
+            return "0";
+        }
+        if (shootShipMultiplayer(posx,posy)==1){
+            return "1";
+        }
+        if (shootShipMultiplayer(posx,posy)==2){
+            return "2";
+        }
         return null;
     }
+
+
+    public static void setLastRowCol(int posx, int posy) {
+        lastx = posx;
+        lasty = posy;
+    }
+
+    private static void checkWin() throws IOException {
+        if (ships.size()==0){
+            MultipayerMainGameController temp = new MultipayerMainGameController();
+            System.out.println("YOU WON");
+            MultipayerMainGameController.currentState=2;
+            Platform.runLater(() -> temp.handleWinForPlayer());
+        }
+    }
+
 }

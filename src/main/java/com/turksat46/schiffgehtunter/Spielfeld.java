@@ -1,7 +1,10 @@
 package com.turksat46.schiffgehtunter;
 import com.turksat46.schiffgehtunter.other.Feld;
+import com.turksat46.schiffgehtunter.other.Music;
 import com.turksat46.schiffgehtunter.other.Ship;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseButton;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
@@ -9,51 +12,72 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 
 public class Spielfeld {
 
     public GridPane gridPane;
     int zellengroesse, groesse;
-    int[][] feld;
-    Feld[][] felder;
+    public int[][] feld;
+    public Feld[][] felder;
     MainGameController mainGameController;
-    ArrayList<Integer> schiffe= new ArrayList<>();
+    MultipayerMainGameController multipayerMainGameController;
     boolean istGegnerFeld;
 
-    public Spielfeld (int groesse, boolean istGegnerFeld){
+    Image sandTexture;
+    Image tntTexture;
+
+    public Spielfeld (int groesse, boolean istGegnerFeld, boolean isMultiplayer, BorderPane root){
         this.feld= new int [groesse][groesse];
         this.gridPane = new GridPane();
         this.groesse = groesse;
         felder = new Feld[groesse][groesse];
-        mainGameController = new MainGameController();
+        if (isMultiplayer){
+            multipayerMainGameController = new MultipayerMainGameController();
+        }
+        else{
+            mainGameController = new MainGameController();
+
+        }
         this.istGegnerFeld = istGegnerFeld;
-        initFeld();
+        initFeld(isMultiplayer);
+        root.setCenter(gridPane);
+
+        // Lade die Texturen
+        try {
+            sandTexture = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/turksat46/schiffgehtunter/images/sand_texture.png")));
+            tntTexture = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/turksat46/schiffgehtunter/images/tnt.png")));
+        } catch (NullPointerException e) {
+            System.err.println("Fehler beim Laden der Texturen. Stelle sicher, dass die Dateien im Ressourcenordner liegen.");
+            throw e;
+        }
+
+    }
+
+    public Spielfeld (int groesse, boolean istGegnerFeld, boolean isMultiplayer, BorderPane root, Map<String, Object> data){
+        this.feld= new int [groesse][groesse];
+        this.gridPane = new GridPane();
+        this.groesse = groesse;
+        felder = new Feld[groesse][groesse];
+        root.setCenter(gridPane);
+        if (isMultiplayer){
+            multipayerMainGameController = new MultipayerMainGameController();
+        }
+        else{
+            mainGameController = new MainGameController();
+
+        }
+        this.istGegnerFeld = istGegnerFeld;
+        initFeld(isMultiplayer);
 
     }
 
     // TODO:Ich schaue hier noch ob wir des so lassen
     // soll bei kleinen felder random schiffsgroeße aufgewöhlt werden oder greedy benutzen ???
     // TODO: IDEE ist jz umgedrehter greedy algorihtmus
-    private void initFeld(){
-
-        int[] schiffsGroessen = {5, 4, 3, 2}; // Größen der Schiffe
-        int totalCells = groesse * groesse; // Gesamtanzahl der Zellen im Spielfeld
-        int shipCount = (int) (totalCells * 0.3); // 30 % der Zellen für Schiffe
-
-
-        // Greedy-Algorithmus zum Auffüllen der Zellen
-        //des hier bei feldgroesse von 10+
-        for (int size : schiffsGroessen) {
-            while (shipCount >= size) {
-                schiffe.add(size); // Schiff hinzufügen
-                shipCount -= size; // Zellen zählen
-            }
-        }
-
-        // Ausgabe der Ergebnisse
-        System.out.println("Schiffe in Zellen: " + schiffe);
-        System.out.println("Verbleibende Zellen: " + shipCount);
+    private void initFeld(boolean isMultiplayer){
 
         if(groesse <=5 ){
             zellengroesse=75;
@@ -71,31 +95,39 @@ public class Spielfeld {
         // Schleife zur Erstellung der Zellen (als Rectangle mit Text)
         for (int i = 0; i < groesse; i++) {
             for (int j = 0; j < groesse; j++) {
-                int row = i;
-                int col = j;
+                int col = i;
+                int row = j;
                 this.feld[row][col] = 0;
 
                 // Rechteck und Text erstellen und position der zelle
                 Feld cell = new Feld(zellengroesse, zellengroesse, row, col);
                 felder[row][col] = cell;
-                cell.setFill(Color.LIGHTBLUE);
+                cell.setFill(Color.TRANSPARENT);
 
                 cell.setStroke(Color.BLACK);
 
-                Text cellText = new Text(String.valueOf(feld[row][col]));
+
 
                 // StackPane für Rechteck und Text in einer Zelle
                 StackPane cellPane = new StackPane();
-                cellPane.getChildren().addAll(cell, cellText);
+                cellPane.getChildren().addAll(cell);
 
 
                 // Klick-Event für jede Zelle
                 cellPane.setOnMouseClicked(event -> {
-                    if (event.getButton()== MouseButton.PRIMARY) {
-                        mainGameController.handlePrimaryClick(this, row, col);
+                    if (!isMultiplayer) {
+                        if (event.getButton() == MouseButton.PRIMARY) {
+                            mainGameController.handlePrimaryClick(this, row, col);
+                        } else if (event.getButton() == MouseButton.SECONDARY) {
+                            mainGameController.handleSecondaryClick(this, row, col);
+                        }
                     }
-                    else if (event.getButton()== MouseButton.SECONDARY) {
-                        mainGameController.handleSecondaryClick(this, row, col);
+                    else {
+                        if (event.getButton() == MouseButton.PRIMARY) {
+                            multipayerMainGameController.handlePrimaryClick(this, row, col);
+                        } else if (event.getButton() == MouseButton.SECONDARY) {
+                            multipayerMainGameController.handleSecondaryClick(this, row, col);
+                        }
                     }
 
                 });
@@ -109,60 +141,19 @@ public class Spielfeld {
 
     public void selectFeld(int posx, int posy){
         //TODO: Eventuell hier die Farbe ändern, wenn ein Schiff angeklickt wird
-        if(istGegnerFeld){
-            felder[posx][posy].setFill(Color.RED);
-        }else{
-            felder[posx][posy].setFill(Color.BLUE);
-        }
+        //felder[posx][posy].setFill(Color.RED);
+        felder[posx][posy].setImage(sandTexture);
+        Music sound = Music.getInstance();
+        sound.playMiss();
     }
 
+    //Wenn Feld ein Schiff ist, wird das ausgeführt
     public void selectFeld(int posx, int posy, Color color){
         //TODO: Eventuell hier die Farbe ändern, wenn ein Schiff angeklickt wird
-            felder[posx][posy].setFill(color);
+        System.out.println("selectFeld mit Farbe wurde ausgewählt");
+        felder[posx][posy].setImage(tntTexture);
+        Music sound = Music.getInstance();
+        sound.playHit();
     }
 
-    public void deselectRowAndColumn(Spielfeld spielfeld, int posx, int posy) {
-        felder[posx][posy].setFill(Color.LIGHTBLUE);
-        spielfeld.felder[posx][posy].gesetzt = false;
-
-        // Horizontale Richtung: Nach links
-        for (int x = posx - 1; x >= 0; x--) {
-            if (spielfeld.felder[x][posy].gesetzt) {
-                spielfeld.felder[x][posy].gesetzt = false;
-                felder[x][posy].setFill(Color.LIGHTBLUE);
-            } else {
-                break; // Stoppen, wenn ein freies Feld gefunden wird
-            }
-        }
-
-        // Horizontale Richtung: Nach rechts
-        for (int x = posx + 1; x < spielfeld.groesse; x++) {
-            if (spielfeld.felder[x][posy].gesetzt) {
-                spielfeld.felder[x][posy].gesetzt = false;
-                felder[x][posy].setFill(Color.LIGHTBLUE);
-            } else {
-                break; // Stoppen, wenn ein freies Feld gefunden wird
-            }
-        }
-
-        // Vertikale Richtung: Nach oben
-        for (int y = posy - 1; y >= 0; y--) {
-            if (spielfeld.felder[posx][y].gesetzt) {
-                spielfeld.felder[posx][y].gesetzt = false;
-                felder[posx][y].setFill(Color.LIGHTBLUE);
-            } else {
-                break; // Stoppen, wenn ein freies Feld gefunden wird
-            }
-        }
-
-        // Vertikale Richtung: Nach unten
-        for (int y = posy + 1; y < spielfeld.felder[posx].length; y++) {
-            if (spielfeld.felder[posx][y].gesetzt) {
-                spielfeld.felder[posx][y].gesetzt = false;
-                felder[posx][y].setFill(Color.LIGHTBLUE);
-            } else {
-                break; // Stoppen, wenn ein freies Feld gefunden wird
-            }
-        }
-    }
 }

@@ -1,23 +1,33 @@
 package com.turksat46.schiffgehtunter;
-import javafx.animation.AnimationTimer;
-import javafx.application.Application;
-import javafx.beans.value.ChangeListener;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.turksat46.schiffgehtunter.backgroundgeneration.BackgroundGenerator;
+import com.turksat46.schiffgehtunter.filemanagement.SaveData;
+import com.turksat46.schiffgehtunter.filemanagement.SaveFileManager;
+import com.turksat46.schiffgehtunter.other.Cell;
+import com.turksat46.schiffgehtunter.other.Music;
+import javafx.animation.FadeTransition;
+import javafx.animation.ScaleTransition;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
+import javafx.scene.Group;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.SnapshotParameters;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
-import javafx.scene.image.WritableImage;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.io.*;
 import java.net.URL;
@@ -25,210 +35,155 @@ import java.util.*;
 
 public class MainGameController implements Initializable {
 
-    //Gesamtgröße des Hintergrund
-    private static int WIDTH = 2500;
-    private static int HEIGHT = 600;
-    //Größe eines Blocks
-    private static final int TILE_SIZE = 30;
-    //Menge der Blöcke in die jeweiligen Richtungen
-    private static final int WORLD_WIDTH_TILES = 37;
-    private static final int WORLD_HEIGHT_TILES = 25;
-    //Experimental: Schatten
-    private static final double SHADOW_OFFSET_X = 2;
-    private static final double SHADOW_OFFSET_Y = 2;
+    private SaveFileManager saveFileManager;
 
-    //Hintergrundmap
-    private Tile[][] world;
-    //Player ignorieren, das wird für die Kamera gebraucht
-    //TODO: Playerwerte allgemein entfernen
-    private double playerX;
-    private double playerY;
-    //Jeweiligen Texturen
-    private Image sandTexture;
-    private Image waterTexture;
-
-    //Hintergrundcanvas, worauf gezeichnet wird
-    private Canvas backgroundCanvas;
-
-    //Typen von Blöcken
-    public enum Tile {
-        WATER, SAND
-    }
 
     @FXML
-    public Pane spielerstackpane, gegnerstackpane;
+    public BorderPane spielerstackpane, gegnerstackpane;
 
-    @FXML public AnchorPane anchorPane;
+    @FXML AnchorPane anchorPane;
+    @FXML
+    Label hinweistext;
 
     @FXML public HBox container;
     @FXML public Pane images;
 
     @FXML public HBox label1;
-   public static int currentState, currentMode, currentDifficulty, groesse;
+
+    @FXML public Button startButton;
+
+    @FXML HBox draggableContainer;
+
+    public static int currentState, currentMode, currentDifficulty, groesse;
     static GridPane feld;
     static Scene scene;
     private static AI bot;
 
+    Music soundPlayer;
+
     static boolean rotated;
 
-    static Spielfeld spielerspielfeld;
-    static Spielfeld gegnerspielfeld;
+    static newSpielfeld spielerspielfeld;
+    public static Spielfeld gegnerspielfeld;
 
+    BackgroundGenerator backgroundManager;
 
     //Drei States: place = Schiffe platzieren, offense = Angriff, defense = Verteidigung bzw. auf Angriff vom Gegner warten
     public String[] state = {"place", "offense", "defense"};
     //Spielmodus P = Spieler, C=Computer
     public String[] mode = {"PvsC", "PvsP", "CvsC"};
 
+    public Map<Group, Set<Cell>> shipCellMap;
+    private final Set<Cell> hitCells = new HashSet<>();
+
+    public MainGameController(){
+        saveFileManager = new SaveFileManager();
+    }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         //Wenn Klasse initialisiert wird, Hintergrund erstellen
-        createBackground();
-    }
+        //backgroundManager = new BackgroundGenerator(anchorPane);
+        //backgroundManager.createBackground();
 
-    //Hintergrundwerte berechnen und Welt erzeugen
-    private void createBackground() {
-        backgroundCanvas = new Canvas(WIDTH, HEIGHT);
-        GraphicsContext gc = backgroundCanvas.getGraphicsContext2D();
-
-        // Lade die Texturen
         try {
-            sandTexture = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/turksat46/schiffgehtunter/images/sand_texture.png")));
-            waterTexture = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/turksat46/schiffgehtunter/images/water_animated.gif")));
+            Image backgroundImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/turksat46/schiffgehtunter/images/background.png")));
+            BackgroundImage background = new BackgroundImage(
+                    backgroundImage,
+                    BackgroundRepeat.NO_REPEAT,
+                    BackgroundRepeat.NO_REPEAT,
+                    BackgroundPosition.DEFAULT,
+                    new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO, false, false, true, true)
+            );
+
+            anchorPane.setBackground(new Background(background));
         } catch (NullPointerException e) {
             System.err.println("Fehler beim Laden der Texturen. Stelle sicher, dass die Dateien im Ressourcenordner liegen.");
             throw e;
         }
 
-        generateWorld();
-        playerX = WIDTH / 2.0;
-        playerY = HEIGHT / 2.0;
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("main-game-view.fxml"));
+        Parent root = loader.getRoot();
 
 
-        new AnimationTimer() {
-            @Override
-            public void handle(long now) {
-                draw(gc);
-            }
-        }.start();
+        MainGameController controller = loader.getController();
+
+
+
     }
 
-    //Blöcke setzen und zeichnen
-    private void generateWorld() {
-        world = new Tile[WORLD_WIDTH_TILES][WORLD_HEIGHT_TILES];
-        // Standardmäßig alles mit Wasser füllen
-        for (int x = 0; x < WORLD_WIDTH_TILES; x++) {
-            for (int y = 0; y < WORLD_HEIGHT_TILES; y++) {
-                world[x][y] = Tile.WATER;
-            }
-        }
-
-        int islandStartY = WORLD_HEIGHT_TILES - 5;
-        Random random = new Random();
-
-        // Insel in der Mitte erstellen
-        int middleXStart = WORLD_WIDTH_TILES / 2 - 2; // Starte etwas links von der Mitte
-        int middleXEnd = WORLD_WIDTH_TILES / 2 + 2;   // Ende etwas rechts von der Mitte
-
-        for (int x = middleXStart; x <= middleXEnd; x++) {
-            for (int y = 2; y < WORLD_HEIGHT_TILES - 2; y++) { // Insel geht von unten nach oben, etwas Platz lassen
-                // Füge etwas Zufall hinzu, um die Inselform interessanter zu gestalten
-                // Innere Teile der Insel immer Sand
-                if (x > middleXStart && x < middleXEnd) {
-                    world[x][y] = Tile.SAND;
-                } else {
-                    // Zufällige Entscheidung für die Seiten
-                    if (random.nextDouble() > 0.4) { // Hier kannst du die Wahrscheinlichkeit anpassen
-                        world[x][y] = Tile.SAND;
-                    }
-                }
-            }
-        }
-        //Kanten randomisieren
-        for (int x = 0; x < WORLD_WIDTH_TILES; x++) {
-            for (int y = islandStartY; y < WORLD_HEIGHT_TILES; y++) {
-                if (y == islandStartY && random.nextDouble() < 0.3) { // Wahrscheinlichkeit für Wasser am oberen Rand der Insel
-                    continue;
-                }
-                world[x][y] = Tile.SAND;
-            }
-        }
-    }
-
-    //Experimental: Schatten
-    private javafx.scene.paint.Color getShadowColor(javafx.scene.paint.Color baseColor) {
-        return baseColor.darker();
-    }
-
-    //Eigentliche Zeichnungsfunktion
-    private void draw(GraphicsContext gc) {
-        //gc.clearRect(0, 0, WIDTH, HEIGHT);
-
-        double cameraOffsetX = playerX - WIDTH / 2.0;
-        double cameraOffsetY = playerY - HEIGHT / 2.0 +150;
-
-        // Zeichne die Schatten der Sandblöcke
-        for (int x = 0; x < WORLD_WIDTH_TILES; x++) {
-            for (int y = 0; y < WORLD_HEIGHT_TILES; y++) {
-                double tileX = x * TILE_SIZE - cameraOffsetX;
-                double tileY = y * TILE_SIZE - cameraOffsetY;
-
-                if (tileX + TILE_SIZE > 0 && tileX < WIDTH && tileY + TILE_SIZE > 0 && tileY < HEIGHT) {
-                    if (world[x][y] ==  Tile.SAND) {
-                        gc.setFill(getShadowColor(javafx.scene.paint.Color.YELLOW));
-                        gc.fillRect(tileX + SHADOW_OFFSET_X, tileY + SHADOW_OFFSET_Y, TILE_SIZE, TILE_SIZE);
-                    }
-                }
-            }
-        }
-
-        // Zeichne die Welt mit Texturen
-        for (int x = 0; x < WORLD_WIDTH_TILES; x++) {
-            for (int y = 0; y < WORLD_HEIGHT_TILES; y++) {
-                double tileX = x * TILE_SIZE - cameraOffsetX;
-                double tileY = y * TILE_SIZE - cameraOffsetY;
-
-                if (tileX + TILE_SIZE > 0 && tileX < WIDTH && tileY + TILE_SIZE > 0 && tileY < HEIGHT) {
-                    if (world[x][y] ==  Tile.WATER) {
-                        gc.drawImage(waterTexture, tileX, tileY, TILE_SIZE, TILE_SIZE);
-                    } else if (world[x][y] ==  Tile.SAND) {
-                        gc.drawImage(sandTexture, tileX, tileY, TILE_SIZE, TILE_SIZE);
-                    }
-                }
-            }
-        }
-
-        //Snapshot von der erstellten Welt erstellen und diese in Hintergrund speichern und anzeigen
-        SnapshotParameters params = new SnapshotParameters();
-        WritableImage image = backgroundCanvas.snapshot(params, null);
-
-        BackgroundImage backgroundImage = new BackgroundImage(
-                image,
-                BackgroundRepeat.NO_REPEAT,
-                BackgroundRepeat.NO_REPEAT,
-                BackgroundPosition.DEFAULT,
-                BackgroundSize.DEFAULT
-        );
-        Background background = new Background(backgroundImage);
-        anchorPane.setBackground(background);
+    public void startGame(){
+        currentState = 1;
+        spielerspielfeld.changeEditableState(false);
+        shipCellMap = spielerspielfeld.getShipCellMap();
+        hinweistext.setVisible(false);
+        startButton.setVisible(false);
     }
 
     public void setupSpiel(int groesse, Stage stage, int currentDifficulty, int currentMode, Scene scene) throws FileNotFoundException {
-        spielerspielfeld = new Spielfeld(groesse,  false);
-        gegnerspielfeld = new Spielfeld(groesse,  true);
+        //spielerspielfeld = new Spielfeld(groesse,  false);
+        gegnerspielfeld = new Spielfeld(groesse,  true, false, gegnerstackpane);
 
-        spielerstackpane.getChildren().add(spielerspielfeld.gridPane);
-        gegnerstackpane.getChildren().add(gegnerspielfeld.gridPane);
+        spielerspielfeld = new newSpielfeld(groesse, false, spielerstackpane, draggableContainer);
+        //gegnerspielfeld = new newSpielfeld(groesse, true, gegnerstackpane);
+
+        //spielerstackpane.getChildren().add(newSpielfeld.gridPane);
+        //agegnerstackpane.getChildren().add(gegnerspielfeld.gridPane);
+
+        if(groesse <= 7){
+            stage.setMinWidth(1110);
+            stage.setMinHeight(650);
+        }else if(groesse <= 15){
+            stage.setMinWidth(1510);
+            stage.setMinHeight(800);
+        }else if(groesse > 15){
+            stage.setMaximized(true);
+        }
 
         // StackPane-Margen setzen
         HBox.setMargin(spielerstackpane, new Insets(10, 10, 100, 10)); // Abstand für spielerstackpane
         HBox.setMargin(gegnerstackpane, new Insets(10, 10, 100, 300)); // Abstand für gegnerstackpane
 
+        setupBase(groesse, stage, currentDifficulty, currentMode, scene);
+
+    }
+
+    // Fürs Laden von einem gespeicherten Spiel
+    public void setupSpiel(Stage stage, Scene scene, Map<String, Object> data) throws FileNotFoundException {
+        //spielerspielfeld = new Spielfeld(groesse,  false);
+        Double groessedouble = (double) data.get("groesse");
+        int groesse = groessedouble.intValue();
+
+        Double currentDifDouble = (double) data.get("currentDifficulty");
+        int currentDifficulty = currentDifDouble.intValue();
+
+        Double currentModeDouble = (double) data.get("currentMode");
+        int currentMode = currentModeDouble.intValue();
+
+        gegnerspielfeld = new Spielfeld(groesse,  true, false, gegnerstackpane);
+
+        spielerspielfeld = new newSpielfeld(groesse, false, spielerstackpane, data);
+
+        //gegnerspielfeld = new newSpielfeld(groesse, true, gegnerstackpane);
+
+        //spielerstackpane.getChildren().add(newSpielfeld.gridPane);
+        //gegnerstackpane.getChildren().add(gegnerspielfeld.gridPane);
+
+        // StackPane-Margen setzen
+        //HBox.setMargin(spielerstackpane, new Insets(10, 10, 100, 10)); // Abstand für spielerstackpane
+        //HBox.setMargin(gegnerstackpane, new Insets(10, 10, 100, 150)); // Abstand für gegnerstackpane
+
+        setupBase(groesse, stage, currentDifficulty, currentMode, scene, data);
+
+    }
+
+    public void setupBase (int groesse,Stage stage, int currentDifficulty, int currentMode, Scene scene) throws FileNotFoundException {
+
 
         this.currentMode = currentMode;
         this.groesse = groesse;
-        this.scene = scene;
+        MainGameController.scene = scene;
+        System.out.println(MainGameController.scene);
         /*scene.widthProperty().addListener((observable, oldValue, newValue) -> {
             WIDTH = newValue.intValue();
         });
@@ -244,118 +199,39 @@ public class MainGameController implements Initializable {
         System.out.println("Difficulty selected and set to: " + currentDifficulty);
         bot = new AI(currentDifficulty, groesse, this);
 
-        generateSchiffe();
+        //generateSchiffe();
 
         setPausierenEventHandler(stage);
+
+        saveFileManager = new SaveFileManager();
     }
-
-    private EventHandler<KeyEvent> createrRotateShiffe(Pane pane) {
-        return event -> {
-            if (event.getCode() == KeyCode.R) {
-                //System.out.println("Rotate ship");
-
-                // Rechtecke aus der aktuellen Pane extrahieren
-                List<Rectangle> rectangles = new ArrayList<>();
-                for (var node : pane.getChildren()) {
-                    if (node instanceof Rectangle) {
-                        rectangles.add((Rectangle) node);
-                    }
-                }
-
-                Pane newPane;
-
-                if (pane instanceof HBox) {
-                    // Erstellen einer VBox, wenn die aktuelle Pane eine HBox ist
-                    VBox vbox = new VBox();
-                    vbox.setSpacing(5);
-                    vbox.getChildren().addAll(rectangles);
-                    newPane = vbox;
-                } else if (pane instanceof VBox) {
-                    // Erstellen einer HBox, wenn die aktuelle Pane eine VBox ist
-                    HBox hbox = new HBox();
-                    hbox.setSpacing(10);
-                    hbox.getChildren().addAll(rectangles);
-                    newPane = hbox;
-                } else {
-                    return;
-                }
-
-                // Position der ursprünglichen Pane übernehmen
-                newPane.setTranslateX(pane.getTranslateX());
-                newPane.setTranslateY(pane.getTranslateY());
-
-                // Eltern-Container der aktuellen Pane finden und die Pane ersetzen
-                if (pane.getParent() instanceof Pane) {
-                    Pane parent = (Pane) pane.getParent();
-                    parent.getChildren().remove(pane);
-                    parent.getChildren().add(newPane);
-
-                    // Drag and drop Logik zur neuen Pane hinzufügen
-                    addDragAndDrop(newPane);
-                }
-            }
-        };
-    }
+    // Fürs Laden von einem Spielstand
+    public void setupBase (int groesse,Stage stage, int currentDifficulty, int currentMode, Scene scene, Map<String, Object> data) throws FileNotFoundException {
 
 
-    private void generateSchiffe(){
-
-        int currentOffset = 0;
-        int offset = 100;
-        HBox hbox = null;
-        // hier richtige:
-        for (int size : spielerspielfeld.schiffe) {
-
-            // Neue HBox für jedes Schiff erstellen
-            hbox = new HBox();
-            hbox.setSpacing(10);
-            hbox.setTranslateY(currentOffset); // Y-Position für Versatz
-
-            for (int i = 0; i < size; i++) {
-                Rectangle rectangle = new Rectangle();
-                rectangle.setWidth(spielerspielfeld.zellengroesse-10);
-                rectangle.setHeight(spielerspielfeld.zellengroesse-10);
-                rectangle.setFill(Color.RED);
-                rectangle.setStroke(Color.BLACK);
-
-                hbox.getChildren().add(rectangle);
-            }
-            // Drag-and-Drop hinzufügen
-            addDragAndDrop(hbox);
-
-
-            spielerstackpane.getChildren().add(hbox);
-
-            currentOffset += offset;
-        }
-    }
-
-    private void addDragAndDrop(Pane pane) {
-        final double[] initialMouseX = {0};
-        final double[] initialMouseY = {0};
-
-        EventHandler<KeyEvent> rotateShipFilter = createrRotateShiffe(pane);
-
-        pane.setOnMousePressed(event -> {
-
-            initialMouseX[0] = event.getSceneX() - pane.getTranslateX();
-            initialMouseY[0] = event.getSceneY() - pane.getTranslateY();
-
-
-            scene.addEventFilter(KeyEvent.KEY_PRESSED, rotateShipFilter);
+        this.currentMode = currentMode;
+        this.groesse = groesse;
+        MainGameController.scene = scene;
+        System.out.println(MainGameController.scene);
+        /*scene.widthProperty().addListener((observable, oldValue, newValue) -> {
+            WIDTH = newValue.intValue();
         });
 
-        pane.setOnMouseDragged(event -> {
-            // Pane an neue Position verschieben
-            pane.setTranslateX(event.getSceneX() - initialMouseX[0]);
-            pane.setTranslateY(event.getSceneY() - initialMouseY[0]);
+        scene.heightProperty().addListener((observable, oldValue, newValue) -> {
+            HEIGHT = newValue.intValue();
         });
+        */
+        this.currentDifficulty = currentDifficulty;
+        System.out.println("Mode selected and set to: " + mode[currentMode]);
+        System.out.println("State selected and set to: " + state[currentState]);
+        System.out.println("Difficulty selected and set to: " + currentDifficulty);
+        bot = new AI(currentDifficulty, groesse, this, data);
 
-        pane.setOnMouseReleased(event -> {
-            // Aktion, wenn die Maus losgelassen wird
-            scene.removeEventFilter(KeyEvent.KEY_PRESSED, rotateShipFilter);
-        });
+        //generateSchiffe();
 
+        setPausierenEventHandler(stage);
+
+        saveFileManager = new SaveFileManager();
     }
 
     public void setPausierenEventHandler(Stage stage){
@@ -379,14 +255,13 @@ public class MainGameController implements Initializable {
         });
     }
 
-
     public void handlePrimaryClick(Spielfeld spielfeld, int posx, int posy){
         System.out.println(currentState);
         switch (currentState){
             //Schiffe setzen
             case 0:
                 if(!spielfeld.istGegnerFeld){
-                    placeShip(spielfeld,posx, posy);
+
                 }else{
                     System.out.println("Spielfeld ist gegner");
                 }
@@ -413,7 +288,6 @@ public class MainGameController implements Initializable {
             //Schiffe entfernen
             if(spielfeld.felder[posx][posy].gesetzt){
                 spielfeld.felder[posx][posy].gesetzt = false;
-                spielfeld.deselectRowAndColumn(spielfeld, posx, posy);
                 System.out.println("Feld wurde abgewählt");
             }
         }
@@ -468,84 +342,127 @@ public class MainGameController implements Initializable {
         return length;
     }
 
-    //Gibt sortierte Positionen benachbarter gesetzter Felder zurück.
-    private List<int[]> getPairPositionen(Spielfeld spielfeld, int posx, int posy) {
-        List<int[]> positionen = new ArrayList<>();
-
-        int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
-
-        for (int[] dir : directions) {
-            int x = posx + dir[0];
-            int y = posy + dir[1];
-            while (x >= 0 && x < spielfeld.groesse && y >= 0 && y < spielfeld.groesse) {
-                if (spielfeld.felder[x][y].gesetzt) {
-                    positionen.add(new int[]{x, y});
-                } else {
-                    break;
-                }
-                x += dir[0];
-                y += dir[1];
-            }
-        }
-        positionen.add(new int[]{posx, posy});
-
-        positionen.sort((p1, p2) -> {
-            if (p1[0] != p2[0]) {
-                return Integer.compare(p1[0], p2[0]);
-            } else {
-                return Integer.compare(p1[1], p2[1]);
-            }
-        });
-
-        return positionen;
-    }
-
-// schau hier mal ob des nur ein vorkommen löscht aus array list ist noc unsiche
-    // und gucken ob des effizient ist wird ja immer geschlieift wenn man clicked
-    private void placeShip(Spielfeld spielfeld, int posx, int posy){
-            if (!spielfeld.felder[posx][posy].gesetzt) {
-                spielfeld.felder[posx][posy].gesetzt = true;
-                spielfeld.selectFeld(posx, posy);
-            // Entferne das passende Schiff aus der Liste
-            int nachbarWert = nachbarFeldGewaehlt(spielfeld, posx, posy); // Berechnung nur einmal
-
-               //Suche das Schiff in der Liste und entferne ein Vorkommen
-                for (int i = 0; i < spielfeld.schiffe.size(); i++) {
-                    int schiff = spielfeld.schiffe.get(i);
-                    if (schiff == nachbarWert) {
-                        spielfeld.schiffe.remove(i);
-                        System.out.println("Schiff mit Wert " + nachbarWert + " aus der Liste entfernt.");
-                        // Da die Liste durch das Entfernen eines Elements kleiner wird,
-                        // muss der Index um eins reduziert werden, um das nächste Element korrekt zu überprüfen.
-                        i--;
-                       break;
-                    }
-                }
-                System.out.println("Hier ist schiffe von spieler die zur Asuwahl stehen : " +spielfeld.schiffe);
-
-                if (spielfeld.schiffe.isEmpty()) {
-                        System.out.println("State wird auf 1 gesetzt");
-                        currentState++;
-                    }
-                }
-
-    }
-
     public void handleHit(int x, int y){
-        gegnerspielfeld.selectFeld(x,y,Color.GREEN);
+        //gegnerspielfeld.selectFeld(x,y,Color.GREEN);
     }
 
     public void handleWinForPlayer(){
-        //TODO: @Elion mach was draus
-        System.out.println("Spieler hat gewonnen!");
+        Stage victoryStage = new Stage();
+        Image image;
+        Font customFont;
+        try {
+            image = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/turksat46/schiffgehtunter/images/water_animated.gif")));
+            customFont = Font.loadFont(getClass().getResource("/com/turksat46/schiffgehtunter/MinecraftRegular-Bmg3.otf").toExternalForm(), 40);
+
+        } catch (NullPointerException e) {
+            System.err.println("Fehler beim Laden der Texturen. Stelle sicher, dass die Dateien im Ressourcenordner liegen.");
+            throw e;
+        }
+
+        StackPane root = new StackPane();
+
+        // Background image
+        Rectangle background = new Rectangle(600, 400);
+
+        background.setFill(new ImagePattern(image));
+
+        // Victory message
+        Text victoryText = new Text("VICTORY FOR PLAYER !");
+        victoryText.setFill(javafx.scene.paint.Color.WHITE);
+        victoryText.setFont(customFont);
+
+        // Adding animations
+        FadeTransition fadeIn = new FadeTransition(Duration.seconds(1.5), victoryText);
+        fadeIn.setFromValue(0);
+        fadeIn.setToValue(1);
+        fadeIn.setCycleCount(3);
+        fadeIn.setAutoReverse(true);
+
+        ScaleTransition scale = new ScaleTransition(Duration.seconds(1.5), victoryText);
+        scale.setFromX(1);
+        scale.setFromY(1);
+        scale.setToX(1.2);
+        scale.setToY(1.2);
+        scale.setCycleCount(3);
+        scale.setAutoReverse(true);
+
+        // Start animations
+        fadeIn.play();
+        scale.play();
+        soundPlayer = Music.getInstance();
+        soundPlayer.playWin();
+        // Add elements to root
+        root.getChildren().addAll(background, victoryText);
+
+        // Show stage
+        Scene scene = new Scene(root, 600, 400);
+        victoryStage.setTitle("Victory!");
+        victoryStage.setScene(scene);
+        victoryStage.show();
+        victoryStage.toFront();
     }
 
     public void handleWinForOpponent(){
-        //TODO: @Elion mach was draus
-        System.out.println("Gegner hat gewonnen!");
+        Stage victoryStage = new Stage();
+        Image image;
+        Font customFont;
+        try {
+            image = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/turksat46/schiffgehtunter/images/water_animated.gif")));
+            customFont = Font.loadFont(getClass().getResource("/com/turksat46/schiffgehtunter/MinecraftRegular-Bmg3.otf").toExternalForm(), 40);
+
+        } catch (NullPointerException e) {
+            System.err.println("Fehler beim Laden der Texturen. Stelle sicher, dass die Dateien im Ressourcenordner liegen.");
+            throw e;
+        }
+
+        StackPane root = new StackPane();
+
+        // Background image
+        Rectangle background = new Rectangle(600, 400);
+
+        //Setting the image view 1
+        //mageView imageView1 = new ImageView(image);
+
+
+        background.setFill(new ImagePattern(image));
+        // Simulated Minecraft "blocks"
+
+        // Victory message
+        Text victoryText = new Text("VICTORY FOR OPPONENT !");
+        victoryText.setFill(javafx.scene.paint.Color.WHITE);
+        victoryText.setFont(customFont);
+
+        // Adding animations
+        FadeTransition fadeIn = new FadeTransition(Duration.seconds(1.5), victoryText);
+        fadeIn.setFromValue(0);
+        fadeIn.setToValue(1);
+        fadeIn.setCycleCount(3);
+        fadeIn.setAutoReverse(true);
+
+        ScaleTransition scale = new ScaleTransition(Duration.seconds(1.5), victoryText);
+        scale.setFromX(1);
+        scale.setFromY(1);
+        scale.setToX(1.2);
+        scale.setToY(1.2);
+        scale.setCycleCount(3);
+        scale.setAutoReverse(true);
+
+        // Start animations
+        fadeIn.play();
+        scale.play();
+
+        // Add elements to root
+        root.getChildren().addAll(background, victoryText);
+
+        // Show stage
+        Scene scene = new Scene(root, 600, 400);
+        victoryStage.setTitle("Victory!");
+        victoryStage.setScene(scene);
+        victoryStage.show();
+        victoryStage.toFront();
     }
 
-    private void  shootShip(Spielfeld spielfeld, int posx, int posy){
+    private void shootShip(Spielfeld spielfeld, int posx, int posy){
         System.out.println("schiffe erschießen");
         if(spielfeld.istGegnerFeld){
             if(spielfeld.felder[posx][posy].wurdeGetroffen == false){
@@ -553,7 +470,8 @@ public class MainGameController implements Initializable {
                 System.out.println("Feld ist gegnerfeld");
                 spielfeld.felder[posx][posy].wurdeGetroffen = true;
                 spielfeld.selectFeld(posx,posy);
-                bot.receiveMove(posx, posy);
+                bot.receiveMove(posx, posy, spielfeld);
+                //animateSnowball(posx, posy);
             }else{
                 //Feld wurde bereits getroffen
                 System.out.println("Feld wurde bereits getroffen. Klick wird ignoriert!");
@@ -562,13 +480,67 @@ public class MainGameController implements Initializable {
     }
 
     public void receiveShoot(int posx, int posy){
+        System.out.println("receiveShot at: " + posx + ", " + posy);
         spielerspielfeld.selectFeld(posx, posy, Color.DARKRED);
-        bot.receiveHit(posx, posy, spielerspielfeld.felder[posx][posy].istSchiff);
+
+        boolean shipHit = false;
+        boolean wholeShipDestroyed = false;
+        Set<Cell> destroyedShipCells = null;
+
+        Iterator<Map.Entry<Group, Set<Cell>>> iterator = shipCellMap.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<Group, Set<Cell>> entry = iterator.next();
+            Group schiffGroup = entry.getKey();
+            Set<Cell> occupiedCells = entry.getValue();
+            System.out.println(shipCellMap.toString());
+
+            for (Cell cell : occupiedCells) {
+                if (cell.getRow() == posy && cell.getCol() == posx) {
+                    shipHit = true;
+                    hitCells.add(cell);
+
+                    if (hitCells.containsAll(occupiedCells)) {
+                        wholeShipDestroyed = true;
+                        destroyedShipCells = occupiedCells;
+                        iterator.remove(); // Entferne das versenkte Schiff
+                    }
+                    break; // Schiff getroffen, innere Schleife abbrechen
+                }
+            }
+        }
+
+        if (shipHit) {
+            if (wholeShipDestroyed) {
+                System.out.println("Schiff komplett zerstört an Position: " + posx + ", " + posy);
+                if (shipCellMap.isEmpty()) {
+                    bot.allShipsShot();
+                }
+                bot.receiveHit(posx, posy, true, true);
+            } else {
+                System.out.println("Schiff getroffen an Position: " + posx + ", " + posy);
+                bot.receiveHit(posx, posy, true, false);
+            }
+        } else {
+            System.out.println("Kein Schiff getroffen an Position: " + posx + ", " + posy);
+            bot.receiveHit(posx, posy, false, false);
+        }
+
         currentState = 1;
     }
 
     private void  watchShip(Spielfeld spielfeld, int posx, int posy){
         System.out.println("schiffe beobachten ");
+    }
+
+    //
+    //  SaveFileProcedure
+    //
+
+    public void saveFile(){
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        Gson gson = gsonBuilder.create();
+        SaveData saveData = new SaveData(this, spielerspielfeld, gegnerspielfeld, bot);
+        saveFileManager.openSaveFileChooserAndSave(saveData.sampleData());
     }
 
 }
