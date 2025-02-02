@@ -2,7 +2,6 @@ package com.turksat46.schiffgehtunter;
 import com.turksat46.schiffgehtunter.filemanagement.SaveFileManager;
 import com.turksat46.schiffgehtunter.netzwerk.Server;
 import com.turksat46.schiffgehtunter.netzwerk.establishConnection;
-import com.turksat46.schiffgehtunter.other.Difficulty;
 import com.turksat46.schiffgehtunter.other.Music;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -47,7 +46,6 @@ public class CreateGameController {
     MainGameController mainGameController;
     MultipayerMainGameController multipayerMainGameController;
     SaveFileManager saveFileManager;
-    ObservableList<Difficulty> difficulties = FXCollections.observableArrayList();
     ObservableList<String> skillLevels = FXCollections.observableArrayList("Noob", "Average", "Hardcore");
     ObservableList<String> gameModes = FXCollections.observableArrayList("Spieler vs. Computer", "Spieler vs. Spieler", "Computer vs. Computer");
 

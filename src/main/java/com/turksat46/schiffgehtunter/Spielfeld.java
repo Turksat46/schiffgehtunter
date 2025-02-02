@@ -1,7 +1,6 @@
 package com.turksat46.schiffgehtunter;
 import com.turksat46.schiffgehtunter.other.Feld;
 import com.turksat46.schiffgehtunter.other.Music;
-import com.turksat46.schiffgehtunter.other.Ship;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
