@@ -76,6 +76,7 @@ public class MultipayerMainGameController extends MainGameController implements 
         //currentState = 1;
         isButtonClicked = true;
         System.out.println("MultipayerMainGameController state 1");
+        startButton.setVisible(false);
     }
 
     @Override

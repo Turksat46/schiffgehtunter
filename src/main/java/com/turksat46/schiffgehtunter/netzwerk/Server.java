@@ -93,8 +93,13 @@ public class Server implements Runnable {
     }
 
     private static String formatShips(List<Integer> ships) {
-        // Konvertiere die Liste von Schiffen in eine durch Leerzeichen getrennte Zeichenkette
-        return ships.stream()
+        // Sortiere die Schiffe aufsteigend
+        List<Integer> sortedShips = ships.stream()
+                .sorted()
+                .collect(Collectors.toList());
+
+        // Konvertiere die sortierte Liste von Schiffen in eine durch Leerzeichen getrennte Zeichenkette
+        return sortedShips.stream()
                 .map(String::valueOf)
                 .collect(Collectors.joining(" "));
     }

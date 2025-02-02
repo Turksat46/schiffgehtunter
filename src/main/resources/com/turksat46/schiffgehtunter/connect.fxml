@@ -6,13 +6,13 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane prefHeight="211.0" prefWidth="410.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.turksat46.schiffgehtunter.netzwerk.Client">
+<AnchorPane fx:id="pane" prefHeight="211.0" prefWidth="410.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.turksat46.schiffgehtunter.netzwerk.Client">
    <children>
       <VBox prefHeight="160.0" prefWidth="350.0">
          <children>
             <HBox prefHeight="57.0" prefWidth="350.0">
                <children>
-                  <Button fx:id="backButton" mnemonicParsing="false" prefHeight="74.0" prefWidth="80.0" text="Zurück">
+                  <Button fx:id="backButton" onAction="#onBackPressed"  mnemonicParsing="false" prefHeight="74.0" prefWidth="80.0"  text="Zurück">
                      <HBox.margin>
                         <Insets left="10.0" top="10.0" />
                      </HBox.margin></Button>
