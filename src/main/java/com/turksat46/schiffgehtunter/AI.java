@@ -166,12 +166,13 @@ public class AI {
     private void updateEverything() {
         for(int i = 0; i < groesse; i++){
             for(int j = 0; j < groesse; j++){
-                if(feld[i][j] == 0){
-                    if(ships.containsValue(new Position(i, j))){
+                if(feld[i][j] == 2){
+                    if(!ships.containsValue(new Position(i, j))){
                         MainGameController.gegnerspielfeld.selectFeld(i,j,Color.GREEN);
-                    }else{
-                        MainGameController.gegnerspielfeld.selectFeld(i,j);
                     }
+                }
+                if(feld[i][j] == 3){
+                    MainGameController.gegnerspielfeld.selectFeld(i,j);
                 }
             }
         }
@@ -264,7 +265,7 @@ public class AI {
         Position hitPosition = new Position(posx, posy);
         if(feld[posx][posy] == 1){
             System.out.println(posx + " " + posy + " wurde getroffen!");
-            feld[posx][posy] = 0;
+            feld[posx][posy] = 2;
             spielfeld.selectFeld(posx,posy, Color.GREEN);
 
             Iterator<Map.Entry<Integer, List<Position>>> iterator = ships.entrySet().iterator();
@@ -286,6 +287,8 @@ public class AI {
                     }
                 }
             }
+        }else if(feld[posx][posy] == 0){
+            feld[posx][posy] = 3;
         }
         mainGameController.handleHit(posx, posy);
         getNextMove(); //Diese Methode darf erst aufgerufen werden, wenn receiveMove fertig ist (wegen der Exception)
