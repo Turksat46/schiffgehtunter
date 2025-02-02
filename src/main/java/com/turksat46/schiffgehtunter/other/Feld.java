@@ -25,13 +25,17 @@ public class Feld extends Rectangle {
         this.wurdeGetroffen = false;
     }
 
+    //Für Bot
+    public Feld(){
+        this.posX = posX;
+        this.posY = posY;
+        this.istSchiff = false;
+        this.wurdeGetroffen = false;
+    }
+
 
     public boolean pruefengesetzt() {
         return gesetzt;
-    }
-
-    public void setzen(int x, int y) {
-
     }
 
     public Rectangle getFeld() {

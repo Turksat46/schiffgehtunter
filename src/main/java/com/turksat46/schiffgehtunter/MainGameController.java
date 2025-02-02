@@ -467,41 +467,49 @@ public class MainGameController implements Initializable {
     public void receiveShoot(int posx, int posy){
         System.out.println("receiveShot at: " + posx + ", " + posy);
         spielerspielfeld.selectFeld(posx, posy, Color.DARKRED);
+
+        boolean shipHit = false;
+        boolean wholeShipDestroyed = false;
+        Set<Cell> destroyedShipCells = null;
+
         Iterator<Map.Entry<Group, Set<Cell>>> iterator = shipCellMap.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<Group, Set<Cell>> entry = iterator.next();
             Group schiffGroup = entry.getKey();
             Set<Cell> occupiedCells = entry.getValue();
             System.out.println(shipCellMap.toString());
-            for (Cell cell : occupiedCells) {
-                if (cell.getRow() == posx && cell.getCol() == posy) {
-                    // Füge die Trefferzelle hinzu
-                    hitCells.add(cell);
-                    // Überprüfe, ob alle Zellen dieses Schiffs getroffen sind
-                    if (hitCells.containsAll(occupiedCells)) {
-                        // Das gesamte Schiff wurde versenkt
-                        iterator.remove();
-                        if(shipCellMap.isEmpty()){
-                            bot.allShipsShot();
-                        }
-                        bot.receiveHit(posx, posy, true);
-                    }else{
-                        //Ein Feld von 'nem Schiff wurde getroffen
-                        bot.receiveHit(posx, posy, true);
-                    }
-                    //return 1; // Treffen, aber nicht alle Zellen des Schiffs sind getroffen
 
-                }else{
-                    bot.receiveHit(posx, posy, false);
+            for (Cell cell : occupiedCells) {
+                if (cell.getRow() == posy && cell.getCol() == posx) {
+                    shipHit = true;
+                    hitCells.add(cell);
+
+                    if (hitCells.containsAll(occupiedCells)) {
+                        wholeShipDestroyed = true;
+                        destroyedShipCells = occupiedCells;
+                        iterator.remove(); // Entferne das versenkte Schiff
+                    }
+                    break; // Schiff getroffen, innere Schleife abbrechen
                 }
             }
-
         }
 
+        if (shipHit) {
+            if (wholeShipDestroyed) {
+                System.out.println("Schiff komplett zerstört an Position: " + posx + ", " + posy);
+                if (shipCellMap.isEmpty()) {
+                    bot.allShipsShot();
+                }
+                bot.receiveHit(posx, posy, true, true);
+            } else {
+                System.out.println("Schiff getroffen an Position: " + posx + ", " + posy);
+                bot.receiveHit(posx, posy, true, false);
+            }
+        } else {
+            System.out.println("Kein Schiff getroffen an Position: " + posx + ", " + posy);
+            bot.receiveHit(posx, posy, false, false);
+        }
 
-
-        //return 0; // Kein Treffer
-        //bot.receiveHit(posx, posy, spielerspielfeld.felder[posx][posy].istSchiff);
         currentState = 1;
     }
 
