@@ -423,6 +423,17 @@ public class newSpielfeld {
 
     }
 
+    private boolean isCollision(Group ship, Set<Cell> newCells) {
+        for (Set<Cell> existingCells : shipCellMap.values()) {
+            for (Cell newCell : newCells) {
+                if (existingCells.contains(newCell)) {
+                    return true; // Kollision gefunden
+                }
+            }
+        }
+        return false; // Keine Kollision
+    }
+
 
     public Map<Group, Set<Cell>> getShipCellMap() {
         return shipCellMap;
@@ -430,6 +441,8 @@ public class newSpielfeld {
 
     private void updateShipCellMap() {
         shipCellMap.clear();
+        Map<Group, Set<Cell>> tempShipCellMap = new HashMap<>();
+
 
         for (Group ship : draggables) {
             Set<Cell> occupiedCells = new HashSet<>();
@@ -449,6 +462,15 @@ public class newSpielfeld {
                         }
                     }
                 }
+            }
+
+            // Prüfe auf Kollision, bevor das Schiff zur temporären Map hinzugefügt wird
+            if (!isCollision(ship, occupiedCells)) {
+                tempShipCellMap.put(ship, occupiedCells);
+            } else {
+                System.out.println("Kollision erkannt! Schiff kann nicht platziert werden.");
+                ship.setTranslateX(0.0);
+                ship.setTranslateY(0.0);
             }
 
             shipCellMap.put(ship, occupiedCells);
