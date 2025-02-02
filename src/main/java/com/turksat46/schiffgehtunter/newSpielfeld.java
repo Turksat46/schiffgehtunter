@@ -108,6 +108,29 @@ public class newSpielfeld {
     }
 
     // Funktion zum Zeichnen von Schiffen aufm Feld
+    public newSpielfeld(int size, boolean isEnemyField, BorderPane root, List<Integer> ships, HBox draggableContainer) {
+        newSpielfeld.GRID_SIZE = size;
+        newSpielfeld.root = root;
+
+        CELL_SIZE = size <= 5 ? 75 : size <= 10 ? 50 : size <= 20 ? 30 : 20;
+
+        gridPane = createGridPane();
+        root.setCenter(gridPane);
+
+        if (!isEnemyField) {
+            draggableContainer.setPadding(new Insets(10));
+
+            for (int shipSize : ships) {
+                Group shipGroup = createDraggableShip(shipSize);
+                makeDraggable(shipGroup);
+                draggables.add(shipGroup);
+                draggableContainer.getChildren().add(shipGroup);
+            }
+
+            root.setBottom(draggableContainer);
+        }
+    }
+
     private void drawShipsFromData(Map<String, Object> data) {
         Map<Group, Set<Cell>> newShipCellMap = new HashMap<>();
 
@@ -235,31 +258,7 @@ public class newSpielfeld {
             System.out.println("Setze Schiff auf X: " + ship.getTranslateX() + ", Y: " + ship.getTranslateY());
         }
     }
-
-
     //Konstruktor ohne schiff Berechnung für Multiplayer
-    public newSpielfeld(int size, boolean isEnemyField, BorderPane root, List<Integer> ships, HBox draggableContainer) {
-        newSpielfeld.GRID_SIZE = size;
-        newSpielfeld.root = root;
-
-        CELL_SIZE = size <= 5 ? 75 : size <= 10 ? 50 : size <= 20 ? 30 : 20;
-
-        gridPane = createGridPane();
-        root.setCenter(gridPane);
-
-        if (!isEnemyField) {
-            draggableContainer.setPadding(new Insets(10));
-
-            for (int shipSize : ships) {
-                Group shipGroup = createDraggableShip(shipSize);
-                makeDraggable(shipGroup);
-                draggables.add(shipGroup);
-                draggableContainer.getChildren().add(shipGroup);
-            }
-
-            root.setBottom(draggableContainer);
-        }
-    }
 
     private GridPane createGridPane() {
         GridPane grid = new GridPane();
@@ -330,7 +329,6 @@ public class newSpielfeld {
         double pivotY = bounds.getHeight() / 2;
         group.setRotate(group.getRotate() + 90);
     }
-
 
     private void snapToGrid(Group ship) {
         if (ship.getChildren().isEmpty()) return;
@@ -432,7 +430,6 @@ public class newSpielfeld {
         }
         return false; // Keine Kollision
     }
-
 
     public Map<Group, Set<Cell>> getShipCellMap() {
         return shipCellMap;

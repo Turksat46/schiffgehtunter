@@ -234,7 +234,6 @@ public class MainGameController implements Initializable {
         saveFileManager = new SaveFileManager();
     }
 
-
     public void setPausierenEventHandler(Stage stage){
         stage.getScene().setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
@@ -342,7 +341,6 @@ public class MainGameController implements Initializable {
         }
         return length;
     }
-
 
     public void handleHit(int x, int y){
         //gegnerspielfeld.selectFeld(x,y,Color.GREEN);

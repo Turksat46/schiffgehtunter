@@ -13,7 +13,10 @@ import javafx.scene.control.Slider;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 
+import java.awt.*;
+import java.io.File;
 import java.io.IOException;
+import java.util.Objects;
 
 
 public class SettingsController {
@@ -90,6 +93,12 @@ public class SettingsController {
 
         // Speichere die Einstellungen, falls erforderlich
         fileManager.saveSettings(musicEnabled, volume);
+    }
+
+    public void openAnleitung() throws IOException {
+        File file = new File(getClass().getResource("/com/turksat46/schiffgehtunter/dokumente/anleitung.pdf").getFile());
+        Desktop desktop = Desktop.getDesktop();
+        desktop.browse(file.toURI());
     }
 
     public void onBackPressed(ActionEvent actionEvent) throws IOException {
