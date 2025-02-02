@@ -12,6 +12,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -37,14 +38,13 @@ public class MainGameController implements Initializable {
 
 
     @FXML
-    public BorderPane spielerstackpane, gegnerstackpane;
+    public BorderPane spielerpane, gegnerpane;
 
-    @FXML AnchorPane anchorPane;
+    @FXML AnchorPane mainGamePane;
 
-    @FXML public HBox container;
     @FXML public Pane images;
+    Stage stage;
 
-    @FXML public HBox label1;
 
     @FXML public Button startButton;
 
@@ -70,6 +70,8 @@ public class MainGameController implements Initializable {
     public Map<Group, Set<Cell>> shipCellMap;
     private final Set<Cell> hitCells = new HashSet<>();
 
+    private Image background;
+
     public MainGameController(){
         saveFileManager = new SaveFileManager();
     }
@@ -77,14 +79,31 @@ public class MainGameController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         //Wenn Klasse initialisiert wird, Hintergrund erstellen
-        backgroundManager = new BackgroundGenerator(anchorPane);
-        backgroundManager.createBackground();
+        //backgroundManager = new BackgroundGenerator(anchorPane);
+        //backgroundManager.createBackground();
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("main-game-view.fxml"));
         Parent root = loader.getRoot();
 
 
         MainGameController controller = loader.getController();
+
+        try {
+            Image backgroundImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/turksat46/schiffgehtunter/images/background.png")));
+            BackgroundImage background = new BackgroundImage(
+                    backgroundImage,
+                    BackgroundRepeat.NO_REPEAT,
+                    BackgroundRepeat.NO_REPEAT,
+                    BackgroundPosition.DEFAULT,
+                    new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO, false, false, true, true)
+            );
+
+            mainGamePane.setBackground(new Background(background));
+        } catch (NullPointerException e) {
+            System.err.println("Fehler beim Laden der Texturen. Stelle sicher, dass die Dateien im Ressourcenordner liegen.");
+            throw e;
+        }
+
 
 
 
@@ -97,18 +116,23 @@ public class MainGameController implements Initializable {
     }
 
     public void setupSpiel(int groesse, Stage stage, int currentDifficulty, int currentMode, Scene scene) throws FileNotFoundException {
-        //spielerspielfeld = new Spielfeld(groesse,  false);
+
+
+        this.stage = stage;
+
+
+        spielerspielfeld = new newSpielfeld(groesse, false, spielerpane);
         gegnerspielfeld = new Spielfeld(groesse,  true, false);
+        gegnerpane.getChildren().add(gegnerspielfeld.gridPane);
 
-        spielerspielfeld = new newSpielfeld(groesse, false, spielerstackpane);
-        //gegnerspielfeld = new newSpielfeld(groesse, true, gegnerstackpane);
+    System.out.println(gegnerpane);
+        System.out.println(spielerspielfeld.root);
+        BorderPane.setAlignment(gegnerpane,  Pos.CENTER);
 
-        //spielerstackpane.getChildren().add(newSpielfeld.gridPane);
-        gegnerstackpane.getChildren().add(gegnerspielfeld.gridPane);
+        // Set the alignment of the GridPane within its parent container (e.g., Scene)
+        gegnerspielfeld.gridPane.setAlignment(Pos.CENTER);  // Align the GridPane to the center
 
-        // StackPane-Margen setzen
-        //HBox.setMargin(spielerstackpane, new Insets(10, 10, 100, 10)); // Abstand für spielerstackpane
-        //HBox.setMargin(gegnerstackpane, new Insets(10, 10, 100, 150)); // Abstand für gegnerstackpane
+
 
         setupBase(groesse, stage, currentDifficulty, currentMode, scene);
 
@@ -128,12 +152,12 @@ public class MainGameController implements Initializable {
 
         gegnerspielfeld = new Spielfeld(groesse,  true, false, data);
 
-        spielerspielfeld = new newSpielfeld(groesse, false, spielerstackpane, data);
+        spielerspielfeld = new newSpielfeld(groesse, false, spielerpane, data);
 
         //gegnerspielfeld = new newSpielfeld(groesse, true, gegnerstackpane);
 
         //spielerstackpane.getChildren().add(newSpielfeld.gridPane);
-        gegnerstackpane.getChildren().add(gegnerspielfeld.gridPane);
+        gegnerpane.getChildren().add(gegnerspielfeld.gridPane);
 
         // StackPane-Margen setzen
         //HBox.setMargin(spielerstackpane, new Insets(10, 10, 100, 10)); // Abstand für spielerstackpane

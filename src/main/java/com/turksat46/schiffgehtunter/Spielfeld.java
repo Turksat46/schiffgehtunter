@@ -1,19 +1,14 @@
 package com.turksat46.schiffgehtunter;
 import com.turksat46.schiffgehtunter.other.Feld;
 import com.turksat46.schiffgehtunter.other.Music;
-import com.turksat46.schiffgehtunter.other.Ship;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
-import javafx.stage.Stage;
+import javafx.scene.shape.Rectangle;
 
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Random;
 
 public class Spielfeld {
 
@@ -24,13 +19,15 @@ public class Spielfeld {
     MainGameController mainGameController;
     MultipayerMainGameController multipayerMainGameController;
     boolean istGegnerFeld;
+    boolean isMultiplayer;
 
     Image sandTexture;
     Image tntTexture;
 
     public Spielfeld (int groesse, boolean istGegnerFeld, boolean isMultiplayer){
         this.feld= new int [groesse][groesse];
-        this.gridPane = new GridPane();
+        this.isMultiplayer = isMultiplayer;
+        this.gridPane = createGridPane();
         this.groesse = groesse;
         felder = new Feld[groesse][groesse];
         if (isMultiplayer){
@@ -56,7 +53,8 @@ public class Spielfeld {
 
     public Spielfeld (int groesse, boolean istGegnerFeld, boolean isMultiplayer, Map<String, Object> data){
         this.feld= new int [groesse][groesse];
-        this.gridPane = new GridPane();
+        this.isMultiplayer = isMultiplayer;
+        this.gridPane = createGridPane();
         this.groesse = groesse;
         felder = new Feld[groesse][groesse];
         if (isMultiplayer){
@@ -89,29 +87,26 @@ public class Spielfeld {
 
         }
 
-        // Schleife zur Erstellung der Zellen (als Rectangle mit Text)
-        for (int i = 0; i < groesse; i++) {
-            for (int j = 0; j < groesse; j++) {
-                int col = i;
-                int row = j;
-                this.feld[row][col] = 0;
 
-                // Rechteck und Text erstellen und position der zelle
-                Feld cell = new Feld(zellengroesse, zellengroesse, row, col);
-                felder[row][col] = cell;
-                cell.setFill(Color.TRANSPARENT);
+    }
 
+
+    private GridPane createGridPane() {
+        GridPane grid = new GridPane();
+        //grid.setMaxHeight(4000);
+        //grid.setMaxWidth(4000);
+
+        for (int zeile = 0; zeile < groesse; zeile++) {
+
+
+
+            for (int reihe = 0; reihe < groesse; reihe++) {
+                int col = reihe;
+                int row = zeile;
+                Rectangle cell = new Rectangle(zellengroesse,zellengroesse, Color.TRANSPARENT);
                 cell.setStroke(Color.BLACK);
-
-
-
-                // StackPane für Rechteck und Text in einer Zelle
-                StackPane cellPane = new StackPane();
-                cellPane.getChildren().addAll(cell);
-
-
                 // Klick-Event für jede Zelle
-                cellPane.setOnMouseClicked(event -> {
+                cell.setOnMouseClicked(event -> {
                     if (!isMultiplayer) {
                         if (event.getButton() == MouseButton.PRIMARY) {
                             mainGameController.handlePrimaryClick(this, row, col);
@@ -129,10 +124,13 @@ public class Spielfeld {
 
                 });
 
-                // Zelle dem GridPane hinzufügen
-                gridPane.add(cellPane, j, i);
+
+                grid.add(cell, col, row);
+
+
             }
         }
+        return grid;
 
     }
 
