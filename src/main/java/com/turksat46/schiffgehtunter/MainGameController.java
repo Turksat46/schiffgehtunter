@@ -139,7 +139,7 @@ public class MainGameController implements Initializable {
         //HBox.setMargin(spielerstackpane, new Insets(10, 10, 100, 10)); // Abstand für spielerstackpane
         //HBox.setMargin(gegnerstackpane, new Insets(10, 10, 100, 150)); // Abstand für gegnerstackpane
 
-        setupBase(groesse, stage, currentDifficulty, currentMode, scene);
+        setupBase(groesse, stage, currentDifficulty, currentMode, scene, data);
 
     }
 
@@ -164,6 +164,34 @@ public class MainGameController implements Initializable {
         System.out.println("State selected and set to: " + state[currentState]);
         System.out.println("Difficulty selected and set to: " + currentDifficulty);
         bot = new AI(currentDifficulty, groesse, this);
+
+        //generateSchiffe();
+
+        setPausierenEventHandler(stage);
+
+        saveFileManager = new SaveFileManager();
+    }
+    // Fürs Laden von einem Spielstand
+    public void setupBase (int groesse,Stage stage, int currentDifficulty, int currentMode, Scene scene, Map<String, Object> data) throws FileNotFoundException {
+
+
+        this.currentMode = currentMode;
+        this.groesse = groesse;
+        MainGameController.scene = scene;
+        System.out.println(MainGameController.scene);
+        /*scene.widthProperty().addListener((observable, oldValue, newValue) -> {
+            WIDTH = newValue.intValue();
+        });
+
+        scene.heightProperty().addListener((observable, oldValue, newValue) -> {
+            HEIGHT = newValue.intValue();
+        });
+        */
+        this.currentDifficulty = currentDifficulty;
+        System.out.println("Mode selected and set to: " + mode[currentMode]);
+        System.out.println("State selected and set to: " + state[currentState]);
+        System.out.println("Difficulty selected and set to: " + currentDifficulty);
+        bot = new AI(currentDifficulty, groesse, this, data);
 
         //generateSchiffe();
 

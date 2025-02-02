@@ -5,13 +5,11 @@ import javafx.animation.ScaleTransition;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.scene.Group;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Region;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.Node;
@@ -19,6 +17,7 @@ import com.turksat46.schiffgehtunter.other.Cell;
 import javafx.util.Duration;
 
 import java.util.*;
+import java.util.List;
 
 public class newSpielfeld {
 
@@ -31,6 +30,7 @@ public class newSpielfeld {
     private static BorderPane root;
     private static int CELL_SIZE = 50;
     public Map<Group, Set<Cell>> shipCellMap = new HashMap<>();
+    public List<Map<String, Object>> shipCellListFromData = new ArrayList<>();
     private final List<Group> draggables = new ArrayList<>();
     private static int shipCount;
     private static int remainingCells;
@@ -56,12 +56,16 @@ public class newSpielfeld {
         List<Integer> shipSizesList = new ArrayList<>();
 
         if (!isEnemyField) {
+            ScrollPane scrollPane = new ScrollPane();
+            scrollPane.setFitToWidth(true);
+            scrollPane.setPadding(new Insets(10));
+
             HBox draggableContainer = new HBox(10);
             draggableContainer.setPadding(new Insets(10));
 
             int[] shipSizes = {5, 4, 3, 2};
             Random random = new Random();
-            shipCount = (int)((size*size)*0.3);
+            shipCount = (int) ((size * size) * 0.3);
             remainingCells = shipCount;
             while (remainingCells > 1) {
                 // Zufällig eine Schiffsgröße auswählen
@@ -77,6 +81,7 @@ public class newSpielfeld {
                     shipSizesList.add(shipSize);
                 }
             }
+            scrollPane.setContent(draggableContainer);
             root.setBottom(draggableContainer);
         }
         Server.setShips(shipSizesList);
@@ -91,8 +96,7 @@ public class newSpielfeld {
 
         gridPane = createGridPane();
         root.setCenter(gridPane);
-;
-        shipCellMap = (Map<Group, Set<Cell>>) data.get(shipCellMap);
+        shipCellListFromData = (List<Map<String, Object>>) data.get("ships");
 
         if (!isEnemyField) {
             HBox draggableContainer = new HBox(10);
@@ -103,13 +107,138 @@ public class newSpielfeld {
         //Server.setShips(shipSizesList);
 
         //Daten laden
-        drawShipsFromData();
+        drawShipsFromData(data);
     }
 
     // Funktion zum Zeichnen von Schiffen aufm Feld
-    private void drawShipsFromData() {
+    private void drawShipsFromData(Map<String, Object> data) {
+        Map<Group, Set<Cell>> newShipCellMap = new HashMap<>();
 
+        shipCellMap.forEach((key, cellSet) -> {
+            if (cellSet.isEmpty()) return;
+
+            int shipLength = cellSet.size();
+            boolean isHorizontal = false;
+            boolean isVertical = false;
+
+            Cell[] cellsArray = cellSet.toArray(new Cell[0]);
+            if (cellsArray.length >= 2) {
+                if (cellsArray[0].getRow() == cellsArray[1].getRow()) {
+                    isHorizontal = true;
+                } else if (cellsArray[0].getCol() == cellsArray[1].getCol()) {
+                    isVertical = true;
+                }
+            } else if (cellsArray.length == 1) {
+                isHorizontal = true;
+            }
+
+            Group drawnShipGroup = createDraggableShip(shipLength);
+
+            if (isHorizontal) {
+                // Rotation is already set to 90 in createDraggableShip, if that's your horizontal default.
+            } else if (isVertical) {
+                drawnShipGroup.setRotate(0);
+            }
+
+            Cell firstCell = cellsArray[0];
+            double startX = firstCell.getCol() * CELL_SIZE;
+            double startY = firstCell.getRow() * CELL_SIZE;
+            drawnShipGroup.setTranslateX(startX);
+            drawnShipGroup.setTranslateY(startY);
+
+            root.getChildren().add(drawnShipGroup);
+            draggables.add(drawnShipGroup);
+
+            newShipCellMap.put(drawnShipGroup, cellSet);
+
+            makeDraggable(drawnShipGroup);
+        });
+        shipCellMap = newShipCellMap;
+
+        // --- Modify these lines to explicitly cast to Integer ---
+        if (data != null && data.containsKey("ships")) {
+            List<Map<String, Object>> loadedShipsDataList = (List<Map<String, Object>>) data.get("ships");
+            shipCellMap = new HashMap<>();
+
+            if (loadedShipsDataList != null) {
+                for (Map<String, Object> shipData : loadedShipsDataList) {
+                    String shipId = (String) shipData.get("shipId");
+                    List<Map<String, Double>> cellDataList = (List<Map<String, Double>>) shipData.get("cells");
+
+                    Set<Cell> cellSet = new HashSet<>();
+                    if (cellDataList != null) {
+                        for (Map<String, Double> cellData : cellDataList) {
+                            // Explicitly cast to Double then to int:
+                            int col = ((Double) cellData.get("col")).intValue();
+                            int row = ((Double) cellData.get("row")).intValue();
+                            cellSet.add(new Cell(col, row));
+                        }
+                    }
+                    // ... (rest of the ship loading code remains the same) ...
+                    int shipLength = cellSet.size();
+                    Group drawnShipGroup = createDraggableShip(shipLength);
+                    // ... (orientation and positioning code) ...
+                    root.getChildren().add(drawnShipGroup);
+                    draggables.add(drawnShipGroup);
+                    shipCellMap.put(drawnShipGroup, cellSet);
+                    makeDraggable(drawnShipGroup);
+                    placeShipsOnPositions(drawnShipGroup, cellSet);
+
+                }
+            }
+            updateShipCellMap();
+        } else {
+            System.out.println("Keine Schiffsdaten im Speicherstand gefunden oder Daten sind null.");
+        }
     }
+
+    private void placeShipsOnPositions(Group ship, Set<Cell> cellSet) {
+        if (ship.getChildren().isEmpty() || cellSet.isEmpty()) return;
+
+        // Nimm die erste Cell aus dem Set als Zielposition
+        Cell targetCell = cellSet.iterator().next();
+
+        // Suche die passende Rectangle-Zelle im GridPane
+        Node targetNode = null;
+        for (Node node : gridPane.getChildren()) {
+            Integer colIndex = GridPane.getColumnIndex(node);
+            Integer rowIndex = GridPane.getRowIndex(node);
+
+            // Falls die Node in der gesuchten Spalte & Zeile ist, speichern
+            if (colIndex != null && rowIndex != null && colIndex == targetCell.getCol() && rowIndex == targetCell.getRow()) {
+                targetNode = node;
+                break;
+            }
+        }
+
+        if (targetNode == null) {
+            System.out.println("Keine passende Zelle gefunden für: " + targetCell);
+            return;
+        } else {
+            Bounds cellBounds = targetNode.localToScene(targetNode.getBoundsInLocal());
+            System.out.println("Gefundene Zelle an (" + targetCell.getCol() + ", " + targetCell.getRow() + ") mit Bounds: " + cellBounds);
+        }
+
+        if (targetNode != null) {
+            Bounds cellBounds = targetNode.localToScene(targetNode.getBoundsInLocal());
+
+            // Mittelpunkte berechnen
+            double targetX = cellBounds.getMinX() + cellBounds.getWidth() / 2;
+            double targetY = cellBounds.getMinY() + cellBounds.getHeight() / 2;
+
+            // Schiffsmittelpunkt berechnen
+            ImageView firstPart = (ImageView) ship.getChildren().get(0);
+            Bounds shipBounds = firstPart.localToScene(firstPart.getBoundsInLocal());
+            double shipCenterX = shipBounds.getMinX() + shipBounds.getWidth() / 2;
+            double shipCenterY = shipBounds.getMinY() + shipBounds.getHeight() / 2;
+
+            // Setze das Schiff auf die richtige Position
+            ship.setTranslateX(ship.getTranslateX() + targetX - shipCenterX);
+            ship.setTranslateY(ship.getTranslateY() + targetY - shipCenterY);
+            System.out.println("Setze Schiff auf X: " + ship.getTranslateX() + ", Y: " + ship.getTranslateY());
+        }
+    }
+
 
     //Konstruktor ohne schiff Berechnung für Multiplayer
     public newSpielfeld(int size, boolean isEnemyField, BorderPane root, List<Integer> ships) {
@@ -122,7 +251,7 @@ public class newSpielfeld {
         root.setCenter(gridPane);
 
         if (!isEnemyField) {
-            HBox draggableContainer = new HBox(10);
+            VBox draggableContainer = new VBox(10);
             draggableContainer.setPadding(new Insets(10));
 
             for (int shipSize : ships) {
@@ -138,12 +267,15 @@ public class newSpielfeld {
 
     private GridPane createGridPane() {
         GridPane grid = new GridPane();
-        grid.setMaxHeight(4000);
-        grid.setMaxWidth(4000);
+        //grid.setMaxHeight(4000);
+        //grid.setMaxWidth(4000);
+
         for (int row = 0; row < GRID_SIZE; row++) {
             for (int col = 0; col < GRID_SIZE; col++) {
                 Rectangle cell = new Rectangle(CELL_SIZE, CELL_SIZE, Color.TRANSPARENT);
                 cell.setStroke(Color.BLACK);
+                //GridPane.setHgrow(cell, Priority.ALWAYS);
+                //GridPane.setVgrow(cell, Priority.ALWAYS);
                 grid.add(cell, col, row);
             }
         }
@@ -164,12 +296,12 @@ public class newSpielfeld {
     }
 
     private void makeDraggable(Group ship) {
-        if(isEditable){
+        if (isEditable) {
             ship.setOnMousePressed(event -> {
                 if (event.getButton() == MouseButton.PRIMARY) {
                     ship.setUserData(new double[]{event.getSceneX(), event.getSceneY(), ship.getTranslateX(), ship.getTranslateY()});
                 }
-                if(event.getButton() == MouseButton.SECONDARY) {
+                if (event.getButton() == MouseButton.SECONDARY) {
                     rotateDraggableGroup(ship);
                 }
             });
@@ -180,7 +312,7 @@ public class newSpielfeld {
                     ship.setTranslateX(data[2] + event.getSceneX() - data[0]);
                     ship.setTranslateY(data[3] + event.getSceneY() - data[1]);
                 }
-                if(event.getButton() == MouseButton.SECONDARY) {
+                if (event.getButton() == MouseButton.SECONDARY) {
                     rotateDraggableGroup(ship);
                 }
             });
@@ -192,7 +324,7 @@ public class newSpielfeld {
         }
     }
 
-    public void changeEditableState(boolean ye){
+    public void changeEditableState(boolean ye) {
         isEditable = ye;
     }
 
@@ -275,14 +407,14 @@ public class newSpielfeld {
         });
     }
 
-    public void selectFeld(int x, int y, Color color){
+    public void selectFeld(int x, int y, Color color) {
         for (javafx.scene.Node node : gridPane.getChildren()) {
             if (GridPane.getColumnIndex(node) == x && GridPane.getRowIndex(node) == y) {
                 if (node instanceof Rectangle) {
                     ((Rectangle) node).setFill(color);
                 }
                 //Wenn es ein Schiff ist
-                if(node instanceof ImageView) {
+                if (node instanceof ImageView) {
                     ScaleTransition scaleTransition = new ScaleTransition(Duration.seconds(2), node);
                     scaleTransition.setFromX(1.0);
                     scaleTransition.setFromY(1.0);

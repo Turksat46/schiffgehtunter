@@ -17,7 +17,7 @@ public class SaveFileManager {
     public SaveFileManager() {
         fileChooser.setDialogTitle("Spielstand laden/speichern");
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        fileChooser.setFileFilter(new FileNameExtensionFilter("Save-Dateien", "*.save"));
+        fileChooser.setFileFilter(new FileNameExtensionFilter("Save-Dateien", "save"));
     }
 
     //Load Data

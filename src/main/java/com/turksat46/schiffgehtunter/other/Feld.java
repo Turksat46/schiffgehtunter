@@ -2,6 +2,8 @@ package com.turksat46.schiffgehtunter.other;
 
 //Dies ist die Klasse für ein einzelnes Feld
 
+import javafx.scene.image.Image;
+import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 
 public class Feld extends Rectangle {
@@ -41,4 +43,7 @@ public class Feld extends Rectangle {
 
     public int getPosY() {return posY+1;}
 
+    public void setImage(Image sandTexture) {
+        this.setFill(new ImagePattern(sandTexture));
+    }
 }

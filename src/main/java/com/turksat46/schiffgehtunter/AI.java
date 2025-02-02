@@ -1,5 +1,6 @@
 package com.turksat46.schiffgehtunter;
 
+import com.turksat46.schiffgehtunter.other.Music;
 import com.turksat46.schiffgehtunter.other.Position;
 import javafx.scene.paint.Color;
 
@@ -28,6 +29,12 @@ public class AI {
         feld = new int[groesse][groesse];
         setShips();
         this.mainGameController = mainGameController;
+    }
+
+    public AI(int difficulty, int groesse, MainGameController mainGameController, Map<String, Object>data){
+        this.difficulty = difficulty;
+        this.groesse = groesse;
+
     }
 
     private void setShips() {
@@ -118,6 +125,8 @@ public class AI {
                 if (shipPositions.isEmpty()) {
                     System.out.println("Schiff " + entry.getKey() + " versenkt!");
                     ships.remove(entry.getKey());
+                    Music sound = Music.getInstance();
+                    sound.playShipDestroyed();
                     if(ships.isEmpty()){
                         //Spieler hat gewonnen
                         mainGameController.handleWinForPlayer();
@@ -135,6 +144,7 @@ public class AI {
 
     public void receiveHit(int x, int y, boolean isShip){
         System.out.println("AI.java: Position an: " + x + " " + y + " ist ein Schiff: "+isShip);
+        
     }
 
     public void allShipsShot(){

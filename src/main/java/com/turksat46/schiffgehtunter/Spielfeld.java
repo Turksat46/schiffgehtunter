@@ -1,6 +1,8 @@
 package com.turksat46.schiffgehtunter;
 import com.turksat46.schiffgehtunter.other.Feld;
+import com.turksat46.schiffgehtunter.other.Music;
 import com.turksat46.schiffgehtunter.other.Ship;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
@@ -10,6 +12,7 @@ import javafx.stage.Stage;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 
 public class Spielfeld {
@@ -21,6 +24,9 @@ public class Spielfeld {
     MainGameController mainGameController;
     MultipayerMainGameController multipayerMainGameController;
     boolean istGegnerFeld;
+
+    Image sandTexture;
+    Image tntTexture;
 
     public Spielfeld (int groesse, boolean istGegnerFeld, boolean isMultiplayer){
         this.feld= new int [groesse][groesse];
@@ -36,6 +42,15 @@ public class Spielfeld {
         }
         this.istGegnerFeld = istGegnerFeld;
         initFeld(isMultiplayer);
+
+        // Lade die Texturen
+        try {
+            sandTexture = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/turksat46/schiffgehtunter/images/sand_texture.png")));
+            tntTexture = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/turksat46/schiffgehtunter/images/tnt.png")));
+        } catch (NullPointerException e) {
+            System.err.println("Fehler beim Laden der Texturen. Stelle sicher, dass die Dateien im Ressourcenordner liegen.");
+            throw e;
+        }
 
     }
 
@@ -88,11 +103,11 @@ public class Spielfeld {
 
                 cell.setStroke(Color.BLACK);
 
-                Text cellText = new Text(String.valueOf(feld[row][col]));
+
 
                 // StackPane für Rechteck und Text in einer Zelle
                 StackPane cellPane = new StackPane();
-                cellPane.getChildren().addAll(cell, cellText);
+                cellPane.getChildren().addAll(cell);
 
 
                 // Klick-Event für jede Zelle
@@ -123,16 +138,19 @@ public class Spielfeld {
 
     public void selectFeld(int posx, int posy){
         //TODO: Eventuell hier die Farbe ändern, wenn ein Schiff angeklickt wird
-        if(istGegnerFeld){
-            felder[posx][posy].setFill(Color.RED);
-        }else{
-            felder[posx][posy].setFill(Color.BLUE);
-        }
+        //felder[posx][posy].setFill(Color.RED);
+        felder[posx][posy].setImage(sandTexture);
+        Music sound = Music.getInstance();
+        sound.playMiss();
     }
 
+    //Wenn Feld ein Schiff ist, wird das ausgeführt
     public void selectFeld(int posx, int posy, Color color){
         //TODO: Eventuell hier die Farbe ändern, wenn ein Schiff angeklickt wird
-        felder[posx][posy].setFill(color);
+        System.out.println("selectFeld mit Farbe wurde ausgewählt");
+        felder[posx][posy].setImage(tntTexture);
+        Music sound = Music.getInstance();
+        sound.playHit();
     }
 
 }

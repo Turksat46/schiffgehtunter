@@ -10,10 +10,7 @@ import com.turksat46.schiffgehtunter.other.Cell;
 import com.turksat46.schiffgehtunter.other.Feld;
 import javafx.scene.Group;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class SaveData {
 
@@ -59,7 +56,33 @@ public class SaveData {
         data.put("currentMode", currentMode);
         data.put("currentDifficulty", currentDifficulty);
         data.put("groesse", groesse);
-        data.put("shipCellMap", shipCellMap);
+        // --- Modified Ship Saving Logic ---
+        List<Map<String, Object>> shipsDataList = new ArrayList<>();
+        int shipIndexCounter = 0; // To create unique ship IDs
+
+        for (Map.Entry<Group, Set<Cell>> entry : shipCellMap.entrySet()) {
+            Group shipGroup = entry.getKey();
+            Set<Cell> cellSet = entry.getValue();
+
+            if (cellSet.isEmpty()) continue; // Skip empty ships if any
+
+            Map<String, Object> shipData = new HashMap<>();
+            shipData.put("shipId", "ship_" + shipIndexCounter++); // Unique ID
+            shipData.put("cells", new ArrayList<>(cellSet)); // Save cells as List (Gson serializes Set directly, but List is clearer in JSON)
+
+            // Determine and save orientation (example, adjust logic as needed)
+            boolean isHorizontal = false;
+            if (cellSet.size() >= 2) {
+                Cell[] cellsArray = cellSet.toArray(new Cell[0]);
+                if (cellsArray[0].getRow() == cellsArray[1].getRow()) {
+                    isHorizontal = true;
+                }
+            }
+            shipData.put("isHorizontal", isHorizontal);
+            shipsDataList.add(shipData);
+        }
+        data.put("ships", shipsDataList); // Save the list of ship data instead of shipCellMap directly
+        // --- End of Modified Ship Saving Logic ---
         data.put("feld", feld);
         data.put("felder", felder);
 
