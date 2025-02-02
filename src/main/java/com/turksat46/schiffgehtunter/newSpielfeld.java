@@ -9,6 +9,7 @@ import javafx.scene.Group;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -321,6 +322,16 @@ public class newSpielfeld {
 
     public void changeEditableState(boolean ye) {
         isEditable = ye;
+        for (Node node : gridPane.getChildren()) {
+            node.setOnMousePressed(null);
+            node.setOnMouseDragged(null);
+            node.setOnMouseReleased(null);
+        }
+        for(Group item : draggables){
+            item.setOnMousePressed(null);
+            item.setOnMouseDragged(null);
+            item.setOnMouseReleased(null);
+        }
     }
 
     private void rotateDraggableGroup(Group group) {
