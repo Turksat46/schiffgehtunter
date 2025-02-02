@@ -10,23 +10,21 @@ import java.util.random.RandomGenerator;
 
 public class AI {
     int difficulty;
-    static int[][] feld;
-    static Feld[][] spielerFeld;
-    static int groesse;
+    public static int[][] feld;
+    public static Feld[][] spielerFeld;
+    public static int groesse;
 
-    static private Map<Integer, List<Position>> ships = new HashMap<>();
-    static private int shipId = 0;
+    static public Map<Integer, List<Position>> ships = new HashMap<>();
+    static public int shipId = 0;
 
-    static Set<Position> felder = new HashSet<>(); // Geändert zu HashSet
+    public static Set<Position> felder = new HashSet<>(); // Geändert zu HashSet
 
-    static List<Position> entdeckteSchiffe = new ArrayList<>();
+    public static List<Position> entdeckteSchiffe = new ArrayList<>();
 
     static MainGameController mainGameController;
     static MultipayerMainGameController multiplayerMainGameController;
-    private boolean huntmode = true;
-    private boolean targetmode = false;
 
-    protected List<Position> validMoves;
+    public List<Position> validMoves;
 
     private boolean isMultiplayer;
 
@@ -61,7 +59,123 @@ public class AI {
     public AI(int difficulty, int groesse, MainGameController mainGameController, Map<String, Object>data){
         this.difficulty = difficulty;
         this.groesse = groesse;
+        // Konvertiere kifeld von ArrayList zu int[][]
+        this.mainGameController = mainGameController;
 
+        ArrayList<ArrayList<Double>> tempKifeld = (ArrayList<ArrayList<Double>>) data.get("kifeld");
+        feld = new int[groesse][groesse];
+        if (tempKifeld != null) {
+            for (int i = 0; i < tempKifeld.size(); i++) {
+                ArrayList<Double> row = tempKifeld.get(i);
+                for (int j = 0; j < row.size(); j++) {
+                    Double ye = row.get(j);
+                    feld[i][j] = ye.intValue();
+                }
+            }
+        }
+
+        Object kishipsObject = data.get("kiships");
+        if (kishipsObject instanceof Map) {
+            Map<?, ?> tempKiships = (Map<?, ?>) kishipsObject;
+            ships = new HashMap<>();
+            for (Map.Entry<?, ?> entry : tempKiships.entrySet()) {
+                // Schlüssel von String zu Integer parsen
+                Integer shipIdKey = null;
+                if (entry.getKey() instanceof String) {
+                    try {
+                        shipIdKey = Integer.parseInt((String) entry.getKey());
+                    } catch (NumberFormatException e) {
+                        System.err.println("Ungültiger Schiffs-ID-Schlüssel: " + entry.getKey());
+                        continue; // Überspringe diesen Eintrag
+                    }
+                } else if (entry.getKey() instanceof Number) {
+                    shipIdKey = ((Number) entry.getKey()).intValue();
+                }
+
+                if (shipIdKey == null) {
+                    System.err.println("Schiffs-ID-Schlüssel konnte nicht geparst werden: " + entry.getKey());
+                    continue; // Überspringe diesen Eintrag
+                }
+
+                List<Position> posList = new ArrayList<>();
+                if (entry.getValue() instanceof List) {
+                    List<?> positionList = (List<?>) entry.getValue();
+                    for (Object positionObject : positionList) {
+                        if (positionObject instanceof Map) {
+                            Map<String, ?> posMap = (Map<String, ?>) positionObject;
+                            if (posMap.containsKey("x") && posMap.containsKey("y") &&
+                                    posMap.get("x") instanceof Number && posMap.get("y") instanceof Number) {
+                                posList.add(new Position(((Number) posMap.get("x")).intValue(),
+                                        ((Number) posMap.get("y")).intValue()));
+                            } else {
+                                System.err.println("Ungültiges Positionsformat in kiships: " + posMap);
+                            }
+                        } else {
+                            System.err.println("Ungültiger Positionstyp in kiships: " + positionObject);
+                        }
+                    }
+                } else {
+                    System.err.println("Ungültiger Listentyp für kiships-Wert: " + entry.getValue());
+                    continue; // Überspringe diesen Eintrag
+                }
+                ships.put(shipIdKey, posList); // Schlüssel ist jetzt ein Integer
+            }
+        } else {
+            System.err.println("kiships-Daten sind nicht im erwarteten Format (Map): " + kishipsObject);
+        }
+
+        // Konvertiere kientdeckteSchiffe
+        List<Map<String, Double>> tempEntdeckteSchiffe = (List<Map<String, Double>>) data.get("kientdeckteSchiffe");
+        if (tempEntdeckteSchiffe != null) {
+            entdeckteSchiffe = new ArrayList<>();
+            for (Map<String, Double> posMap : tempEntdeckteSchiffe) {
+                entdeckteSchiffe.add(new Position(posMap.get("x").intValue(), posMap.get("y").intValue()));
+            }
+        }
+
+        // Konvertiere kifelder
+        Object kifelderObject = data.get("kifelder");
+        if (kifelderObject instanceof List) { // Prüfe, ob es eine Liste ist
+            List<Map<String, Double>> tempKifelder = (List<Map<String, Double>>) kifelderObject;
+            felder = new HashSet<>();
+            for (Map<String, Double> posMap : tempKifelder) {
+                felder.add(new Position(posMap.get("x").intValue(), posMap.get("y").intValue()));
+            }
+        } else if (kifelderObject instanceof Set) { // Falls es bereits ein Set ist (optional)
+            Set<Map<String, Double>> tempKifelder = (Set<Map<String, Double>>) kifelderObject;
+            felder = new HashSet<>();
+            for (Map<String, Double> posMap : tempKifelder) {
+                felder.add(new Position(posMap.get("x").intValue(), posMap.get("y").intValue()));
+            }
+        } else {
+            System.err.println("kifelder-Daten sind nicht im erwarteten Format (weder List noch Set): " + kifelderObject);
+        }
+
+        // Konvertiere kivalidMoves
+        List<Map<String, Double>> tempValidMoves = (List<Map<String, Double>>) data.get("kivalidMoves");
+        if (tempValidMoves != null) {
+            validMoves = new ArrayList<>();
+            for (Map<String, Double> posMap : tempValidMoves) {
+                validMoves.add(new Position(posMap.get("x").intValue(), posMap.get("y").intValue()));
+            }
+        }
+
+        updateEverything();
+    }
+
+    private void updateEverything() {
+        for(int i = 0; i < groesse; i++){
+            for(int j = 0; j < groesse; j++){
+                if(feld[i][j] == 2){
+                    if(!ships.containsValue(new Position(i, j))){
+                        MainGameController.gegnerspielfeld.selectFeld(i,j,Color.GREEN);
+                    }
+                }
+                if(feld[i][j] == 3){
+                    MainGameController.gegnerspielfeld.selectFeld(i,j);
+                }
+            }
+        }
     }
 
     public AI(int difficulty, int groesse, MultipayerMainGameController multiplayerMainGameController){
@@ -151,7 +265,7 @@ public class AI {
         Position hitPosition = new Position(posx, posy);
         if(feld[posx][posy] == 1){
             System.out.println(posx + " " + posy + " wurde getroffen!");
-            feld[posx][posy] = 0;
+            feld[posx][posy] = 2;
             spielfeld.selectFeld(posx,posy, Color.GREEN);
 
             Iterator<Map.Entry<Integer, List<Position>>> iterator = ships.entrySet().iterator();
@@ -173,7 +287,10 @@ public class AI {
                     }
                 }
             }
+        }else if(feld[posx][posy] == 0){
+            feld[posx][posy] = 3;
         }
+        mainGameController.handleHit(posx, posy);
         getNextMove(); //Diese Methode darf erst aufgerufen werden, wenn receiveMove fertig ist (wegen der Exception)
     }
 
@@ -187,19 +304,6 @@ public class AI {
         }
     }
 
-    private boolean containsAllPositions(List<Position> positionsToSearch, List<Position> listToSearchIn) {
-        for(Position searchPosition : positionsToSearch) {
-            boolean found = false;
-            for(Position searchInPosition : listToSearchIn) {
-                if(searchInPosition.equals(searchPosition)) {
-                    found = true;
-                    break;
-                }
-            }
-            if(!found) return false;
-        }
-        return true;
-    }
 
     public void allShipsShot(){
         mainGameController.handleWinForOpponent();
@@ -342,14 +446,6 @@ public class AI {
         return bestMove;
     }
 
-    private boolean atLeastTwoHitsInDirection(Position start, Position direction) {
-        Position testPosition = new Position(start);
-        testPosition.add(direction);
-        if(!entdeckteSchiffe.contains(testPosition)) return false;
-        testPosition.add(direction);
-        if(!entdeckteSchiffe.contains(testPosition)) return false;
-        return true;
-    }
 
     private List<Position> getNextBestMoves() {
         List<Position> result = new ArrayList<>();

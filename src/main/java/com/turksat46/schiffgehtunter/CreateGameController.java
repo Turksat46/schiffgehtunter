@@ -19,43 +19,38 @@ import java.io.IOException;
 import java.util.Map;
 
 
-/**
- * Das ist der Controller also die Logik für das CreateGameView
- */
 public class CreateGameController {
 
-    /**
-     * cb ist schwierigkeit der KI
-     * cb2 ist Spielstrategie
-     * groesseslider ist die ausgwählte grid größe
-     * grossetextfield auch die grid größe
-     *
-     */
     Music soundPlayer = Music.getInstance();
+
+    // cb = Schwierigkeit
+    // cb2 = Spielstrategie
+
     @FXML
     ChoiceBox cb = new ChoiceBox();
     @FXML
     ChoiceBox cb2 = new ChoiceBox();
+
     @FXML
     Slider groesseslider = new Slider();
     @FXML
     TextField groessetextfield = new TextField();
+
     @FXML
     Label ladenhinweislabel = new Label();
+
     @FXML
     HBox kiDifficultyUI = new HBox();
+
     MainGameController mainGameController;
     MultipayerMainGameController multipayerMainGameController;
     SaveFileManager saveFileManager;
+
     ObservableList<Difficulty> difficulties = FXCollections.observableArrayList();
     ObservableList<String> skillLevels = FXCollections.observableArrayList("Noob", "Average", "Hardcore");
     ObservableList<String> gameModes = FXCollections.observableArrayList("Spieler vs. Computer", "Spieler vs. Spieler", "Computer vs. Computer");
 
 
-    /**
-     * Es werden die choiceboxen mit den Daten für das skillLevel und spielstrategie befüllt.
-     * Und ebenso die Daten gespeichert der grid größe
-     */
     public void initialize() {
         cb.setItems(skillLevels);
         cb2.setItems(gameModes);
@@ -83,9 +78,7 @@ public class CreateGameController {
         saveFileManager = new SaveFileManager();
     }
 
-    /**
-     * Eventhandler für das wechseln der Spielstrategie.
-     */
+
     public void onStrategieChanged() {
         if (cb2.getSelectionModel().getSelectedIndex() == 0) {
             kiDifficultyUI.setVisible(true);
@@ -94,10 +87,11 @@ public class CreateGameController {
         }
     }
 
-    /**
-     * Hier wird getestet wie welche Strategie gewählt wurde und je nachdem wird hier StartSinglePlayer oder OpenconnectionSetup aufgerufen
-     * @throws IOException
-     */
+    public void onPlayPressed() throws IOException {
+        soundPlayer.playSound();
+        startGame();
+    }
+
     public void startGame() throws IOException {
         if (cb2.getSelectionModel().getSelectedIndex() == 0) {
             startSinglePlayerGame();
@@ -107,11 +101,6 @@ public class CreateGameController {
         }
     }
 
-    /**
-     * Hier wird die Main-game view geladen und im fenster angezeigt.
-     * Ebenso wird der controller dafür geladen und das setupspiel darin wird aufgerufen
-     * @throws IOException
-     */
     private void startSinglePlayerGame() throws IOException {
         soundPlayer.playSound();
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("main-game-view.fxml"));
@@ -129,14 +118,6 @@ public class CreateGameController {
         thisstage.close();
     }
 
-
-
-
-    /**
-     * Hier wird die EstablishConnection view geladen in der dem Serer die grid groesse gegeben wurde.
-     * Es wird ebenso gewartet bis ein Spieler sich verbindet.
-     *  @throws IOException
-     */
     private void openConnectionSetup() throws IOException {
         soundPlayer.playSound();
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("establishConnection.fxml"));
@@ -155,22 +136,16 @@ public class CreateGameController {
         waitForConnectionAndStartGame(stage);
     }
 
-
-    /**
-     * Wenn die Verbindung erfolgreich war dann soll hier die funktion startMultiplayer aufgerufen werden.
-     * @param stage damit man die selbe stage benutzt
-     * @throws IOException
-     */
     private void waitForConnectionAndStartGame(Stage stage) throws IOException {
         new Thread(() -> {
             while (!Server.connectionEstablished) {
                 try {
-                    Thread.sleep(100); // Checke im takt
+                    Thread.sleep(100); // Check periodically
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
-            // wenn connection erfolgreich dann start Muliplayer
+            // Once connection is established, start multiplayer game
             Platform.runLater(() -> {
                 try {
                     startMultiplayerGame(stage, (int) groesseslider.getValue());
@@ -182,13 +157,7 @@ public class CreateGameController {
         }).start();
     }
 
-    /**
-     * Hier wird die Multiplayer view geladen und der Controller geladen.
-     * Der controller ruft setupSpiel auf um das spiel zu initialisieren.
-     * @param connectionStage stage der connection
-     * @param groesse grid groesse
-     * @throws IOException
-     */
+    //Überarbeiten so das auch schiffe übergeben werden können
     public void startMultiplayerGame(Stage connectionStage, int groesse) throws IOException {
         soundPlayer.playSound();
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("multiplayer-main-game-view.fxml"));
@@ -204,10 +173,6 @@ public class CreateGameController {
         connectionStage.close();
     }
 
-    /**
-     * Zurück Button funktion der zur hello view führt
-     * @throws IOException
-     */
     public void onBackPressed() throws IOException {
         soundPlayer.playSound();
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("hello-view.fxml"));
@@ -219,10 +184,6 @@ public class CreateGameController {
         thisstage.close();
     }
 
-    /**
-     * Wenn der Button "Spiel laden" gedrückt wurde dann wird ein Dialog eröffnet.
-     * @throws IOException
-     */
     public void openLoadFileDialog() throws IOException {
         soundPlayer.playSound();
         ladenhinweislabel.setText("Bitte eine Save-Datei im Dialog öffnen...");

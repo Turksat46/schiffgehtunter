@@ -29,11 +29,17 @@ import java.util.ResourceBundle;
 public class HelloController implements Initializable {
 
     Music soundsPlayer = Music.getInstance();
+
+    //
+    // Kommentare zur Hintergrundzeichnung bei @MainGameController.java anschauen
+    //
     @FXML
     private VBox rootBox;
     @FXML
     private Label welcomeText;
+
     private Canvas backgroundCanvas;
+
     private static final int WIDTH = 400;
     private static final int HEIGHT = 600;
     private static final int TILE_SIZE = 30;
@@ -41,30 +47,22 @@ public class HelloController implements Initializable {
     private static final int WORLD_HEIGHT_TILES = 20;
     private static final double SHADOW_OFFSET_X = 2;
     private static final double SHADOW_OFFSET_Y = 2;
+
     private Tile[][] world;
     private double playerX;
     private double playerY;
     private Image sandTexture;
     private Image waterTexture;
+
     public enum Tile {
         WATER, SAND
     }
 
-
-    /**
-     * initialieren der Hello-view mit einem Hintergrund.
-     * @param url url des hintergrundes
-     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         createBackground();
     }
 
-    /**
-     * Ein canvas wird erstellt auf dem man die sandtexturen und wassertexturen werden geladen.
-     * GenerateWorld wird aufgerufen.
-     * Animation wird gestartet für das animieren des Wassers
-     */
     private void createBackground() {
         backgroundCanvas = new Canvas(WIDTH, HEIGHT);
         GraphicsContext gc = backgroundCanvas.getGraphicsContext2D();
@@ -86,15 +84,12 @@ public class HelloController implements Initializable {
         new AnimationTimer() {
             @Override
             public void handle(long now) {
-                //Zeichne alles auf den Canvas
+                // 1. Zeichne alles auf den Canvas
                 draw(gc);
             }
         }.start();
     }
 
-    /**
-     * ordnen die Tiles des Welthintergrundes in einem zufälligen muster aber das eher sand unten ist
-     */
     private void generateWorld() {
         world = new Tile[WORLD_WIDTH_TILES][WORLD_HEIGHT_TILES];
         // Standardmäßig alles mit Wasser füllen
@@ -119,18 +114,10 @@ public class HelloController implements Initializable {
         }
     }
 
-    /**
-     * hilfsfunktion
-     * @param baseColor
-     * @return dunkle color
-     */
     private javafx.scene.paint.Color getShadowColor(javafx.scene.paint.Color baseColor) {
         return baseColor.darker();
     }
 
-    /** Hier werden alle tiles in ein background gesetzt und zu dem root in der view zugefügt.
-     *@param gc
-     */
     private void draw(GraphicsContext gc) {
         //gc.clearRect(0, 0, WIDTH, HEIGHT);
 
@@ -191,11 +178,7 @@ public class HelloController implements Initializable {
     }
 
 
-    /**
-     * Beim Klick auf den Button "Neues Spiel starten" wird eine fxml Datei createGame geladen und dem fenster hinzugefügt.
-     * Das ist für das Erstellen eines Spieles verantwortlich und das Laden eines Spieles
-     * @throws IOException
-     */
+
     @FXML
     protected void onHelloButtonClick() throws IOException {
         soundsPlayer.playSound();
@@ -211,12 +194,6 @@ public class HelloController implements Initializable {
         hideCurrentStage();
     }
 
-
-    /**
-     * Beim Klicken auf den Button "Spiel finden" wird eine fxml Datei connect geladen und dem fenster hinzugefügt.
-     * Das ist für das Verbinden eines erstellten Spiels indem man die Ip Adresse eingibt
-     * @throws IOException
-     */
     @FXML
     protected void onMultiplayerClick() throws IOException {
         soundsPlayer.playSound();
@@ -228,19 +205,11 @@ public class HelloController implements Initializable {
         hideCurrentStage();
     }
 
-    /**
-     *Hilfsfunktion zum schließen des aktuellen Fensters
-     */
     public void hideCurrentStage() {
         Stage stage = (Stage) welcomeText.getScene().getWindow();
         stage.hide();
     }
 
-    /**
-     * Beim Klicken auf den Button "Einstellungen" wird eine fxml Datei settings geladen und dem fenster hinzugefügt.
-     * In den Einstellungen kann man die Soundeinstellungen ändern und speichern
-     * @throws IOException
-     */
     @FXML
     protected void onSettingsButtonClick() throws IOException {
         soundsPlayer.playSound();
@@ -251,20 +220,12 @@ public class HelloController implements Initializable {
         stage.show();
     }
 
-
-    /**
-     * Der sound stoppt beim Exit
-     */
     @FXML
     protected void onExitButtonClick() {
         soundsPlayer.playSound();
         System.exit(0);
     }
 
-
-    /**
-     * Hier ist ein Eastereggsound beim Klick auf das Logo
-     */
     @FXML
     protected void onEasterEggClick(){
         soundsPlayer.playEasterEgg();

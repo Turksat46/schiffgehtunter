@@ -1,75 +1,102 @@
 package com.turksat46.schiffgehtunter;
 
+import com.turksat46.schiffgehtunter.backgroundgeneration.BackgroundGenerator;
+import com.turksat46.schiffgehtunter.filemanagement.SaveFileManager;
 import com.turksat46.schiffgehtunter.netzwerk.Client;
 import com.turksat46.schiffgehtunter.netzwerk.Server;
+import com.turksat46.schiffgehtunter.netzwerk.establishConnection;
+import com.turksat46.schiffgehtunter.other.Cell;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 
 public class MultipayerMainGameController extends MainGameController implements Initializable {
 
-    /**
-     * State ist für die den status des Spiels also ob man verteidigt oder schiffe platziert oder angreift
-     * mode ozeigt an in welchen modus man ist also SpielervSpieler, ComputervComputer oder SpielervComputer
-     */
+
     @FXML
     public BorderPane spielerstackpane, gegnerstackpane;
+
     @FXML AnchorPane anchorPane;
+
     @FXML public HBox container;
     @FXML public Pane images;
+
     @FXML public HBox label1;
     @FXML private Button startButton;
+
     public static int currentState, currentMode, currentDifficulty, groesse;
-    private static AI bot;;
+    static GridPane feld;
+    static Scene scene;
+    private static AI bot;
+
+    static boolean rotated;
+
     static newSpielfeld spielerspielfeld;
     public static Spielfeld gegnerspielfeld;
+
+    BackgroundGenerator backgroundManager;
+
     public static volatile boolean isButtonClicked = false;
     private static boolean isServer;
     public static boolean isBotPlayer = false;
+
+
+    //Drei States: place = Schiffe platzieren, offense = Angriff, defense = Verteidigung bzw. auf Angriff vom Gegner warten
     public String[] state = {"place", "offense", "defense"};
+    //Spielmodus P = Spieler, C=Computer
     public String[] mode = {"PvsC", "PvsP", "CvsC"};
 
-
-    /**
-     * Der Hintergrdund wird hier geladen und der view zugefügt.
-     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         super.initialize(url, resourceBundle);
     }
 
-    /**
-     * der mulitplayer startet
-     */
+
     public void startGameMultiplayer() {
+        //super.startGame();
+        //currentState = 1;
         isButtonClicked = true;
+        System.out.println("MultipayerMainGameController state 1");
         startButton.setVisible(false);
     }
 
-
-    /**
-     * Für das Setup eines Spiels aus einer Datei.
-     * @param stage selbe fenster
-     * @throws FileNotFoundException
-     */
     @Override
     public void setupSpiel(int groesse, Stage stage, int currentDifficulty, int currentMode, Scene scene) throws FileNotFoundException {
-
+        //spielerspielfeld = new Spielfeld(groesse,  false);
         gegnerspielfeld = new Spielfeld(groesse,  true, true, gegnerstackpane);
+
         spielerspielfeld = new newSpielfeld(groesse, false, spielerstackpane, draggableContainer);
-        gegnerstackpane.getChildren().add(gegnerspielfeld.gridPane);
+        //gegnerspielfeld = new newSpielfeld(groesse, true, gegnerstackpane);
+
+        //spielerstackpane.getChildren().add(newSpielfeld.gridPane);
+        //gegnerstackpane.getChildren().add(gegnerspielfeld.gridPane);
+
+        // StackPane-Margen setzen
+        //HBox.setMargin(spielerstackpane, new Insets(10, 10, 100, 10)); // Abstand für spielerstackpane
+        //HBox.setMargin(gegnerstackpane, new Insets(10, 10, 100, 150)); // Abstand für gegnerstackpane
 
         super.setupBase(groesse, stage,currentDifficulty,currentMode,scene);
+
 
         if(currentMode == 2) {
             bot = new AI(currentDifficulty, groesse, this);
@@ -80,47 +107,38 @@ public class MultipayerMainGameController extends MainGameController implements 
         isServer = true;
     }
 
-    /**
-     * Für das Setup eines Spiels aus einer Datei.
-     * @param stage selbe fenster
-     * @throws FileNotFoundException
-     */
+
+    //Konstruktor mit schiff übergabe
     public void setupSpiel(int groesse, Stage stage, int currentDifficulty, int currentMode, Scene scene, List<Integer> ships) throws FileNotFoundException {
-      gegnerspielfeld = new Spielfeld(groesse, true,  true, gegnerstackpane);
+        //spielerspielfeld = new Spielfeld(groesse,  false);
+        gegnerspielfeld = new Spielfeld(groesse, true,  true, gegnerstackpane);
 
-      spielerspielfeld = new newSpielfeld(groesse, false, spielerstackpane, ships);
+        spielerspielfeld = new newSpielfeld(groesse, false, spielerstackpane, ships, draggableContainer);
+        //gegnerspielfeld = new newSpielfeld(groesse, true, gegnerstackpane);
 
-      gegnerstackpane.getChildren().add(gegnerspielfeld.gridPane);
+        //spielerstackpane.getChildren().add(newSpielfeld.gridPane);
+        //gegnerstackpane.getChildren().add(gegnerspielfeld.gridPane);
 
+        // StackPane-Margen setzen
+        //HBox.setMargin(spielerstackpane, new Insets(10, 10, 100, 10)); // Abstand für spielerstackpane
+        //HBox.setMargin(gegnerstackpane, new Insets(10, 10, 100, 150)); // Abstand für gegnerstackpane
 
-      super.setupBase(groesse, stage,currentDifficulty,currentMode,scene);
+        super.setupBase(groesse, stage,currentDifficulty,currentMode,scene);
 
-      if(currentMode == 1) {
+        if(currentMode == 1) {
             bot = new AI(currentDifficulty, groesse, this);
             isBotPlayer = true;
             System.out.println("Neuer bot");
-      }
+        }
 
         isServer = false;
     }
 
-    /**
-     * Setzt den Event-Handler für das Pausieren des Spiels.
-     *
-     * @param stage Die Hauptbühne der Anwendung.
-     */
     @Override
     public void setPausierenEventHandler(Stage stage) {
         super.setPausierenEventHandler(stage);
     }
 
-    /**
-     * Behandelt den Primärklick auf das Spielfeld.
-     *
-     * @param spielfeld Das betroffene Spielfeld.
-     * @param posx      Die X-Koordinate des Klicks.
-     * @param posy      Die Y-Koordinate des Klicks.
-     */
     @Override
     public void handlePrimaryClick(Spielfeld spielfeld, int posx, int posy){
         System.out.println(currentState);
@@ -152,18 +170,16 @@ public class MultipayerMainGameController extends MainGameController implements 
         }
     }
 
+    @Override
+    public void handleSecondaryClick(Spielfeld spielfeld, int posx, int posy) {
+        super.handleSecondaryClick(spielfeld, posx, posy);
+    }
 
-    /**
-     * Behandelt den Sieg des Spielers.
-     */
     @Override
     public void handleWinForPlayer() {
         super.handleWinForPlayer();
     }
 
-    /**
-     * Behandelt den Sieg des Gegners.
-     */
     @Override
     public  void handleWinForOpponent() {
         super.handleWinForOpponent();
@@ -171,13 +187,7 @@ public class MultipayerMainGameController extends MainGameController implements 
 
 
 
-    /**
-     * Überprüft, ob ein Schiff an der angegebenen Position getroffen wurde.
-     *
-     * @param posx Die X-Koordinate des Schusses.
-     * @param posy Die Y-Koordinate des Schusses.
-     * @return 1, wenn ein Schiff getroffen wurde, 2 wenn ein Teil eines versenkten Schiffs getroffen wurde, sonst 0.
-     */
+
     public static int shootShipMultiplayer(int posx, int posy){
         if (spielerspielfeld.isShipAtPosition(posx, posy) == 1){
             return 1;
@@ -189,13 +199,7 @@ public class MultipayerMainGameController extends MainGameController implements 
             return 0;
     }
 
-    /**
-     * Verarbeitet einen Schuss auf das gegnerische Spielfeld im Multiplayer-Modus.
-     *
-     * @param spielfeld Das gegnerische Spielfeld.
-     * @param posx      Die X-Koordinate des Schusses.
-     * @param posy      Die Y-Koordinate des Schusses.
-     */
+    //Shoot Funktionen Überarbeiten
     private void  shootEnemyShipMultiplayer(Spielfeld spielfeld, int posx, int posy){
         System.out.println("schiffe erschießen");
         if(spielfeld.istGegnerFeld){
@@ -226,21 +230,11 @@ public class MultipayerMainGameController extends MainGameController implements 
         }
     }
 
-    /**
-     * Markiert eine Zelle auf dem Spielfeld als getroffen.
-     *
-     * @param posx Die X-Koordinate der Zelle.
-     * @param posy Die Y-Koordinate der Zelle.
-     */
     public static void dyeCell(int posx, int posy){
         spielerspielfeld.selectFeld(posx, posy, Color.DARKRED);
     }
 
-    /**
-     * Führt den Spielzug der KI aus.
-     *
-     * @throws InterruptedException Falls der Thread unterbrochen wird.
-     */
+
     public void executeAITurn() throws InterruptedException {
 
         // Simuliere KI-Klick auf das Gegner-Spielfeld
@@ -254,14 +248,15 @@ public class MultipayerMainGameController extends MainGameController implements 
         }
     }
 
+    public int [] receiveBotShoot(int posx, int posy) {
+        int [] result = new int[2];
+        result[0] = posx;
+        result[1] = posy;
+        return result;
+    }
 
-    /**
-     * Beobachtet ein Schiff auf dem Spielfeld (für Zuschauermodus oder Analyse).
-     *
-     * @param spielfeld Das Spielfeld, auf dem das Schiff beobachtet wird.
-     * @param posx      Die X-Koordinate der Beobachtung.
-     * @param posy      Die Y-Koordinate der Beobachtung.
-     */
+
+
     private void  watchShip(Spielfeld spielfeld, int posx, int posy){
         System.out.println("schiffe beobachten ");
     }

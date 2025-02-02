@@ -118,11 +118,15 @@ public class Spielfeld {
                     if (!isMultiplayer) {
                         if (event.getButton() == MouseButton.PRIMARY) {
                             mainGameController.handlePrimaryClick(this, row, col);
+                        } else if (event.getButton() == MouseButton.SECONDARY) {
+                            mainGameController.handleSecondaryClick(this, row, col);
                         }
                     }
                     else {
                         if (event.getButton() == MouseButton.PRIMARY) {
                             multipayerMainGameController.handlePrimaryClick(this, row, col);
+                        } else if (event.getButton() == MouseButton.SECONDARY) {
+                            multipayerMainGameController.handleSecondaryClick(this, row, col);
                         }
                     }
 

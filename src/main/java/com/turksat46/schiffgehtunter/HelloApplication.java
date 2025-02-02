@@ -9,10 +9,6 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-
-/**
- * Das ist der root unseres Spieles von der aus alle anderen Klassen, Controller usw erstellt und gerendert werden
- */
 public class HelloApplication extends Application {
     private Stage stage = null;
 
@@ -20,12 +16,6 @@ public class HelloApplication extends Application {
 
     SettingsController settingsController;
 
-    /**
-     * Lädt die fxml datei hello-view also das Menü, und zugehörige controller für die Logik der View
-     * analog für settings, dient ebenso zum Abspielen der musik
-     * @param stage anfangsfenster
-     * @throws IOException falls fehler beim Laden entsteht
-     */
     @Override
     public void start(Stage stage) throws IOException {
         this.stage = stage;
@@ -42,11 +32,6 @@ public class HelloApplication extends Application {
         settingsController.setSettings();
     }
 
-    /**
-     * Kurze Lösung zum Laden einer Fxml Datei und anzeigen auf einer stage
-     * @param pfadFXML
-     * @throws IOException
-     */
     public void setScene(String pfadFXML) throws IOException {
         Parent root = FXMLLoader.load(getClass().getResource(pfadFXML));
         Scene scene = new Scene(root);
@@ -54,6 +39,9 @@ public class HelloApplication extends Application {
         stage.show();               // Scene zeigen
     }
 
+    public void showSettings() throws IOException {
+        setScene("settings.fxml");
+    }
 
     public static void main(String[] args) {
         launch();

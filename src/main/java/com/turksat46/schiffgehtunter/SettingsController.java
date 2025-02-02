@@ -13,12 +13,12 @@ import javafx.scene.control.Slider;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 
+import java.awt.*;
+import java.io.File;
 import java.io.IOException;
+import java.util.Objects;
 
-/**
- * Der SettingsController verwaltet die Einstellungen der Anwendung,
- * insbesondere die Musiksteuerung und Lautstärkeregulierung.
- */
+
 public class SettingsController {
     Music player = Music.getInstance();
     @FXML
@@ -32,11 +32,10 @@ public class SettingsController {
 
     SettingsFileManager fileManager = new SettingsFileManager();
 
-    /**
-     * Initialisiert die Einstellungen, setzt die gespeicherten Werte
-     * und fügt Event-Listener für UI-Komponenten hinzu.
-     */
+
     public void initialize() {
+
+
 
         volumeSlider.setMin(0);
         volumeSlider.setMax(1);
@@ -75,9 +74,6 @@ public class SettingsController {
 
     }
 
-    /**
-     * Lädt die gespeicherten Einstellungen und wendet sie an.
-     */
     public void setSettings() {
 
         boolean musicEnabled = fileManager.isMusicEnabled();
@@ -99,15 +95,14 @@ public class SettingsController {
         fileManager.saveSettings(musicEnabled, volume);
     }
 
+    public void openAnleitung() throws IOException {
+        File file = new File(getClass().getResource("/com/turksat46/schiffgehtunter/dokumente/anleitung.pdf").getFile());
+        Desktop desktop = Desktop.getDesktop();
+        desktop.browse(file.toURI());
+    }
 
-
-    /**
-     * Schließt das aktuelle Einstellungsfenster.
-     *
-     * @param actionEvent Das Event, das durch den Button-Klick ausgelöst wurde
-     * @throws IOException Falls ein Fehler beim Schließen des Fensters auftritt
-     */
     public void onBackPressed(ActionEvent actionEvent) throws IOException {
+
 
         Stage stage = (Stage) toggleMusic.getScene().getWindow();
         stage.close();
