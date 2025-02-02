@@ -238,7 +238,7 @@ public class newSpielfeld {
 
 
     //Konstruktor ohne schiff Berechnung für Multiplayer
-    public newSpielfeld(int size, boolean isEnemyField, BorderPane root, List<Integer> ships) {
+    public newSpielfeld(int size, boolean isEnemyField, BorderPane root, List<Integer> ships, HBox draggableContainer) {
         newSpielfeld.GRID_SIZE = size;
         newSpielfeld.root = root;
 
@@ -248,7 +248,6 @@ public class newSpielfeld {
         root.setCenter(gridPane);
 
         if (!isEnemyField) {
-            VBox draggableContainer = new VBox(10);
             draggableContainer.setPadding(new Insets(10));
 
             for (int shipSize : ships) {

@@ -89,7 +89,7 @@ public class MultipayerMainGameController extends MainGameController implements 
         //gegnerspielfeld = new newSpielfeld(groesse, true, gegnerstackpane);
 
         //spielerstackpane.getChildren().add(newSpielfeld.gridPane);
-        gegnerstackpane.getChildren().add(gegnerspielfeld.gridPane);
+        //gegnerstackpane.getChildren().add(gegnerspielfeld.gridPane);
 
         // StackPane-Margen setzen
         //HBox.setMargin(spielerstackpane, new Insets(10, 10, 100, 10)); // Abstand für spielerstackpane
@@ -113,11 +113,11 @@ public class MultipayerMainGameController extends MainGameController implements 
         //spielerspielfeld = new Spielfeld(groesse,  false);
         gegnerspielfeld = new Spielfeld(groesse, true,  true, gegnerstackpane);
 
-        spielerspielfeld = new newSpielfeld(groesse, false, spielerstackpane, ships);
+        spielerspielfeld = new newSpielfeld(groesse, false, spielerstackpane, ships, draggableContainer);
         //gegnerspielfeld = new newSpielfeld(groesse, true, gegnerstackpane);
 
         //spielerstackpane.getChildren().add(newSpielfeld.gridPane);
-        gegnerstackpane.getChildren().add(gegnerspielfeld.gridPane);
+        //gegnerstackpane.getChildren().add(gegnerspielfeld.gridPane);
 
         // StackPane-Margen setzen
         //HBox.setMargin(spielerstackpane, new Insets(10, 10, 100, 10)); // Abstand für spielerstackpane
