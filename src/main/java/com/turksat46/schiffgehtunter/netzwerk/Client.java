@@ -5,6 +5,8 @@ import com.turksat46.schiffgehtunter.MainGameController;
 import com.turksat46.schiffgehtunter.MultipayerMainGameController;
 import com.turksat46.schiffgehtunter.other.Music;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -12,6 +14,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
@@ -35,8 +38,6 @@ public class Client implements Runnable{
     private volatile TextField ipInput;
     @FXML
     private volatile Button connectButton;
-    @FXML
-    private volatile ProgressBar progressBar;
 
     @FXML
     private volatile Button backButton = new Button();
@@ -63,6 +64,12 @@ public class Client implements Runnable{
 
     private static volatile Stage primaryStage;
 
+    @FXML
+    private volatile   ChoiceBox cbGameMode = new ChoiceBox();
+    private static volatile int gameMode = 0;
+
+    ObservableList<String> gameModes = FXCollections.observableArrayList("Spieler", "Computer");
+
 
 
     @FXML
@@ -81,6 +88,9 @@ public class Client implements Runnable{
 
     @FXML
     public void initialize() throws IOException {
+        cbGameMode.setItems(gameModes);
+        cbGameMode.getSelectionModel().select(0);
+
         backButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
@@ -93,6 +103,7 @@ public class Client implements Runnable{
         });
 
         connectButton.setOnAction(actionEvent -> {
+            gameMode = cbGameMode.getSelectionModel().getSelectedIndex();
             ip = ipInput.getText();
             primaryStage = (Stage) connectButton.getScene().getWindow();
 
@@ -124,13 +135,11 @@ public class Client implements Runnable{
 
 
     public void startConnection() throws IOException {
-        //progressBar.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
         System.out.println("ip " +ip);
         s = new Socket(ip, port);
 
         System.out.println("Connection established.");
 
-        //progressBar.setProgress(1.0);
 
         // Ein- und Ausgabestrom des Sockets ermitteln
         // und als BufferedReader bzw. Writer verpacken
@@ -178,7 +187,7 @@ public class Client implements Runnable{
                                 newStage.setScene(scene);
 
                                 MultipayerMainGameController gameController = fxmlLoader.getController();
-                                gameController.setupSpiel(finalGroesse, newStage, 0, 1, scene, ships);
+                                gameController.setupSpiel(finalGroesse, newStage, 0, gameMode, scene, ships);
 
                                 newStage.show();
 
@@ -217,6 +226,16 @@ public class Client implements Runnable{
         final int numberOfShips = ships.size();
 
         while (true) {
+            if (MultipayerMainGameController.isBotPlayer && MultipayerMainGameController.currentState == 1) {
+                MultipayerMainGameController tmp = new MultipayerMainGameController();
+
+                try {
+                    tmp.executeAITurn();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
             String message = receiveMessage();
 
             String[] parts = message.split(" ");
@@ -265,11 +284,11 @@ public class Client implements Runnable{
                         checkWin();
                         break;
                     }
-                    break;
 
                 case "pass":
                    MultipayerMainGameController.currentState=1;
                    break;
+
             }
         }
     }

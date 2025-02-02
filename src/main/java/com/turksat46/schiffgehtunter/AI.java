@@ -20,8 +20,11 @@ public class AI {
     static List<Position> entdeckteSchiffe = new ArrayList<>();
 
     static MainGameController mainGameController;
+    static MultipayerMainGameController multiplayerMainGameController;
     private boolean huntmode = true;
     private boolean targetmode = false;
+
+    private boolean isMultiplayer;
 
     public AI(int difficulty, int groesse, MainGameController mainGameController){
         this.difficulty = difficulty;
@@ -35,6 +38,14 @@ public class AI {
         this.difficulty = difficulty;
         this.groesse = groesse;
 
+    }
+
+    public AI(int difficulty, int groesse, MultipayerMainGameController multiplayerMainGameController){
+        this.difficulty = difficulty;
+        this.groesse = groesse;
+        feld = new int[groesse][groesse];
+        isMultiplayer = true;
+        this.multiplayerMainGameController = multiplayerMainGameController;
     }
 
     private void setShips() {
@@ -212,4 +223,17 @@ public class AI {
 
         }
     }
+
+    public int[] calculateMultiplayerMove() {
+        while (true) {
+            int nextposx = RandomGenerator.getDefault().nextInt(0, groesse);
+            int nextposy = RandomGenerator.getDefault().nextInt(0, groesse);
+            Position pos = new Position(nextposx, nextposy);
+            if (!felder.contains(pos)) {
+                felder.add(pos);
+                return new int[]{nextposx, nextposy}; // Gib die Position [x, y] für den nächsten Zug zurück.
+            }
+        }
+    }
+
 }
