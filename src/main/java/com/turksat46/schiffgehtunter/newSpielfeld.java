@@ -337,9 +337,15 @@ public class newSpielfeld {
         if (ship.getChildren().isEmpty()) return;
 
         ImageView firstPart = (ImageView) ship.getChildren().get(0);
-        Bounds bounds = firstPart.localToScene(firstPart.getBoundsInLocal());
-        double centerX = bounds.getMinX() + bounds.getWidth() / 2;
-        double centerY = bounds.getMinY() + bounds.getHeight() / 2;
+        ImageView lastPart = (ImageView) ship.getChildren().get(ship.getChildren().size() - 1);
+
+        Bounds firstBounds = firstPart.localToScene(firstPart.getBoundsInLocal());
+        Bounds lastBounds = lastPart.localToScene(lastPart.getBoundsInLocal());
+
+        double firstCenterX = firstBounds.getMinX() + firstBounds.getWidth() / 2;
+        double firstCenterY = firstBounds.getMinY() + firstBounds.getHeight() / 2;
+        double lastCenterX = lastBounds.getMinX() + lastBounds.getWidth() / 2;
+        double lastCenterY = lastBounds.getMinY() + lastBounds.getHeight() / 2;
 
         Node closestCell = null;
         double minDistance = Double.MAX_VALUE;
@@ -347,12 +353,17 @@ public class newSpielfeld {
         for (Node node : gridPane.getChildren()) {
             if (node instanceof Rectangle cell) {
                 Bounds cellBounds = cell.localToScene(cell.getBoundsInLocal());
+
                 double cellCenterX = cellBounds.getMinX() + cellBounds.getWidth() / 2;
                 double cellCenterY = cellBounds.getMinY() + cellBounds.getHeight() / 2;
 
-                double distance = Math.hypot(centerX - cellCenterX, centerY - cellCenterY);
-                if (distance < minDistance) {
-                    minDistance = distance;
+                double distanceToFirst = Math.hypot(firstCenterX - cellCenterX, firstCenterY - cellCenterY);
+                double distanceToLast = Math.hypot(lastCenterX - cellCenterX, lastCenterY - cellCenterY);
+
+                double minChildDistance = Math.min(distanceToFirst, distanceToLast);
+
+                if (minChildDistance < minDistance) {
+                    minDistance = minChildDistance;
                     closestCell = cell;
                 }
             }
@@ -360,14 +371,58 @@ public class newSpielfeld {
 
         if (closestCell != null) {
             Bounds cellBounds = closestCell.localToScene(closestCell.getBoundsInLocal());
-            double targetX = cellBounds.getMinX() + closestCell.getBoundsInLocal().getWidth() / 2 - bounds.getWidth() / 2;
-            double targetY = cellBounds.getMinY() + closestCell.getBoundsInLocal().getHeight() / 2 - bounds.getHeight() / 2;
 
-            ship.setTranslateX(ship.getTranslateX() + targetX - bounds.getMinX());
-            ship.setTranslateY(ship.getTranslateY() + targetY - bounds.getMinY());
+            // Dynamisch bestimmen, ob firstBounds oder lastBounds verwendet werden
+            double distanceToFirst = Math.hypot(
+                    firstBounds.getMinX() + firstBounds.getWidth() / 2 - (cellBounds.getMinX() + cellBounds.getWidth() / 2),
+                    firstBounds.getMinY() + firstBounds.getHeight() / 2 - (cellBounds.getMinY() + cellBounds.getHeight() / 2)
+            );
+            double distanceToLast = Math.hypot(
+                    lastBounds.getMinX() + lastBounds.getWidth() / 2 - (cellBounds.getMinX() + cellBounds.getWidth() / 2),
+                    lastBounds.getMinY() + lastBounds.getHeight() / 2 - (cellBounds.getMinY() + cellBounds.getHeight() / 2)
+            );
+
+            Bounds chosenBounds = (distanceToFirst < distanceToLast) ? firstBounds : lastBounds;
+
+            // Berechnung der Zielkoordinaten
+            double targetX = cellBounds.getMinX() + closestCell.getBoundsInLocal().getWidth() / 2 - chosenBounds.getWidth() / 2;
+            double targetY = cellBounds.getMinY() + closestCell.getBoundsInLocal().getHeight() / 2 - chosenBounds.getHeight() / 2;
+
+            // Übersetzung anwenden
+            ship.setTranslateX(ship.getTranslateX() + targetX - chosenBounds.getMinX());
+            ship.setTranslateY(ship.getTranslateY() + targetY - chosenBounds.getMinY());
+
+            // Sicherstellen, dass KEIN Teil außerhalb der Grenzen des Spielfelds liegt
+            Bounds shipBounds = ship.localToScene(ship.getBoundsInLocal());
+            double gridMinX = gridPane.getLayoutX();
+            double gridMinY = gridPane.getLayoutY();
+            double gridMaxX = gridMinX + gridPane.getWidth();
+            double gridMaxY = gridMinY + gridPane.getHeight();
+
+            // Überprüfung für Out-of-Bounds für das gesamte Schiff
+            double shipTranslateX = ship.getTranslateX();
+            double shipTranslateY = ship.getTranslateY();
+
+            // Falls out of bounds (zu weit links)
+            if (shipBounds.getMinX() < gridMinX) {
+                ship.setTranslateX(shipTranslateX + (gridMinX - shipBounds.getMinX()));
+            }
+            // Falls out of bounds (zu weit oben)
+            if (shipBounds.getMinY() < gridMinY) {
+                ship.setTranslateY(shipTranslateY + (gridMinY - shipBounds.getMinY()));
+            }
+            // Falls out of bounds (zu weit rechts)
+            if (shipBounds.getMaxX() > gridMaxX) {
+                ship.setTranslateX(shipTranslateX - (shipBounds.getMaxX() - gridMaxX));
+            }
+            // Falls out of bounds (zu weit unten)
+            if (shipBounds.getMaxY() > gridMaxY) {
+                ship.setTranslateY(shipTranslateY - (shipBounds.getMaxY() - gridMaxY));
+            }
         }
 
     }
+
 
     public Map<Group, Set<Cell>> getShipCellMap() {
         return shipCellMap;

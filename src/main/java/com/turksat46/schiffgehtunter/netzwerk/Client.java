@@ -280,6 +280,8 @@ public class Client implements Runnable{
                     else if (parts[1].equals("2")) {
                         MultipayerMainGameController.currentState=1;
                         MultipayerMainGameController.gegnerspielfeld.selectFeld(lastx,lasty, Color.GREEN);
+                        Music sound = Music.getInstance();
+                        sound.playShipDestroyed();
                         ships.pop();
                         checkWin();
                         break;

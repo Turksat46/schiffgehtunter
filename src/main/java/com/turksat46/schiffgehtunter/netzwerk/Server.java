@@ -2,6 +2,7 @@ package com.turksat46.schiffgehtunter.netzwerk;
 
 import com.turksat46.schiffgehtunter.MainGameController;
 import com.turksat46.schiffgehtunter.MultipayerMainGameController;
+import com.turksat46.schiffgehtunter.other.Music;
 import javafx.application.Platform;
 import javafx.scene.paint.Color;
 
@@ -196,6 +197,8 @@ public class Server implements Runnable {
                         else if (parts[1].equals("2")) {
                             MultipayerMainGameController.currentState=1;
                             MultipayerMainGameController.gegnerspielfeld.selectFeld(lastx,lasty, Color.GREEN);
+                            Music sound = Music.getInstance();
+                            sound.playShipDestroyed();
                             ships.pop();
                             checkWin();
                             break;
