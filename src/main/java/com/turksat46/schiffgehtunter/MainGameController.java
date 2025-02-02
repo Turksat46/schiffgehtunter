@@ -12,6 +12,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -77,8 +78,24 @@ public class MainGameController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         //Wenn Klasse initialisiert wird, Hintergrund erstellen
-        backgroundManager = new BackgroundGenerator(anchorPane);
-        backgroundManager.createBackground();
+        //backgroundManager = new BackgroundGenerator(anchorPane);
+        //backgroundManager.createBackground();
+
+        try {
+            Image backgroundImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/turksat46/schiffgehtunter/images/background.png")));
+            BackgroundImage background = new BackgroundImage(
+                    backgroundImage,
+                    BackgroundRepeat.NO_REPEAT,
+                    BackgroundRepeat.NO_REPEAT,
+                    BackgroundPosition.DEFAULT,
+                    new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO, false, false, true, true)
+            );
+
+            anchorPane.setBackground(new Background(background));
+        } catch (NullPointerException e) {
+            System.err.println("Fehler beim Laden der Texturen. Stelle sicher, dass die Dateien im Ressourcenordner liegen.");
+            throw e;
+        }
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("main-game-view.fxml"));
         Parent root = loader.getRoot();
@@ -107,8 +124,8 @@ public class MainGameController implements Initializable {
         gegnerstackpane.getChildren().add(gegnerspielfeld.gridPane);
 
         // StackPane-Margen setzen
-        //HBox.setMargin(spielerstackpane, new Insets(10, 10, 100, 10)); // Abstand für spielerstackpane
-        //HBox.setMargin(gegnerstackpane, new Insets(10, 10, 100, 150)); // Abstand für gegnerstackpane
+        HBox.setMargin(spielerstackpane, new Insets(10, 10, 100, 10)); // Abstand für spielerstackpane
+        HBox.setMargin(gegnerstackpane, new Insets(10, 10, 100, 150)); // Abstand für gegnerstackpane
 
         setupBase(groesse, stage, currentDifficulty, currentMode, scene);
 
