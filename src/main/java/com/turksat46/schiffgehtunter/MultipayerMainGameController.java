@@ -58,6 +58,7 @@ public class MultipayerMainGameController extends MainGameController implements 
 
     public static volatile boolean isButtonClicked = false;
     private static boolean isServer;
+    public static boolean isBotPlayer = false;
 
 
     //Drei States: place = Schiffe platzieren, offense = Angriff, defense = Verteidigung bzw. auf Angriff vom Gegner warten
@@ -96,6 +97,13 @@ public class MultipayerMainGameController extends MainGameController implements 
 
         super.setupBase(groesse, stage,currentDifficulty,currentMode,scene);
 
+
+        if(currentMode == 2) {
+            bot = new AI(currentDifficulty, groesse, this);
+            isBotPlayer = true;
+            System.out.println("Neuer bot");
+        }
+
         isServer = true;
     }
 
@@ -116,6 +124,12 @@ public class MultipayerMainGameController extends MainGameController implements 
         //HBox.setMargin(gegnerstackpane, new Insets(10, 10, 100, 150)); // Abstand für gegnerstackpane
 
         super.setupBase(groesse, stage,currentDifficulty,currentMode,scene);
+
+        if(currentMode == 1) {
+            bot = new AI(currentDifficulty, groesse, this);
+            isBotPlayer = true;
+            System.out.println("Neuer bot");
+        }
 
         isServer = false;
     }
@@ -219,6 +233,29 @@ public class MultipayerMainGameController extends MainGameController implements 
     public static void dyeCell(int posx, int posy){
         spielerspielfeld.selectFeld(posx, posy, Color.DARKRED);
     }
+
+
+    public void executeAITurn() throws InterruptedException {
+
+        // Simuliere KI-Klick auf das Gegner-Spielfeld
+        if (currentState == 1 && gegnerspielfeld != null) {
+            int[] nextMove = bot.calculateMultiplayerMove(); // KI gibt den nächsten Zug [x, y]
+            int posx = nextMove[0];
+            int posy = nextMove[1];
+            System.out.println("KI-Schuss an Position: " + posx + ", " + posy);
+            Thread.currentThread().sleep(250);
+            shootEnemyShipMultiplayer(gegnerspielfeld, posx, posy);
+        }
+    }
+
+    public int [] receiveBotShoot(int posx, int posy) {
+        int [] result = new int[2];
+        result[0] = posx;
+        result[1] = posy;
+        return result;
+    }
+
+
 
     private void  watchShip(Spielfeld spielfeld, int posx, int posy){
         System.out.println("schiffe beobachten ");

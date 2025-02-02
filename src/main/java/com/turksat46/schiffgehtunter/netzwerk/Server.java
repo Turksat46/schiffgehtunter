@@ -135,6 +135,16 @@ public class Server implements Runnable {
             int answerCounterWin=0;
             final int numberOfShips = ships.size();
             while (true) {
+                if (MultipayerMainGameController.isBotPlayer && MultipayerMainGameController.currentState == 1) {
+                    MultipayerMainGameController tmp = new MultipayerMainGameController();
+
+                    try {
+                        tmp.executeAITurn();
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+
                 String message = receiveMessage();
 
 
