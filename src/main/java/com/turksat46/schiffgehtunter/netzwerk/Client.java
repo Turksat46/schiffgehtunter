@@ -31,19 +31,22 @@ import java.util.Stack;
 import static com.turksat46.schiffgehtunter.MultipayerMainGameController.dyeCell;
 import static com.turksat46.schiffgehtunter.MultipayerMainGameController.shootShipMultiplayer;
 
-public class Client implements Runnable{
+/**
+ * Die Client-Klasse ermöglicht die Kommunikation eines Clients in einem Multiplayer-Spiel.
+ * Sie stellt eine Verbindung zu einem Server her, empfängt und sendet Nachrichten,
+ * und steuert das Spiel zwischen zwei Spielern.
+ */
+public class Client implements Runnable {
     @FXML
     private volatile AnchorPane pane;
     @FXML
     private volatile TextField ipInput;
     @FXML
     private volatile Button connectButton;
-
     @FXML
     private volatile Button backButton = new Button();
 
     static MultipayerMainGameController gameController;
-
 
     final int port = 50000;
     Socket server;
@@ -53,7 +56,6 @@ public class Client implements Runnable{
     private BufferedReader usr;
 
     private static Thread clientThread = new Thread(new Client());
-
 
     private static int lastx;
     private static int lasty;
@@ -65,13 +67,18 @@ public class Client implements Runnable{
     private static volatile Stage primaryStage;
 
     @FXML
-    private volatile   ChoiceBox cbGameMode = new ChoiceBox();
+    private volatile ChoiceBox cbGameMode = new ChoiceBox();
     private static volatile int gameMode = 0;
 
     ObservableList<String> gameModes = FXCollections.observableArrayList("Spieler", "Computer");
 
-
-
+    /**
+     * Wird aufgerufen, wenn der Benutzer auf den "Zurück"-Button klickt.
+     * Lädt die Hauptmenü-Szene und schließt das aktuelle Fenster.
+     *
+     * @param event Das Ereignis, das den Button-Klick repräsentiert.
+     * @throws IOException Wenn beim Laden der FXML-Datei ein Fehler auftritt.
+     */
     @FXML
     private void onBackPressed(ActionEvent event) throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/turksat46/schiffgehtunter/hello-view.fxml"));
@@ -84,8 +91,11 @@ public class Client implements Runnable{
         thisstage.close();
     }
 
-
-
+    /**
+     * Initialisiert die Benutzeroberfläche des Clients und setzt Event-Handler für die Schaltflächen.
+     *
+     * @throws IOException Wenn beim Laden von Ressourcen ein Fehler auftritt.
+     */
     @FXML
     public void initialize() throws IOException {
         cbGameMode.setItems(gameModes);
@@ -112,18 +122,20 @@ public class Client implements Runnable{
                 clientThread.setDaemon(true);
                 clientThread.start();
             } else if (!clientThread.isAlive()) {
-                // Client-Thread wurde gestoppt oder läuft nicht mehr -> Neuen Thread erstellen
                 clientThread = new Thread(new Client());
                 clientThread.setDaemon(true);
                 clientThread.start();
-
             } else {
                 System.out.println("Connection thread is already running...");
             }
         });
-
     }
 
+    /**
+     * Wird im neuen Thread ausgeführt, um die Verbindung zum Server herzustellen.
+     *
+     * @throws IOException Wenn bei der Verbindung zum Server ein Fehler auftritt.
+     */
     @Override
     public void run() {
         try {
@@ -133,27 +145,30 @@ public class Client implements Runnable{
         }
     }
 
-
+    /**
+     * Stellt die Verbindung zum Server her und initialisiert das Spiel.
+     *
+     * @throws IOException Wenn bei der Verbindung oder Kommunikation mit dem Server ein Fehler auftritt.
+     */
     public void startConnection() throws IOException {
         System.out.println("ip " +ip);
         s = new Socket(ip, port);
 
         System.out.println("Connection established.");
 
-
-        // Ein- und Ausgabestrom des Sockets ermitteln
-        // und als BufferedReader bzw. Writer verpacken
-        // (damit man zeilen- bzw. zeichenweise statt byteweise arbeiten kann).
         in = new BufferedReader(new InputStreamReader(s.getInputStream()));
         out = new OutputStreamWriter(s.getOutputStream());
 
-        // Standardeingabestrom ebenfalls als BufferedReader verpacken.
         usr = new BufferedReader(new InputStreamReader(System.in));
 
         initializeGame();
-
     }
 
+    /**
+     * Initialisiert das Spiel, indem Nachrichten vom Server empfangen und verarbeitet werden.
+     *
+     * @throws IOException Wenn beim Empfangen von Nachrichten oder der Initialisierung des Spiels ein Fehler auftritt.
+     */
     private void initializeGame() throws IOException {
         int groesse = 0;
         while (true) {
@@ -176,7 +191,6 @@ public class Client implements Runnable{
                     sendMessage("done");
 
                     if(groesse!=0 && ships.size()!=0) {
-
                         int finalGroesse = groesse;
                         Platform.runLater(() -> {
                             try {
@@ -196,15 +210,9 @@ public class Client implements Runnable{
                                 e.printStackTrace();
                             }
                         });
-
                     }
-
                     break;
                 case "ready":
-
-
-                    //warten bis schiffe gesetzt sind
-                    // Warten bis der Button gedrückt wurde
                     while (!MultipayerMainGameController.isButtonClicked) {
                         try {
                             clientThread.sleep(100); // Kurze Pause, um das UI zu ermöglichen
@@ -221,6 +229,12 @@ public class Client implements Runnable{
         }
     }
 
+    /**
+     * Handhabt die Spielereignisse während des Spiels.
+     * Empfängt Nachrichten und führt je nach Inhalt bestimmte Aktionen aus, wie das Schießen auf Schiffe oder das Empfangen von Antworten.
+     *
+     * @throws IOException Wenn beim Empfangen von Nachrichten oder der Spielsteuerung ein Fehler auftritt.
+     */
     private void handleGame () throws IOException {
         int answerCounterWin=0;
         final int numberOfShips = ships.size();
@@ -246,9 +260,6 @@ public class Client implements Runnable{
                     System.out.println("Opponent shot at: (" + posx + ", " + posy + ")");
                     dyeCell(posx, posy);
 
-
-
-
                     String answer = handleshot(posx, posy);
                     sendMessage("answer " + answer); // 0 wasser/ 1 schiff/ 2 versenkt
                     if (answer=="2") {
@@ -261,8 +272,6 @@ public class Client implements Runnable{
                             break;
                         }
                     }
-
-                    //wenn Treffer dann weiter ansonsten pass und schießen
                     break;
 
                 case "answer":
@@ -274,40 +283,57 @@ public class Client implements Runnable{
                     else if (parts[1].equals("1")) {
                         MultipayerMainGameController.currentState=1;
                         MultipayerMainGameController.gegnerspielfeld.selectFeld(lastx,lasty, Color.GREEN);
-
                         break;
                     }
                     else if (parts[1].equals("2")) {
                         MultipayerMainGameController.currentState=1;
                         MultipayerMainGameController.gegnerspielfeld.selectFeld(lastx,lasty, Color.GREEN);
-                        Music sound = Music.getInstance();
-                        sound.playShipDestroyed();
                         ships.pop();
                         checkWin();
                         break;
                     }
 
                 case "pass":
-                   MultipayerMainGameController.currentState=1;
-                   break;
+                    MultipayerMainGameController.currentState=1;
+                    break;
 
             }
         }
     }
+
+    /**
+     * Sendet eine Nachricht an den Server.
+     *
+     * @param message Die Nachricht, die gesendet werden soll.
+     * @throws IOException Wenn beim Senden der Nachricht ein Fehler auftritt.
+     */
     public static void sendMessage(String message) throws IOException {
         out.write(message + "\n");
         out.flush();
         System.out.println("Client sent: " + message);
     }
 
+    /**
+     * Empfängt eine Nachricht vom Server.
+     *
+     * @return Die empfangene Nachricht.
+     * @throws IOException Wenn beim Empfangen der Nachricht ein Fehler auftritt.
+     */
     private String receiveMessage() throws IOException {
         String message = in.readLine();
         System.out.println("Client received: " + message);
         return message;
     }
 
+    /**
+     * Handhabt den Schuss eines Spielers und überprüft, ob ein Treffer, ein Schiff oder ein versenktes Schiff getroffen wurde.
+     *
+     * @param posx Die X-Position des Schusses.
+     * @param posy Die Y-Position des Schusses.
+     * @return Ein String, der den Status des Schusses beschreibt ("0" = Wasser, "1" = Schiff, "2" = Versenkt).
+     * @throws IOException Wenn beim Verarbeiten des Schusses ein Fehler auftritt.
+     */
     public String handleshot(int posx, int posy) throws IOException {
-        //shootShipMultiplayer() liefert ob an dieser stelle ein schiff ist es zerstört wurde oder wasser
         if (shootShipMultiplayer(posx,posy)==0){
             return "0";
         }
@@ -320,11 +346,22 @@ public class Client implements Runnable{
         return null;
     }
 
+    /**
+     * Setzt die letzten Schusskoordinaten (x, y).
+     *
+     * @param posx Die X-Position des Schusses.
+     * @param posy Die Y-Position des Schusses.
+     */
     public static void setLastRowCol(int posx, int posy) {
         lastx = posx;
         lasty = posy;
     }
 
+    /**
+     * Überprüft, ob der Spieler gewonnen hat, indem überprüft wird, ob noch Schiffe übrig sind.
+     *
+     * @throws IOException Wenn beim Überprüfen des Spielstands ein Fehler auftritt.
+     */
     private static void checkWin() throws IOException {
         if (ships.size()==0){
             MultipayerMainGameController temp = new MultipayerMainGameController();
@@ -333,6 +370,4 @@ public class Client implements Runnable{
             Platform.runLater(() -> temp.handleWinForPlayer());
         }
     }
-
-
 }

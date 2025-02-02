@@ -9,30 +9,45 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
+/**
+ * Controller-Klasse für das Pausenmenü des Spiels.
+ * Diese Klasse verwaltet Benutzeraktionen im Pausenbildschirm,
+ * einschließlich Fortsetzen, Speichern, Schließen des Spiels und Öffnen der Einstellungen.
+ */
 public class PauseGameController {
     @FXML
     public Button continuebutton;
 
-    public void initialize(){
 
-    }
 
+    /**
+     * Setzt das Spiel fort, indem das Pausenmenü geschlossen wird.
+     */
     public void continueGame() {
-        //TODO: Wenn sich iwas geändert hat, reverten
         Stage stage = (Stage) continuebutton.getScene().getWindow();
         stage.close();
     }
 
+    /**
+     * Speichert das aktuelle Spiel über den Hauptspiel-Controller.
+     */
     public void saveGame(){
         MainGameController mainGameController = new MainGameController();
         mainGameController.saveFile();
     }
 
+    /**
+     * Beendet das Spiel.
+     */
     public void closeGame(){
-        //TODO: Erst vllt abfragen, ob Spiel gespeichert werden soll, oder prüfen, ob gespeichert wurde
         System.exit(0);
     }
 
+    /**
+     * Öffnet das Einstellungsmenü.
+     *
+     * @throws IOException Falls das Laden der FXML-Datei fehlschlägt.
+     */
     public void openSettings() throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("settings.fxml"));
         Stage stage = new Stage();

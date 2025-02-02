@@ -9,7 +9,6 @@ import javafx.scene.Group;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -21,11 +20,11 @@ import javafx.util.Duration;
 import java.util.*;
 import java.util.List;
 
+/**
+ * repräsentiert das Spielfeld des Spielers mit drag udn drop funktionen
+ */
 public class newSpielfeld {
 
-    //
-    //  FÜRS SPEICHERN WICHTIGE VARIABLEN
-    //
 
 
     private static GridPane gridPane;
@@ -41,11 +40,14 @@ public class newSpielfeld {
 
     private final Set<Cell> hitCells = new HashSet<>();
 
-    /***
+
+    /**
+     * Erstellt ein neues Spielfeld.
      *
-     * @param size Feldgröße
-     * @param isEnemyField
-     * @param root
+     * @param size        Die Größe des Spielfelds.
+     * @param isEnemyField Ob es sich um das Feld des Gegners handelt.
+     * @param root        Das Hauptlayout.
+     * @param draggableContainer Die HBox für verschiebbare Schiffe.
      */
     public newSpielfeld(int size, boolean isEnemyField, BorderPane root, HBox draggableContainer) {
         newSpielfeld.GRID_SIZE = size;
@@ -79,13 +81,19 @@ public class newSpielfeld {
                     shipSizesList.add(shipSize);
                 }
             }
-            //scrollPane.setContent(draggableContainer);
-            //root.setBottom(draggableContainer);
+
         }
         Server.setShips(shipSizesList);
     }
 
-    //Fürs Laden vom Speicherstand
+    /**
+     * Erstellt ein Spielfeld basierend auf gespeicherten Daten.
+     *
+     * @param size        Die Größe des Spielfelds.
+     * @param isEnemyField Ob es sich um das Feld des Gegners handelt.
+     * @param root        Das Hauptlayout.
+     * @param data        Die gespeicherten Spielfeld-Daten.
+     */
     public newSpielfeld(int size, boolean isEnemyField, BorderPane root, Map<String, Object> data) {
         newSpielfeld.GRID_SIZE = size;
         newSpielfeld.root = root;
@@ -102,36 +110,15 @@ public class newSpielfeld {
 
             root.setBottom(draggableContainer);
         }
-        //Server.setShips(shipSizesList);
 
         //Daten laden
         drawShipsFromData(data);
     }
-
-    // Funktion zum Zeichnen von Schiffen aufm Feld
-    public newSpielfeld(int size, boolean isEnemyField, BorderPane root, List<Integer> ships, HBox draggableContainer) {
-        newSpielfeld.GRID_SIZE = size;
-        newSpielfeld.root = root;
-
-        CELL_SIZE = size <= 5 ? 75 : size <= 10 ? 50 : size <= 20 ? 30 : 20;
-
-        gridPane = createGridPane();
-        root.setCenter(gridPane);
-
-        if (!isEnemyField) {
-            draggableContainer.setPadding(new Insets(10));
-
-            for (int shipSize : ships) {
-                Group shipGroup = createDraggableShip(shipSize);
-                makeDraggable(shipGroup);
-                draggables.add(shipGroup);
-                draggableContainer.getChildren().add(shipGroup);
-            }
-
-            root.setBottom(draggableContainer);
-        }
-    }
-
+    /**
+     * Zeichnet die Schiffe aus den gespeicherten Daten auf das Spielfeld.
+     *
+     * @param data Die gespeicherten Daten mit Schiffspositionen.
+     */
     private void drawShipsFromData(Map<String, Object> data) {
         Map<Group, Set<Cell>> newShipCellMap = new HashMap<>();
 
@@ -213,6 +200,12 @@ public class newSpielfeld {
         }
     }
 
+    /**
+     * Platziert Schiffe an den gespeicherten Positionen.
+     *
+     * @param ship    Die Schiffsgruppe.
+     * @param cellSet Die Zellen, die das Schiff belegt.
+     */
     private void placeShipsOnPositions(Group ship, Set<Cell> cellSet) {
         if (ship.getChildren().isEmpty() || cellSet.isEmpty()) return;
 
@@ -259,8 +252,42 @@ public class newSpielfeld {
             System.out.println("Setze Schiff auf X: " + ship.getTranslateX() + ", Y: " + ship.getTranslateY());
         }
     }
-    //Konstruktor ohne schiff Berechnung für Multiplayer
 
+    /**
+     * Erstellt ein neues Spielfeld.
+     *
+     * @param size        Die Größe des Spielfelds.
+     * @param isEnemyField Ob es sich um das Feld des Gegners handelt.
+     * @param root        Das Hauptlayout.
+     */
+    public newSpielfeld(int size, boolean isEnemyField, BorderPane root, List<Integer> ships) {
+        newSpielfeld.GRID_SIZE = size;
+        newSpielfeld.root = root;
+
+        CELL_SIZE = size <= 5 ? 75 : size <= 10 ? 50 : size <= 20 ? 30 : 20;
+
+        gridPane = createGridPane();
+        root.setCenter(gridPane);
+
+        if (!isEnemyField) {
+            VBox draggableContainer = new VBox(10);
+            draggableContainer.setPadding(new Insets(10));
+
+            for (int shipSize : ships) {
+                Group shipGroup = createDraggableShip(shipSize);
+                makeDraggable(shipGroup);
+                draggables.add(shipGroup);
+                draggableContainer.getChildren().add(shipGroup);
+            }
+
+            root.setBottom(draggableContainer);
+        }
+    }
+    /**
+     * Erstellt eine neue GridPane für das Spielfeld.
+     *
+     * @return Die erstellte GridPane.
+     */
     private GridPane createGridPane() {
         GridPane grid = new GridPane();
         //grid.setMaxHeight(4000);
@@ -278,6 +305,13 @@ public class newSpielfeld {
         return grid;
     }
 
+
+    /**
+     * Erstellt ein verschiebbares Schiff mit einer bestimmten Länge.
+     *
+     * @param length Die Länge des Schiffs.
+     * @return Die erstellte Schiffsgruppe.
+     */
     private Group createDraggableShip(int length) {
         Group ship = new Group();
         for (int i = 0; i < length; i++) {
@@ -291,6 +325,12 @@ public class newSpielfeld {
         return ship;
     }
 
+
+    /**
+     * Macht eine Schiffsgruppe verschiebbar und drehbar.
+     *
+     * @param ship Die Schiffsgruppe.
+     */
     private void makeDraggable(Group ship) {
         if (isEditable) {
             ship.setOnMousePressed(event -> {
@@ -320,20 +360,19 @@ public class newSpielfeld {
         }
     }
 
+    /**
+     * Ändert den Bearbeitungsstatus des Spielfelds.
+     *
+     */
     public void changeEditableState(boolean ye) {
         isEditable = ye;
-        for (Node node : gridPane.getChildren()) {
-            node.setOnMousePressed(null);
-            node.setOnMouseDragged(null);
-            node.setOnMouseReleased(null);
-        }
-        for(Group item : draggables){
-            item.setOnMousePressed(null);
-            item.setOnMouseDragged(null);
-            item.setOnMouseReleased(null);
-        }
     }
 
+    /**
+     * Dreht eine verschiebbare Schiffsgruppe.
+     *
+     * @param group Die Schiffsgruppe.
+     */
     private void rotateDraggableGroup(Group group) {
         Bounds bounds = group.getLayoutBounds();
         double pivotX = bounds.getWidth() / 2;
@@ -341,19 +380,20 @@ public class newSpielfeld {
         group.setRotate(group.getRotate() + 90);
     }
 
+
+
+    /**
+     * Richtet ein Schiff an den Rasterzellen aus.
+     *
+     * @param ship Die Schiffsgruppe.
+     */
     private void snapToGrid(Group ship) {
         if (ship.getChildren().isEmpty()) return;
 
         ImageView firstPart = (ImageView) ship.getChildren().get(0);
-        ImageView lastPart = (ImageView) ship.getChildren().get(ship.getChildren().size() - 1);
-
-        Bounds firstBounds = firstPart.localToScene(firstPart.getBoundsInLocal());
-        Bounds lastBounds = lastPart.localToScene(lastPart.getBoundsInLocal());
-
-        double firstCenterX = firstBounds.getMinX() + firstBounds.getWidth() / 2;
-        double firstCenterY = firstBounds.getMinY() + firstBounds.getHeight() / 2;
-        double lastCenterX = lastBounds.getMinX() + lastBounds.getWidth() / 2;
-        double lastCenterY = lastBounds.getMinY() + lastBounds.getHeight() / 2;
+        Bounds bounds = firstPart.localToScene(firstPart.getBoundsInLocal());
+        double centerX = bounds.getMinX() + bounds.getWidth() / 2;
+        double centerY = bounds.getMinY() + bounds.getHeight() / 2;
 
         Node closestCell = null;
         double minDistance = Double.MAX_VALUE;
@@ -361,17 +401,12 @@ public class newSpielfeld {
         for (Node node : gridPane.getChildren()) {
             if (node instanceof Rectangle cell) {
                 Bounds cellBounds = cell.localToScene(cell.getBoundsInLocal());
-
                 double cellCenterX = cellBounds.getMinX() + cellBounds.getWidth() / 2;
                 double cellCenterY = cellBounds.getMinY() + cellBounds.getHeight() / 2;
 
-                double distanceToFirst = Math.hypot(firstCenterX - cellCenterX, firstCenterY - cellCenterY);
-                double distanceToLast = Math.hypot(lastCenterX - cellCenterX, lastCenterY - cellCenterY);
-
-                double minChildDistance = Math.min(distanceToFirst, distanceToLast);
-
-                if (minChildDistance < minDistance) {
-                    minDistance = minChildDistance;
+                double distance = Math.hypot(centerX - cellCenterX, centerY - cellCenterY);
+                if (distance < minDistance) {
+                    minDistance = distance;
                     closestCell = cell;
                 }
             }
@@ -379,77 +414,29 @@ public class newSpielfeld {
 
         if (closestCell != null) {
             Bounds cellBounds = closestCell.localToScene(closestCell.getBoundsInLocal());
+            double targetX = cellBounds.getMinX() + closestCell.getBoundsInLocal().getWidth() / 2 - bounds.getWidth() / 2;
+            double targetY = cellBounds.getMinY() + closestCell.getBoundsInLocal().getHeight() / 2 - bounds.getHeight() / 2;
 
-            // Dynamisch bestimmen, ob firstBounds oder lastBounds verwendet werden
-            double distanceToFirst = Math.hypot(
-                    firstBounds.getMinX() + firstBounds.getWidth() / 2 - (cellBounds.getMinX() + cellBounds.getWidth() / 2),
-                    firstBounds.getMinY() + firstBounds.getHeight() / 2 - (cellBounds.getMinY() + cellBounds.getHeight() / 2)
-            );
-            double distanceToLast = Math.hypot(
-                    lastBounds.getMinX() + lastBounds.getWidth() / 2 - (cellBounds.getMinX() + cellBounds.getWidth() / 2),
-                    lastBounds.getMinY() + lastBounds.getHeight() / 2 - (cellBounds.getMinY() + cellBounds.getHeight() / 2)
-            );
-
-            Bounds chosenBounds = (distanceToFirst < distanceToLast) ? firstBounds : lastBounds;
-
-            // Berechnung der Zielkoordinaten
-            double targetX = cellBounds.getMinX() + closestCell.getBoundsInLocal().getWidth() / 2 - chosenBounds.getWidth() / 2;
-            double targetY = cellBounds.getMinY() + closestCell.getBoundsInLocal().getHeight() / 2 - chosenBounds.getHeight() / 2;
-
-            // Übersetzung anwenden
-            ship.setTranslateX(ship.getTranslateX() + targetX - chosenBounds.getMinX());
-            ship.setTranslateY(ship.getTranslateY() + targetY - chosenBounds.getMinY());
-
-            // Sicherstellen, dass KEIN Teil außerhalb der Grenzen des Spielfelds liegt
-            Bounds shipBounds = ship.localToScene(ship.getBoundsInLocal());
-            double gridMinX = gridPane.getLayoutX();
-            double gridMinY = gridPane.getLayoutY();
-            double gridMaxX = gridMinX + gridPane.getWidth();
-            double gridMaxY = gridMinY + gridPane.getHeight();
-
-            // Überprüfung für Out-of-Bounds für das gesamte Schiff
-            double shipTranslateX = ship.getTranslateX();
-            double shipTranslateY = ship.getTranslateY();
-
-            // Falls out of bounds (zu weit links)
-            if (shipBounds.getMinX() < gridMinX) {
-                ship.setTranslateX(shipTranslateX + (gridMinX - shipBounds.getMinX()));
-            }
-            // Falls out of bounds (zu weit oben)
-            if (shipBounds.getMinY() < gridMinY) {
-                ship.setTranslateY(shipTranslateY + (gridMinY - shipBounds.getMinY()));
-            }
-            // Falls out of bounds (zu weit rechts)
-            if (shipBounds.getMaxX() > gridMaxX) {
-                ship.setTranslateX(shipTranslateX - (shipBounds.getMaxX() - gridMaxX));
-            }
-            // Falls out of bounds (zu weit unten)
-            if (shipBounds.getMaxY() > gridMaxY) {
-                ship.setTranslateY(shipTranslateY - (shipBounds.getMaxY() - gridMaxY));
-            }
+            ship.setTranslateX(ship.getTranslateX() + targetX - bounds.getMinX());
+            ship.setTranslateY(ship.getTranslateY() + targetY - bounds.getMinY());
         }
 
     }
 
-    private boolean isCollision(Group ship, Set<Cell> newCells) {
-        for (Set<Cell> existingCells : shipCellMap.values()) {
-            for (Cell newCell : newCells) {
-                if (existingCells.contains(newCell)) {
-                    return true; // Kollision gefunden
-                }
-            }
-        }
-        return false; // Keine Kollision
-    }
-
+    /**
+     * Gibt die aktuelle Zuordnung von Schiffen zu ihren Zellen zurück.
+     *
+     * @return Die Map von Schiffen zu belegten Zellen.
+     */
     public Map<Group, Set<Cell>> getShipCellMap() {
         return shipCellMap;
     }
 
+    /**
+     * Aktualisiert die Zuordnung von Schiffen zu ihren belegten Zellen.
+     */
     private void updateShipCellMap() {
         shipCellMap.clear();
-        Map<Group, Set<Cell>> tempShipCellMap = new HashMap<>();
-
 
         for (Group ship : draggables) {
             Set<Cell> occupiedCells = new HashSet<>();
@@ -471,15 +458,6 @@ public class newSpielfeld {
                 }
             }
 
-            // Prüfe auf Kollision, bevor das Schiff zur temporären Map hinzugefügt wird
-            if (!isCollision(ship, occupiedCells)) {
-                tempShipCellMap.put(ship, occupiedCells);
-            } else {
-                System.out.println("Kollision erkannt! Schiff kann nicht platziert werden.");
-                ship.setTranslateX(0.0);
-                ship.setTranslateY(0.0);
-            }
-
             shipCellMap.put(ship, occupiedCells);
         }
 
@@ -488,6 +466,13 @@ public class newSpielfeld {
         });
     }
 
+    /**
+     * Markiert eine bestimmte Zelle auf dem Spielfeld mit einer Farbe.
+     *
+     * @param x     Die X-Koordinate.
+     * @param y     Die Y-Koordinate.
+     * @param color Die Farbe der Markierung.
+     */
     public void selectFeld(int x, int y, Color color) {
         for (javafx.scene.Node node : gridPane.getChildren()) {
             if (GridPane.getColumnIndex(node) == x && GridPane.getRowIndex(node) == y) {
@@ -511,6 +496,13 @@ public class newSpielfeld {
         }
     }
 
+    /**
+     * Überprüft, ob sich an einer bestimmten Position ein Schiff befindet.
+     *
+     * @param x Die X-Koordinate.
+     * @param y Die Y-Koordinate.
+     * @return 0 = Kein Treffer, 1 = Treffer, 2 = Schiff versenkt.
+     */
     public int isShipAtPosition(int x, int y) {
         // Iteriere durch alle Schiffsgruppen und ihre belegten Zellen
         for (Map.Entry<Group, Set<Cell>> entry : shipCellMap.entrySet()) {

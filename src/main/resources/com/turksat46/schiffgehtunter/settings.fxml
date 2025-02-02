@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.turksat46.schiffgehtunter.SettingsController">
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.turksat46.schiffgehtunter.SettingsController">
    <children>
       <Button layoutX="20.0" layoutY="29.0" maxHeight="100.0" maxWidth="98.0" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onBackPressed" prefHeight="43.0" prefWidth="10.0" text="Zurück">
          <HBox.margin>
@@ -48,7 +48,6 @@
             <Insets left="50.0" />
          </padding>
       </CheckBox>
-      <Button layoutX="486.0" layoutY="31.0" mnemonicParsing="false" onAction="#openAnleitung" prefWidth="48.0" text="Anleitung" />
    </children>
    <stylesheets>
       <URL value="@settings_style.css" />

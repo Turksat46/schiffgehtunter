@@ -35,56 +35,48 @@ import java.util.*;
 
 public class MainGameController implements Initializable {
 
+
+    /**
+     * State ist für die den status des Spiels also ob man verteidigt oder schiffe platziert oder angreift
+     * mode ozeigt an in welchen modus man ist also SpielervSpieler, ComputervComputer oder SpielervComputer
+     */
     private SaveFileManager saveFileManager;
-
-
     @FXML
     public BorderPane spielerstackpane, gegnerstackpane;
-
     @FXML AnchorPane anchorPane;
     @FXML
     Label hinweistext;
-
-    @FXML public HBox container;
     @FXML public Pane images;
-
-    @FXML public HBox label1;
-
     @FXML public Button startButton;
-
     @FXML HBox draggableContainer;
-
     public static int currentState, currentMode, currentDifficulty, groesse;
     static GridPane feld;
     static Scene scene;
     private static AI bot;
-
     Music soundPlayer;
-
-    static boolean rotated;
-
     static newSpielfeld spielerspielfeld;
-    public static Spielfeld gegnerspielfeld;
-
-    BackgroundGenerator backgroundManager;
-
-    //Drei States: place = Schiffe platzieren, offense = Angriff, defense = Verteidigung bzw. auf Angriff vom Gegner warten
+    static Spielfeld gegnerspielfeld;
     public String[] state = {"place", "offense", "defense"};
-    //Spielmodus P = Spieler, C=Computer
     public String[] mode = {"PvsC", "PvsP", "CvsC"};
-
     public Map<Group, Set<Cell>> shipCellMap;
     private final Set<Cell> hitCells = new HashSet<>();
 
+
+    /**
+     * Filemanager wir initialisiert
+     */
     public MainGameController(){
         saveFileManager = new SaveFileManager();
     }
 
+
+    /**
+     * Der Hintergrdund wird hier geladen und der view zugefügt.
+     * @param url
+     * @param resourceBundle
+     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        //Wenn Klasse initialisiert wird, Hintergrund erstellen
-        //backgroundManager = new BackgroundGenerator(anchorPane);
-        //backgroundManager.createBackground();
 
         try {
             Image backgroundImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/com/turksat46/schiffgehtunter/images/background.png")));
@@ -102,16 +94,11 @@ public class MainGameController implements Initializable {
             throw e;
         }
 
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("main-game-view.fxml"));
-        Parent root = loader.getRoot();
-
-
-        MainGameController controller = loader.getController();
-
-
-
     }
 
+    /**
+     * Hier werden sie schiff auf dem grid ausgegeben
+     */
     public void startGame(){
         currentState = 1;
         spielerspielfeld.changeEditableState(false);
@@ -120,16 +107,17 @@ public class MainGameController implements Initializable {
         startButton.setVisible(false);
     }
 
+
+    /**
+     * Für das normale Setup eines Spiels
+     * @param groesse grid groesse
+     * @param stage damit man selbe fenster rendert
+     * @throws FileNotFoundException
+     */
     public void setupSpiel(int groesse, Stage stage, int currentDifficulty, int currentMode, Scene scene) throws FileNotFoundException {
-        //spielerspielfeld = new Spielfeld(groesse,  false);
+
         gegnerspielfeld = new Spielfeld(groesse,  true, false, gegnerstackpane);
-
         spielerspielfeld = new newSpielfeld(groesse, false, spielerstackpane, draggableContainer);
-        //gegnerspielfeld = new newSpielfeld(groesse, true, gegnerstackpane);
-
-        //spielerstackpane.getChildren().add(newSpielfeld.gridPane);
-        //agegnerstackpane.getChildren().add(gegnerspielfeld.gridPane);
-
         if(groesse <= 7){
             stage.setMinWidth(1110);
             stage.setMinHeight(650);
@@ -140,7 +128,6 @@ public class MainGameController implements Initializable {
             stage.setMaximized(true);
         }
 
-        // StackPane-Margen setzen
         HBox.setMargin(spielerstackpane, new Insets(10, 10, 100, 10)); // Abstand für spielerstackpane
         HBox.setMargin(gegnerstackpane, new Insets(10, 10, 100, 300)); // Abstand für gegnerstackpane
 
@@ -148,9 +135,15 @@ public class MainGameController implements Initializable {
 
     }
 
-    // Fürs Laden von einem gespeicherten Spiel
+
+    /**
+     * Für das Setup eines Spiels aus einer Datei.
+     * @param stage selbe fenster
+     * @param data zusätzliche Daten der schiffplatzierung
+     * @throws FileNotFoundException
+     */
     public void setupSpiel(Stage stage, Scene scene, Map<String, Object> data) throws FileNotFoundException {
-        //spielerspielfeld = new Spielfeld(groesse,  false);
+
         Double groessedouble = (double) data.get("groesse");
         int groesse = groessedouble.intValue();
 
@@ -163,77 +156,55 @@ public class MainGameController implements Initializable {
         gegnerspielfeld = new Spielfeld(groesse,  true, false, gegnerstackpane);
 
         spielerspielfeld = new newSpielfeld(groesse, false, spielerstackpane, data);
-
-        //gegnerspielfeld = new newSpielfeld(groesse, true, gegnerstackpane);
-
-        //spielerstackpane.getChildren().add(newSpielfeld.gridPane);
-        //gegnerstackpane.getChildren().add(gegnerspielfeld.gridPane);
-
-        // StackPane-Margen setzen
-        //HBox.setMargin(spielerstackpane, new Insets(10, 10, 100, 10)); // Abstand für spielerstackpane
-        //HBox.setMargin(gegnerstackpane, new Insets(10, 10, 100, 150)); // Abstand für gegnerstackpane
-
         setupBase(groesse, stage, currentDifficulty, currentMode, scene, data);
 
     }
 
+
+    /**
+     * Hier wird beim normalen Spielstart die daten and die AI gegeben
+     * @throws FileNotFoundException
+     */
     public void setupBase (int groesse,Stage stage, int currentDifficulty, int currentMode, Scene scene) throws FileNotFoundException {
 
 
         this.currentMode = currentMode;
         this.groesse = groesse;
         MainGameController.scene = scene;
-        System.out.println(MainGameController.scene);
-        /*scene.widthProperty().addListener((observable, oldValue, newValue) -> {
-            WIDTH = newValue.intValue();
-        });
-
-        scene.heightProperty().addListener((observable, oldValue, newValue) -> {
-            HEIGHT = newValue.intValue();
-        });
-        */
         currentState = 0;
         this.currentDifficulty = currentDifficulty;
-        System.out.println("Mode selected and set to: " + mode[currentMode]);
-        System.out.println("State selected and set to: " + state[currentState]);
-        System.out.println("Difficulty selected and set to: " + currentDifficulty);
+
         bot = new AI(currentDifficulty, groesse, this);
-
-        //generateSchiffe();
-
         setPausierenEventHandler(stage);
-
         saveFileManager = new SaveFileManager();
     }
-    // Fürs Laden von einem Spielstand
-    public void setupBase (int groesse,Stage stage, int currentDifficulty, int currentMode, Scene scene, Map<String, Object> data) throws FileNotFoundException {
 
+
+    /**
+     * Hier werdem beim Laden aus einer Datei die daten an die AI gegeben
+     * @throws FileNotFoundException
+     */
+    public void setupBase (int groesse,Stage stage, int currentDifficulty, int currentMode, Scene scene, Map<String, Object> data) throws FileNotFoundException {
 
         this.currentMode = currentMode;
         this.groesse = groesse;
         MainGameController.scene = scene;
         System.out.println(MainGameController.scene);
-        /*scene.widthProperty().addListener((observable, oldValue, newValue) -> {
-            WIDTH = newValue.intValue();
-        });
-
-        scene.heightProperty().addListener((observable, oldValue, newValue) -> {
-            HEIGHT = newValue.intValue();
-        });
-        */
         this.currentDifficulty = currentDifficulty;
         System.out.println("Mode selected and set to: " + mode[currentMode]);
         System.out.println("State selected and set to: " + state[currentState]);
         System.out.println("Difficulty selected and set to: " + currentDifficulty);
         bot = new AI(currentDifficulty, groesse, this, data);
 
-        //generateSchiffe();
-
         setPausierenEventHandler(stage);
 
         saveFileManager = new SaveFileManager();
     }
 
+    /**
+     * Das ist ein Listener der auf den ESC Druck reagiert und ein Pause fenster rendert
+     * @param stage akutelle Fenster
+     */
     public void setPausierenEventHandler(Stage stage){
         stage.getScene().setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
@@ -255,8 +226,14 @@ public class MainGameController implements Initializable {
         });
     }
 
+    /**
+     * Für das setzten, erschießen und beobachten der Schiffe je nach state
+     * @param spielfeld auf welchen feld operationen ausgeführt werden sollen
+     * @param posx
+     * @param posy
+     */
     public void handlePrimaryClick(Spielfeld spielfeld, int posx, int posy){
-        System.out.println(currentState);
+
         switch (currentState){
             //Schiffe setzen
             case 0:
@@ -269,7 +246,6 @@ public class MainGameController implements Initializable {
 
             //Schiffe erschießen
             case 1:
-                System.out.println("Klick mit State 1 entdeckt");
                 shootShip(spielfeld, posx, posy);
                 break;
 
@@ -283,69 +259,11 @@ public class MainGameController implements Initializable {
         }
     }
 
-    public void handleSecondaryClick(Spielfeld spielfeld, int posx, int posy){
-        if (currentState == 0){
-            //Schiffe entfernen
-            if(spielfeld.felder[posx][posy].gesetzt){
-                spielfeld.felder[posx][posy].gesetzt = false;
-                System.out.println("Feld wurde abgewählt");
-            }
-        }
-    }
 
-    public void setFeld(GridPane feld){
-        this.feld = feld;
-    }
-
-    public int nachbarFeldGewaehlt(Spielfeld spielfeld, int posx, int posy){
-        int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
-
-        for (int[] dir : directions) {
-            int x = posx + dir[0];
-            int y = posy + dir[1];
-
-            // Überprüfen, ob die Koordinaten innerhalb des Spielfelds liegen
-            if (x >= 0 && x < spielfeld.groesse && y >= 0 && y < spielfeld.groesse) {
-                if (spielfeld.felder[x][y].gesetzt) {
-                    // Färbe das aktuelle und das Nachbarfeld grün
-                    spielfeld.felder[x][y].setFill(Color.GREEN);
-                    spielfeld.felder[posx][posy].setFill(Color.GREEN);
-
-                    break; // Sobald ein gesetztes Nachbarfeld gefunden wurde, abbrechen
-                }
-            }
-        }
-
-
-        // Prüfe die Nachbarschaft und bestimme die Paarlänge
-        int maxLength = 1; // Mindestens das aktuelle Feld
-        for (int[] dir : directions) {
-            int lengthInDir = getPairLength(spielfeld, posx, posy, dir[0], dir[1]) +
-                    getPairLength(spielfeld, posx, posy, -dir[0], -dir[1]);
-            maxLength = Math.max(maxLength, lengthInDir + 1);
-        }
-
-        return maxLength;
-    }
-
-    private int getPairLength(Spielfeld spielfeld, int x, int y, int dx, int dy) {
-
-        int length = 0;
-        int nx = x + dx;
-        int ny = y + dy;
-
-        while (nx >= 0 && nx < spielfeld.groesse && ny >= 0 && ny < spielfeld.groesse && spielfeld.felder[nx][ny].gesetzt) {
-            length++;
-            nx += dx;
-            ny += dy;
-        }
-        return length;
-    }
-
-    public void handleHit(int x, int y){
-        //gegnerspielfeld.selectFeld(x,y,Color.GREEN);
-    }
-
+    /**
+     * Beim Gewinnen eines Spielers wird ein Fenster hier angezeigt.
+     * Dabei wird ein bild mit Minecraft geladen und gerendert.
+     */
     public void handleWinForPlayer(){
         Stage victoryStage = new Stage();
         Image image;
@@ -402,6 +320,9 @@ public class MainGameController implements Initializable {
         victoryStage.toFront();
     }
 
+    /**
+     * Das Fenster beim Gewinnen des Gegners
+     */
     public void handleWinForOpponent(){
         Stage victoryStage = new Stage();
         Image image;
@@ -419,10 +340,6 @@ public class MainGameController implements Initializable {
 
         // Background image
         Rectangle background = new Rectangle(600, 400);
-
-        //Setting the image view 1
-        //mageView imageView1 = new ImageView(image);
-
 
         background.setFill(new ImagePattern(image));
         // Simulated Minecraft "blocks"
@@ -462,8 +379,14 @@ public class MainGameController implements Initializable {
         victoryStage.toFront();
     }
 
+
+    /**
+     *Prüfen ob die zelle schon getroffen wurde und wenn nicht dann soll der bot den zug registrieren.
+     * @param spielfeld
+     * @param posx
+     * @param posy
+     */
     private void shootShip(Spielfeld spielfeld, int posx, int posy){
-        System.out.println("schiffe erschießen");
         if(spielfeld.istGegnerFeld){
             if(spielfeld.felder[posx][posy].wurdeGetroffen == false){
                 currentState = 2;
@@ -471,7 +394,6 @@ public class MainGameController implements Initializable {
                 spielfeld.felder[posx][posy].wurdeGetroffen = true;
                 spielfeld.selectFeld(posx,posy);
                 bot.receiveMove(posx, posy, spielfeld);
-                //animateSnowball(posx, posy);
             }else{
                 //Feld wurde bereits getroffen
                 System.out.println("Feld wurde bereits getroffen. Klick wird ignoriert!");
@@ -479,6 +401,12 @@ public class MainGameController implements Initializable {
         }
     }
 
+    /**
+     * Das spieler spielfeld bekommt hier einen Hit und färbt die zughörige Zelle.
+     * Es prüft ebenfalls ob ein gesamtes schiff getroffen wurde oder nicht.
+     * @param posx
+     * @param posy
+     */
     public void receiveShoot(int posx, int posy){
         System.out.println("receiveShot at: " + posx + ", " + posy);
         spielerspielfeld.selectFeld(posx, posy, Color.DARKRED);
@@ -528,14 +456,20 @@ public class MainGameController implements Initializable {
         currentState = 1;
     }
 
+    /**
+     *Hier werden die Schiffe beobachet
+     * @param spielfeld
+     * @param posx
+     * @param posy
+     */
     private void  watchShip(Spielfeld spielfeld, int posx, int posy){
         System.out.println("schiffe beobachten ");
     }
 
-    //
-    //  SaveFileProcedure
-    //
 
+    /**
+     * hier werden die Daten vorbereitet und dem SaveFileManager zugeschickt
+     */
     public void saveFile(){
         GsonBuilder gsonBuilder = new GsonBuilder();
         Gson gson = gsonBuilder.create();
