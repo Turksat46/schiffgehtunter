@@ -8,6 +8,7 @@ import com.turksat46.schiffgehtunter.Spielfeld;
 import com.turksat46.schiffgehtunter.newSpielfeld;
 import com.turksat46.schiffgehtunter.other.Cell;
 import com.turksat46.schiffgehtunter.other.Feld;
+import com.turksat46.schiffgehtunter.other.Position;
 import javafx.scene.Group;
 
 import java.util.*;
@@ -29,10 +30,16 @@ public class SaveData {
     int[][] feld;
     Feld[][] felder;
 
-    //
+
     Map<String, Object> data = new HashMap<>();
 
     //AI Daten
+    static int[][] kifeld;
+    static private Map<Integer, List<Position>> kiships = new HashMap<>();
+    static List<Position> kientdeckteSchiffe = new ArrayList<>();
+    static Set<Position> kifelder = new HashSet<>(); // Geändert zu HashSet
+    public List<Position> kivalidMoves;
+
 
 
     public SaveData(MainGameController mainGameController, newSpielfeld newSpielfeld, Spielfeld gegnerfeld, AI bot){
@@ -50,6 +57,14 @@ public class SaveData {
 
         this.feld = gegnerfeld.feld;
         //this.felder = gegnerfeld.felder;
+
+        this.kifeld = AI.feld;
+        this.kiships = AI.ships;
+        this.kientdeckteSchiffe = AI.entdeckteSchiffe;
+        this.kifelder = AI.felder;
+
+        this.kivalidMoves = bot.validMoves;
+
 
     }
 
@@ -87,6 +102,14 @@ public class SaveData {
         data.put("ships", shipsDataList); // Save the list of ship data instead of shipCellMap directly
         data.put("feld", feld);
         data.put("felder", felder);
+
+        //Von KI
+        data.put("kifeld", kifeld);
+        data.put("kiships", kiships);
+        data.put("kientdeckteSchiffe", kientdeckteSchiffe);
+        data.put("kifelder", kifelder);
+        data.put("kivalidMoves", kivalidMoves);
+
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         String json = gson.toJson(data);

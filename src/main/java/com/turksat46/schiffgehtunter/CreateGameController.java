@@ -78,6 +78,7 @@ public class CreateGameController {
         saveFileManager = new SaveFileManager();
     }
 
+
     public void onStrategieChanged() {
         if (cb2.getSelectionModel().getSelectedIndex() == 0) {
             kiDifficultyUI.setVisible(true);

@@ -64,7 +64,7 @@ public class MainGameController implements Initializable {
     static boolean rotated;
 
     static newSpielfeld spielerspielfeld;
-    static Spielfeld gegnerspielfeld;
+    public static Spielfeld gegnerspielfeld;
 
     BackgroundGenerator backgroundManager;
 
