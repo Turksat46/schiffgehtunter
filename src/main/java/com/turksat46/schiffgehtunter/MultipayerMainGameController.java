@@ -198,11 +198,11 @@ public class MultipayerMainGameController extends MainGameController implements 
                 try {
                     if(isServer) {
                         Server.sendMessage("shot " + posx + " " + posy);
-                        Server.setLastRowCol(posy, posx);
+                        Server.setLastRowCol(posx, posy);
                     }
                     else {
                         Client.sendMessage("shot " + posx + " " + posy);
-                        Client.setLastRowCol(posy, posx);
+                        Client.setLastRowCol(posx, posy);
                     }
 
                 } catch (IOException e) {
@@ -216,12 +216,8 @@ public class MultipayerMainGameController extends MainGameController implements 
         }
     }
 
-    public void receiveShoot(int posx, int posy){
-
-
-        //spielerspielfeld.selectFeld(posx, posy, Color.DARKRED);
-        //bot.receiveHit(posx, posy, spielerspielfeld.felder[posx][posy].istSchiff);
-        currentState = 1;
+    public static void dyeCell(int posx, int posy){
+        spielerspielfeld.selectFeld(posx, posy, Color.DARKRED);
     }
 
     private void  watchShip(Spielfeld spielfeld, int posx, int posy){

@@ -305,7 +305,7 @@ public class newSpielfeld {
 
             // Überprüfe, ob die Zelle (x, y) in der belegten Zellenmenge enthalten ist
             for (Cell cell : occupiedCells) {
-                if (cell.getRow() == x && cell.getCol() == y) {
+                if (cell.getRow() == y && cell.getCol() == x) {
                     // Füge die Trefferzelle hinzu
                     hitCells.add(cell);
 

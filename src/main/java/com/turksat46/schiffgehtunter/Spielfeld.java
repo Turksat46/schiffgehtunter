@@ -77,8 +77,8 @@ public class Spielfeld {
         // Schleife zur Erstellung der Zellen (als Rectangle mit Text)
         for (int i = 0; i < groesse; i++) {
             for (int j = 0; j < groesse; j++) {
-                int row = i;
-                int col = j;
+                int col = i;
+                int row = j;
                 this.feld[row][col] = 0;
 
                 // Rechteck und Text erstellen und position der zelle

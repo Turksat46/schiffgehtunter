@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
+import static com.turksat46.schiffgehtunter.MultipayerMainGameController.dyeCell;
 import static com.turksat46.schiffgehtunter.MultipayerMainGameController.shootShipMultiplayer;
 
 public class Client implements Runnable{
@@ -53,8 +54,8 @@ public class Client implements Runnable{
     private static Thread clientThread = new Thread(new Client());
 
 
-    private static int lastRow;
-    private static int lastCol;
+    private static int lastx;
+    private static int lasty;
 
     static Stack<Integer> ships = new Stack<>();
 
@@ -221,14 +222,15 @@ public class Client implements Runnable{
             String[] parts = message.split(" ");
             switch (parts[0]) {
                 case "shot":
-                    int row = Integer.parseInt(parts[1]);
-                    int col = Integer.parseInt(parts[2]);
-                    System.out.println("Opponent shot at: (" + row + ", " + col + ")");
+                    int posx = Integer.parseInt(parts[1]);
+                    int posy = Integer.parseInt(parts[2]);
+                    System.out.println("Opponent shot at: (" + posx + ", " + posy + ")");
+                    dyeCell(posx, posy);
 
 
 
 
-                    String answer = handleshot(row, col);
+                    String answer = handleshot(posx, posy);
                     sendMessage("answer " + answer); // 0 wasser/ 1 schiff/ 2 versenkt
                     if (answer=="2") {
                         answerCounterWin = answerCounterWin + 1;
@@ -252,13 +254,13 @@ public class Client implements Runnable{
                     }
                     else if (parts[1].equals("1")) {
                         MultipayerMainGameController.currentState=1;
-                        MultipayerMainGameController.gegnerspielfeld.selectFeld(lastCol,lastRow, Color.GREEN);
+                        MultipayerMainGameController.gegnerspielfeld.selectFeld(lastx,lasty, Color.GREEN);
 
                         break;
                     }
                     else if (parts[1].equals("2")) {
                         MultipayerMainGameController.currentState=1;
-                        MultipayerMainGameController.gegnerspielfeld.selectFeld(lastCol,lastRow, Color.GREEN);
+                        MultipayerMainGameController.gegnerspielfeld.selectFeld(lastx,lasty, Color.GREEN);
                         ships.pop();
                         checkWin();
                         break;
@@ -283,23 +285,23 @@ public class Client implements Runnable{
         return message;
     }
 
-    public String handleshot(int row, int col) throws IOException {
+    public String handleshot(int posx, int posy) throws IOException {
         //shootShipMultiplayer() liefert ob an dieser stelle ein schiff ist es zerstört wurde oder wasser
-        if (shootShipMultiplayer(row,col)==0){
+        if (shootShipMultiplayer(posx,posy)==0){
             return "0";
         }
-        if (shootShipMultiplayer(row,col)==1){
+        if (shootShipMultiplayer(posx,posy)==1){
             return "1";
         }
-        if (shootShipMultiplayer(row,col)==2){
+        if (shootShipMultiplayer(posx,posy)==2){
             return "2";
         }
         return null;
     }
 
-    public static void setLastRowCol(int row, int col) {
-        lastCol = col;
-        lastRow = row;
+    public static void setLastRowCol(int posx, int posy) {
+        lastx = posx;
+        lasty = posy;
     }
 
     private static void checkWin() throws IOException {
