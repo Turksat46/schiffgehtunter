@@ -344,32 +344,41 @@ public class newSpielfeld {
     private void snapToGrid(Group ship) {
         if (ship.getChildren().isEmpty()) return;
 
+        // Hol dir die erste und die letzte Schiffskomponente
         ImageView firstPart = (ImageView) ship.getChildren().get(0);
         ImageView lastPart = (ImageView) ship.getChildren().get(ship.getChildren().size() - 1);
 
+        // Berechne die Grenzen (Bounds) der Schiffsteile relativ zur Szene
         Bounds firstBounds = firstPart.localToScene(firstPart.getBoundsInLocal());
         Bounds lastBounds = lastPart.localToScene(lastPart.getBoundsInLocal());
 
+        // Berechne die Mittelpunkte der ersten und letzten Schiffsteile
         double firstCenterX = firstBounds.getMinX() + firstBounds.getWidth() / 2;
         double firstCenterY = firstBounds.getMinY() + firstBounds.getHeight() / 2;
         double lastCenterX = lastBounds.getMinX() + lastBounds.getWidth() / 2;
         double lastCenterY = lastBounds.getMinY() + lastBounds.getHeight() / 2;
 
+        // Variablen zur Speicherung der nächsten Zelle
         Node closestCell = null;
         double minDistance = Double.MAX_VALUE;
 
+        // Iteriere durch alle Zellen im GridPane
         for (Node node : gridPane.getChildren()) {
             if (node instanceof Rectangle cell) {
                 Bounds cellBounds = cell.localToScene(cell.getBoundsInLocal());
 
+                // Berechnung der Mittelpunkte der Zellen
                 double cellCenterX = cellBounds.getMinX() + cellBounds.getWidth() / 2;
                 double cellCenterY = cellBounds.getMinY() + cellBounds.getHeight() / 2;
 
+                // Berechne die Entfernung zu den Mittelpunkten des Schiffes
                 double distanceToFirst = Math.hypot(firstCenterX - cellCenterX, firstCenterY - cellCenterY);
                 double distanceToLast = Math.hypot(lastCenterX - cellCenterX, lastCenterY - cellCenterY);
 
+                // Finde die kürzeste Entfernung
                 double minChildDistance = Math.min(distanceToFirst, distanceToLast);
 
+                // Falls die aktuelle Zelle die nächstgelegene ist, speichere sie
                 if (minChildDistance < minDistance) {
                     minDistance = minChildDistance;
                     closestCell = cell;
@@ -378,58 +387,46 @@ public class newSpielfeld {
         }
 
         if (closestCell != null) {
+            // Berechne die Grenzen der nächsten Zelle
             Bounds cellBounds = closestCell.localToScene(closestCell.getBoundsInLocal());
 
-            // Dynamisch bestimmen, ob firstBounds oder lastBounds verwendet werden
-            double distanceToFirst = Math.hypot(
-                    firstBounds.getMinX() + firstBounds.getWidth() / 2 - (cellBounds.getMinX() + cellBounds.getWidth() / 2),
-                    firstBounds.getMinY() + firstBounds.getHeight() / 2 - (cellBounds.getMinY() + cellBounds.getHeight() / 2)
-            );
-            double distanceToLast = Math.hypot(
-                    lastBounds.getMinX() + lastBounds.getWidth() / 2 - (cellBounds.getMinX() + cellBounds.getWidth() / 2),
-                    lastBounds.getMinY() + lastBounds.getHeight() / 2 - (cellBounds.getMinY() + cellBounds.getHeight() / 2)
-            );
+            // Dynamisch bestimmen, ob firstBounds oder lastBounds verwendet werden, um Übersetzung zu bestimmen
+            double targetX = cellBounds.getMinX() + cellBounds.getWidth() / 2 - firstBounds.getWidth() / 2;
+            double targetY = cellBounds.getMinY() + cellBounds.getHeight() / 2 - firstBounds.getHeight() / 2;
 
-            Bounds chosenBounds = (distanceToFirst < distanceToLast) ? firstBounds : lastBounds;
+            // Setze die Übersetzungen vom Schiff
+            ship.setTranslateX(ship.getTranslateX() + targetX - firstBounds.getMinX());
+            ship.setTranslateY(ship.getTranslateY() + targetY - firstBounds.getMinY());
 
-            // Berechnung der Zielkoordinaten
-            double targetX = cellBounds.getMinX() + closestCell.getBoundsInLocal().getWidth() / 2 - chosenBounds.getWidth() / 2;
-            double targetY = cellBounds.getMinY() + closestCell.getBoundsInLocal().getHeight() / 2 - chosenBounds.getHeight() / 2;
-
-            // Übersetzung anwenden
-            ship.setTranslateX(ship.getTranslateX() + targetX - chosenBounds.getMinX());
-            ship.setTranslateY(ship.getTranslateY() + targetY - chosenBounds.getMinY());
-
-            // Sicherstellen, dass KEIN Teil außerhalb der Grenzen des Spielfelds liegt
+            // Begrenzungen prüfen (Out-of-Bounds-Korrektur)
             Bounds shipBounds = ship.localToScene(ship.getBoundsInLocal());
             double gridMinX = gridPane.getLayoutX();
             double gridMinY = gridPane.getLayoutY();
             double gridMaxX = gridMinX + gridPane.getWidth();
             double gridMaxY = gridMinY + gridPane.getHeight();
 
-            // Überprüfung für Out-of-Bounds für das gesamte Schiff
             double shipTranslateX = ship.getTranslateX();
             double shipTranslateY = ship.getTranslateY();
 
-            // Falls out of bounds (zu weit links)
+            // Korrektur, falls das Schiff über die Grid-Grenzen hinausgeht
             if (shipBounds.getMinX() < gridMinX) {
                 ship.setTranslateX(shipTranslateX + (gridMinX - shipBounds.getMinX()));
             }
-            // Falls out of bounds (zu weit oben)
             if (shipBounds.getMinY() < gridMinY) {
                 ship.setTranslateY(shipTranslateY + (gridMinY - shipBounds.getMinY()));
             }
-            // Falls out of bounds (zu weit rechts)
             if (shipBounds.getMaxX() > gridMaxX) {
                 ship.setTranslateX(shipTranslateX - (shipBounds.getMaxX() - gridMaxX));
             }
-            // Falls out of bounds (zu weit unten)
             if (shipBounds.getMaxY() > gridMaxY) {
                 ship.setTranslateY(shipTranslateY - (shipBounds.getMaxY() - gridMaxY));
             }
+        } else {
+            System.out.println("Keine passende Zelle für das Schiff gefunden.");
         }
-
     }
+
+
 
     private boolean isCollision(Group ship, Set<Cell> newCells) {
         for (Set<Cell> existingCells : shipCellMap.values()) {
@@ -446,10 +443,10 @@ public class newSpielfeld {
         return shipCellMap;
     }
 
+    private static final double TOLERANCE = 9.0; // Toleranz in Pixeln
+
     private void updateShipCellMap() {
         shipCellMap.clear();
-        Map<Group, Set<Cell>> tempShipCellMap = new HashMap<>();
-
 
         for (Group ship : draggables) {
             Set<Cell> occupiedCells = new HashSet<>();
@@ -461,7 +458,15 @@ public class newSpielfeld {
                     for (Node node : gridPane.getChildren()) {
                         if (node instanceof Rectangle cell) {
                             Bounds cellBounds = cell.localToScene(cell.getBoundsInLocal());
-                            if (partBounds.intersects(cellBounds)) {
+
+                            // Prüfen, ob die Schiffsteil-Bounds innerhalb der Zell-Bounds liegen (mit Toleranz)
+                            boolean intersectsWithTolerance =
+                                    partBounds.getMinX() + TOLERANCE < cellBounds.getMaxX() &&
+                                            partBounds.getMaxX() - TOLERANCE > cellBounds.getMinX() &&
+                                            partBounds.getMinY() + TOLERANCE < cellBounds.getMaxY() &&
+                                            partBounds.getMaxY() - TOLERANCE > cellBounds.getMinY();
+
+                            if (intersectsWithTolerance) {
                                 int col = GridPane.getColumnIndex(cell);
                                 int row = GridPane.getRowIndex(cell);
                                 occupiedCells.add(new Cell(col, row));
@@ -471,22 +476,21 @@ public class newSpielfeld {
                 }
             }
 
-            // Prüfe auf Kollision, bevor das Schiff zur temporären Map hinzugefügt wird
+            // Prüfen auf Kollisionen und Hinzufügen zur tempShipCellMap
             if (!isCollision(ship, occupiedCells)) {
-                tempShipCellMap.put(ship, occupiedCells);
+                shipCellMap.put(ship, occupiedCells);
             } else {
-                System.out.println("Kollision erkannt! Schiff kann nicht platziert werden.");
+                System.out.println("Kollision erkannt! Schiff wird zurückgesetzt.");
                 ship.setTranslateX(0.0);
                 ship.setTranslateY(0.0);
             }
-
-            shipCellMap.put(ship, occupiedCells);
         }
 
         shipCellMap.forEach((group, cells) -> {
-            System.out.println("Ship at cells: " + cells);
+            System.out.println("Schiff auf Zellen: " + cells);
         });
     }
+
 
     public void selectFeld(int x, int y, Color color) {
         for (javafx.scene.Node node : gridPane.getChildren()) {
