@@ -6,6 +6,7 @@ import com.turksat46.schiffgehtunter.netzwerk.Client;
 import com.turksat46.schiffgehtunter.netzwerk.Server;
 import com.turksat46.schiffgehtunter.netzwerk.establishConnection;
 import com.turksat46.schiffgehtunter.other.Cell;
+import com.turksat46.schiffgehtunter.other.Position;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -43,6 +44,7 @@ public class MultipayerMainGameController extends MainGameController implements 
 
     @FXML public HBox label1;
     @FXML private Button startButton;
+    @FXML HBox draggableContainer;
 
     public static int currentState, currentMode, currentDifficulty, groesse;
     static GridPane feld;
@@ -77,7 +79,9 @@ public class MultipayerMainGameController extends MainGameController implements 
         //currentState = 1;
         isButtonClicked = true;
         System.out.println("MultipayerMainGameController state 1");
+        hinweistext.setVisible(false);
         startButton.setVisible(false);
+        spielerspielfeld.changeEditableState(false);
     }
 
     @Override
@@ -91,9 +95,20 @@ public class MultipayerMainGameController extends MainGameController implements 
         //spielerstackpane.getChildren().add(newSpielfeld.gridPane);
         //gegnerstackpane.getChildren().add(gegnerspielfeld.gridPane);
 
+        if(groesse <= 7){
+            stage.setMinWidth(1110);
+            stage.setMinHeight(650);
+        }else if(groesse <= 15){
+            stage.setMinWidth(1510);
+            stage.setMinHeight(800);
+        }else if(groesse > 15){
+            stage.setMaximized(true);
+        }
+
         // StackPane-Margen setzen
-        //HBox.setMargin(spielerstackpane, new Insets(10, 10, 100, 10)); // Abstand für spielerstackpane
-        //HBox.setMargin(gegnerstackpane, new Insets(10, 10, 100, 150)); // Abstand für gegnerstackpane
+        HBox.setMargin(spielerstackpane, new Insets(10, 10, 100, 10)); // Abstand für spielerstackpane
+        HBox.setMargin(gegnerstackpane, new Insets(10, 10, 100, 300)); // Abstand für gegnerstackpane
+
 
         super.setupBase(groesse, stage,currentDifficulty,currentMode,scene);
 
@@ -119,9 +134,19 @@ public class MultipayerMainGameController extends MainGameController implements 
         //spielerstackpane.getChildren().add(newSpielfeld.gridPane);
         //gegnerstackpane.getChildren().add(gegnerspielfeld.gridPane);
 
+        if(groesse <= 7){
+            stage.setMinWidth(1110);
+            stage.setMinHeight(650);
+        }else if(groesse <= 15){
+            stage.setMinWidth(1510);
+            stage.setMinHeight(800);
+        }else if(groesse > 15){
+            stage.setMaximized(true);
+        }
+
         // StackPane-Margen setzen
-        //HBox.setMargin(spielerstackpane, new Insets(10, 10, 100, 10)); // Abstand für spielerstackpane
-        //HBox.setMargin(gegnerstackpane, new Insets(10, 10, 100, 150)); // Abstand für gegnerstackpane
+        HBox.setMargin(spielerstackpane, new Insets(10, 10, 100, 10)); // Abstand für spielerstackpane
+        HBox.setMargin(gegnerstackpane, new Insets(10, 10, 100, 300)); // Abstand für gegnerstackpane
 
         super.setupBase(groesse, stage,currentDifficulty,currentMode,scene);
 
